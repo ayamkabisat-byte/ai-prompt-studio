@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, RefreshCcw, 
   Scissors, Palette, Glasses, Smile, LayoutGrid, CheckCircle2,
@@ -52,85 +52,63 @@ const POSES = [
     { id: 'Front-facing close-up headshot', label: 'Front-Facing Close-up (Pasfoto)', allowedTypes: ['all'] },
     { id: 'match_bg_pose', label: 'Ikuti Pose dari Gambar Latar Upload', allowedTypes: ['all'] },
   ]},
+  { group: 'Inspirasi Upload (Custom Poses)', items: [
+    { id: 'Adjusting suit jacket and tie with both hands, looking serious and confident directly at the camera', label: 'Membenarkan Jas/Dasi dengan Dua Tangan (Serius)', allowedTypes: ['all'] },
+    { id: 'Sitting casually on a wooden bench, holding a basketball in the lap, looking directly at the camera', label: 'Duduk di Bangku Kayu, Memangku Bola Basket', allowedTypes: ['all'] },
+    { id: 'Sitting casually on a tall wooden stool, both hands resting relaxed on the knees, soft smile', label: 'Duduk Santai di Kursi Kayu Tinggi, Tangan di Lutut', allowedTypes: ['all'] },
+    { id: 'Sitting gracefully on the edge of a bed, one hand playfully running through the hair near the neck', label: 'Duduk di Tepi Kasur, Tangan Memainkan Rambut', allowedTypes: ['indoor', 'studio', 'all'] },
+    { id: 'Sitting elegantly on an outdoor wooden chair, legs crossed, hands resting relaxed in the lap', label: 'Duduk Elegan di Kursi Kayu Outdoor, Kaki Bersilang', allowedTypes: ['urban', 'nature', 'all'] },
+    { id: 'Sitting confidently in the middle of modern stairs, leaning slightly forward, hands clasped together resting between the knees', label: 'Duduk Confident di Tengah Tangga, Tangan Bertautan', allowedTypes: ['indoor', 'urban', 'all'] },
+    { id: 'Standing sideways looking off-camera (three-quarter profile), both hands tucked inside coat pockets, candid observation', label: 'Berdiri Menyamping Mengamati, Tangan di Saku Mantel', allowedTypes: ['indoor', 'urban', 'nature', 'all'] },
+    { id: 'Sitting at a cafe table leaning slightly forward, one hand playfully resting on the table as if holding a partner\'s hand', label: 'Duduk di Kafe, Condong ke Depan (POV Pasangan)', allowedTypes: ['urban', 'nature', 'all'] }
+  ]},
   { group: 'Bawah Air (Underwater)', items: [
     { id: 'Floating weightlessly underwater, relaxed limbs, looking up towards the light source', label: 'Mengambang Bebas (Menatap Cahaya Permukaan)', allowedTypes: ['underwater'] },
     { id: 'Swimming gracefully underwater horizontally', label: 'Berenang Horizontal Bawah Air', allowedTypes: ['underwater'] },
     { id: 'Diving downwards into the deep water', label: 'Menyelam ke Bawah (Diving)', allowedTypes: ['underwater'] },
     { id: 'Standing on the pool floor underwater, looking at the camera', label: 'Berdiri di Dasar Kolam Bawah Air', allowedTypes: ['underwater'] }
   ]},
+  { group: 'Hari Raya & Perayaan (Festive)', items: [
+    { id: 'Standing with hands clasped together in front of the chest in a traditional Indonesian greeting/apology gesture (Gestur salam / sungkem / minta maaf)', label: 'Gestur Minta Maaf / Sungkem (Lebaran)', allowedTypes: ['all', 'indoor', 'studio', 'nature'] },
+    { id: 'Standing with one hand cupped over the other fist in a traditional Chinese greeting gesture (Gong Xi Fa Cai / Baoquan li)', label: 'Gestur Salam Gong Xi Fa Cai (Imlek)', allowedTypes: ['all', 'indoor', 'studio', 'urban'] },
+    { id: 'Standing joyfully with hands pressed together in front of the chest in a traditional Balinese greeting (Om Swastiastu)', label: 'Gestur Salam Panganjali (Galungan/Bali)', allowedTypes: ['all', 'nature', 'indoor', 'studio'] },
+    { id: 'Holding a beautifully wrapped gift box and smiling warmly', label: 'Memegang Kotak Kado (Natal / Hadiah)', allowedTypes: ['all', 'indoor', 'studio'] }
+  ]},
   { group: 'Kasual & Dinamis', items: [
     { id: 'Casual half-body medium shot, arms and hands naturally visible in frame', label: 'Casual Half-Body (Original / Tangan Terlihat)', allowedTypes: ['all'] },
-    { id: 'Casual half-body medium shot, highly natural and fluid candid posture, perfectly formed hand anatomy, avoiding stiff or awkward poses', label: 'Casual Half-Body (Tangan Natural & Dinamis)', allowedTypes: ['all'] },
     { id: 'Casual half-body portrait, standing with a relaxed natural curve, hands resting comfortably, candid lifestyle photography', label: 'Casual Half-Body (Santai & Rileks)', allowedTypes: ['all'] },
     { id: 'Standing perfectly straight facing the camera in an open landscape, both arms resting naturally by the sides', label: 'Berdiri Lurus Menatap Kamera, Lengan Natural', allowedTypes: ['nature', 'urban'] },
     { id: 'Side profile shot, looking 45 degrees away', label: 'Side Profile (Menyamping 45°)', allowedTypes: ['all'] },
-    { id: 'Side profile shot, looking far into the distance, explicitly not looking at the camera', label: 'Side Profile, Memandang Jauh (Tidak Menatap Kamera)', allowedTypes: ['nature', 'urban', 'yacht', 'sports'] },
-    { id: 'Candid shot, subject looking away from the camera', label: 'Candid Looking Away', allowedTypes: ['all'] },
     { id: 'Standing straight facing the camera, both hands tucked fully and deeply inside the pockets', label: 'Berdiri Lurus, Kedua Tangan Masuk Penuh ke Saku', allowedTypes: ['all'] },
     { id: 'Standing relaxed in the middle of the street facing the camera, one leg slightly bent, both hands in pockets', label: 'Berdiri Santai di Tengah Jalan, Satu Kaki Ditekuk', allowedTypes: ['urban'] },
-    { id: 'Standing naturally on an escalator, hands in pockets, looking casually to the side', label: 'Berdiri di Eskalator, Tangan di Saku, Menoleh ke Samping', allowedTypes: ['escalator'] },
-    { id: 'Looking slightly up and smiling gently', label: 'Melihat ke Atas Sambil Tersenyum', allowedTypes: ['all'] },
-    { id: 'Standing facing the camera laughing happily, giving a double thumbs up', label: 'Berdiri Tertawa Gembira, Pose Dua Jempol (Double Thumbs Up)', allowedTypes: ['all'] },
-    { id: 'Standing slightly sideways, soft smile, hands resting gently in front of the body', label: 'Berdiri Menyamping Lembut (Tersenyum)', allowedTypes: ['nature', 'urban', 'yacht', 'indoor'] },
-    { id: 'Dynamic candid shot, subject walking forward naturally towards the camera with a confident strut', label: 'Berjalan ke Arah Kamera (Dynamic Strut)', allowedTypes: ['urban', 'nature', 'indoor'] },
-    { id: 'Candid walking, stepping forward confidently, looking straight ahead with natural arm swings', label: 'Candid Berjalan Mantap Menatap Lurus', allowedTypes: ['urban', 'nature', 'indoor'] },
+    { id: 'Dynamic candid shot, subject walking forward naturally towards the camera with a confident strut', label: 'Berjalan ke Arah Kamera (Dynamic Strut)', allowedTypes: ['urban', 'nature', 'indoor'] }
   ]},
   { group: 'Profesional & Ekspresif', items: [
     { id: 'Confident professional pose, arms crossed over chest', label: 'Professional Confident (Tangan Bersilang)', allowedTypes: ['studio', 'urban', 'indoor'] },
     { id: 'Standing straight formally in the middle of the frame, both hands neatly clasped or stacked below the stomach', label: 'Berdiri Formal, Tangan Bertautan di Bawah Perut', allowedTypes: ['studio', 'indoor', 'urban'] },
-    { id: 'Standing perfectly straight and symmetrical, staring intensely straight into the camera, arms flat by the sides', label: 'Berdiri Simetris Tegap (Menatap Lurus)', allowedTypes: ['all'] },
-    { id: 'Standing, both hands holding the front lapels of a trench coat, soft smile looking at camera', label: 'Berdiri Lembut, Kedua Tangan Memegang Bagian Depan Mantel', allowedTypes: ['urban', 'nature'] },
-    { id: 'Low angle shot, subject looking slightly up, establishing a dominant presence', label: 'Low Angle (Mendongak Sedikit)', allowedTypes: ['all'] },
     { id: 'Low-angle shot, standing tall facing the camera, looking down with a sharp, dominant and powerful gaze', label: 'Low Angle Dominan (Menunduk Tajam)', allowedTypes: ['studio', 'urban'] },
     { id: 'Powerful boss pose, looking slightly down at the camera with confidence', label: 'Pose Wibawa/Bos (Melihat ke Bawah)', allowedTypes: ['studio', 'indoor', 'urban'] },
-    { id: 'Hand gently resting on the jawline, highlighting facial bone structure', label: 'Tangan Menunjukkan Jawline', allowedTypes: ['all'] },
-    { id: 'Resting chin on hand, looking pensive and thoughtful', label: 'Menopang Pipi/Dagu (Pensive)', allowedTypes: ['all'] },
-    { id: 'Masculine confident pose, one hand combing or running fingers backward through the hair', label: 'Menyisir Rambut ke Belakang (Confident)', allowedTypes: ['studio', 'urban', 'vehicle_interior'] },
+    { id: 'Masculine confident pose, one hand combing or running fingers backward through the hair', label: 'Menyisir Rambut ke Belakang (Confident)', allowedTypes: ['studio', 'urban', 'vehicle_interior'] }
   ]},
   { group: 'Duduk & Bersandar', items: [
     { id: 'Sitting gracefully on a chair with legs crossed, looking casually at the camera', label: 'Duduk di Kursi, Kaki Menyilang (Graceful)', allowedTypes: ['studio', 'indoor', 'urban'] },
     { id: 'Sitting cross-legged on a wooden bench, both hands resting softly on thighs', label: 'Duduk Sila di Bangku Kayu, Tangan di Paha', allowedTypes: ['nature', 'urban', 'indoor'] },
-    { id: 'Sitting casually on a modern chair, legs slightly spread apart in a relaxed posture', label: 'Duduk Santai di Kursi (Relaxed/Spread)', allowedTypes: ['studio', 'indoor', 'urban'] },
-    { id: 'Sitting relaxed on a folding chair, legs comfortably spread apart in a casual open posture', label: 'Duduk Santai di Kursi Lipat (Open Posture)', allowedTypes: ['urban', 'nature', 'studio'] },
     { id: 'Sitting relaxed and leaning back on a plush sofa, right leg casually crossed over the left', label: 'Duduk Bersandar di Sofa, Kaki Menyilang', allowedTypes: ['indoor', 'studio'] },
-    { id: 'Sitting relaxed in a comfortable seat, looking out a window pensively', label: 'Duduk Rileks, Pandangan ke Jendela (Candid)', allowedTypes: ['indoor', 'vehicle_interior'] },
     { id: 'Sitting relaxed on the edge of an object, body leaning slightly forward, hands resting softly on the thighs or knees, smiling at the camera', label: 'Duduk di Tepi, Condong ke Depan, Tangan di Atas Lutut', allowedTypes: ['urban', 'nature', 'yacht'] },
-    { id: 'Sitting on a street guardrail, playfully holding an electric guitar, cheerful smile', label: 'Duduk di Pembatas Jalan, Pegang Gitar Elektrik', allowedTypes: ['urban'] },
-    { id: 'Sitting on a large rock, both hands holding the brim of a hat, looking away upwards thoughtfully', label: 'Duduk di Batu, Pegang Pinggiran Topi, Memandang ke Atas', allowedTypes: ['nature'] },
-    { id: 'Sitting upright on a rock, legs crossed at ankles, wearing a backpack, one hand on the rock, one hand on thigh, calm expression facing camera', label: 'Duduk Tegak di Batu, Bersilang Kaki, Memakai Ransel', allowedTypes: ['nature'] },
-    { id: 'Sitting casually on a rock or surface, one leg slightly bent, one hand relaxed on knee, the other hand supporting body weight backwards', label: 'Duduk Santai, Satu Tangan Menopang ke Belakang', allowedTypes: ['nature', 'urban', 'yacht'] },
-    { id: 'Sitting casually on a metal street object, both hands clasped together resting relaxed between the knees', label: 'Duduk Santai di Objek Jalanan, Tangan Bertautan di Paha', allowedTypes: ['urban'] },
     { id: 'Sitting and leaning back comfortably on the hood of a car, legs crossed loosely forward, both hands inside pockets', label: 'Duduk Bersandar di Kap Mobil, Kaki Menyilang', allowedTypes: ['urban'] },
-    { id: 'Sitting on the floor leaning back against an iron railing, legs stretched to the side, one hand casually fixing hair behind the ear, soft gaze', label: 'Duduk Bersandar di Pagar Besi, Merapikan Rambut (Candid)', allowedTypes: ['urban', 'indoor'] },
-    { id: 'Sitting sideways hugging knees, looking back over the shoulder with a soft smile', label: 'Duduk Menyamping Memeluk Lutut, Menoleh ke Belakang', allowedTypes: ['nature', 'yacht', 'urban', 'indoor'] },
-    { id: 'Sitting sweetly on a wooden swing, hands resting politely in lap, looking straight with a slight smile', label: 'Duduk Manis di Ayunan Kayu, Kacamata di Kepala', allowedTypes: ['nature', 'urban'] },
-    { id: 'Sitting relaxed on a concrete barrier, looking up into the distance, hands relaxed in lap', label: 'Duduk di Pembatas Beton, Mendongak Menatap Jauh', allowedTypes: ['urban', 'nature'] },
-    { id: 'Casual pose, leaning comfortably against a wall or object', label: 'Bersandar Santai di Dinding/Objek', allowedTypes: ['urban', 'indoor', 'studio'] },
-    { id: 'Cool pose leaning casually against a car or surface, hands clasped loosely together in front of the waist', label: 'Bersandar Santai, Tangan Bertautan di Depan', allowedTypes: ['urban'] },
-    { id: 'Leaning casually on a glass railing with back towards the camera, looking back over the shoulder', label: 'Bersandar di Pagar Kaca, Membelakangi Kamera & Menoleh', allowedTypes: ['urban', 'yacht', 'indoor'] },
-    { id: 'Leaning back comfortably with one hand resting on the head or running through hair, relaxed high-fashion vibe', label: 'Bersandar, Tangan di Kepala (Editorial)', allowedTypes: ['studio', 'urban', 'vehicle_interior', 'indoor'] },
-    { id: 'Leaning on a concrete pillar, arms crossed over chest, legs slightly crossed, looking down with a cool and melancholic expression', label: 'Bersandar di Pilar, Lengan Bersilang, Menunduk Cool', allowedTypes: ['urban', 'indoor'] },
+    { id: 'Sitting sweetly on a wooden swing, hands resting politely in lap, looking straight with a slight smile', label: 'Duduk Manis di Ayunan Kayu', allowedTypes: ['nature', 'urban'] },
+    { id: 'Casual pose, leaning comfortably against a wall or object', label: 'Bersandar Santai di Dinding/Objek', allowedTypes: ['urban', 'indoor', 'studio'] }
   ]},
   { group: 'Aktivitas & Interaksi', items: [
     { id: 'Standing for a mirror selfie, legs casually crossed, both hands holding a smartphone at chest height', label: 'Mirror Selfie, Kaki Bersilang, Pegang HP', allowedTypes: ['indoor', 'vehicle_interior', 'urban'] },
-    { id: 'Sitting on the edge of a boat with legs dangling, extending one arm holding a smartphone for a selfie, the other hand resting thoughtfully on the cheek, facing the sun', label: 'Duduk di Tepi Kapal, Selfie, Tangan Menopang Dagu/Pipi', allowedTypes: ['yacht'] },
-    { id: 'Lying prone on a paddleboard, legs bent upwards showing soles, one hand making a peace sign, the other holding an action camera, sweet smile', label: 'Tengkurap di Papan Selancar, Pegang Action Cam & Peace Sign', allowedTypes: ['nature', 'yacht'] },
-    { id: 'Standing, right hand shading eyes from the sun, left hand making a peace sign while holding a smartphone, playful pouty lips', label: 'Tangan Menghalangi Mata, Tangan Lain Peace Sign & Pegang HP', allowedTypes: ['nature', 'urban', 'sports', 'yacht'] },
+    { id: 'Sitting on the edge of a boat with legs dangling, extending one arm holding a smartphone for a selfie', label: 'Duduk di Tepi Kapal, Selfie dengan HP', allowedTypes: ['yacht'] },
+    { id: 'Standing, right hand shading eyes from the sun, left hand making a peace sign', label: 'Tangan Menghalangi Matahari & Peace Sign', allowedTypes: ['nature', 'urban', 'sports', 'yacht'] },
     { id: 'Side profile shot looking forward, right hand holding a black umbrella, left hand tucked into coat pocket', label: 'Menyamping Pegang Payung, Tangan Kiri di Saku', allowedTypes: ['urban', 'nature'] },
-    { id: 'Slightly turned sideways looking at a billboard, right hand holding a newspaper at waist level, left index finger pointing', label: 'Menyamping Menunjuk Layar, Pegang Koran', allowedTypes: ['urban', 'indoor'] },
     { id: 'Standing straight and sporty, both hands holding a padel racket and a ball in front of the stomach', label: 'Berdiri Tegap, Memegang Raket Padel & Bola', allowedTypes: ['sports'] },
     { id: 'Standing facing the camera, holding a small coffee or tea cup near the chest with both hands, sweet smile', label: 'Berdiri, Pegang Cangkir Hangat di Dada, Senyum Manis', allowedTypes: ['urban', 'indoor', 'nature'] },
-    { id: 'Leaning back comfortably on a short stone wall, legs crossed, holding a coffee cup at chest level', label: 'Bersandar di Tembok, Kaki Menyilang, Pegang Kopi', allowedTypes: ['urban', 'nature'] },
-    { id: 'Standing relaxed (shot from a slightly higher angle), one hand holding a coffee cup, the other hand kept behind the back or in pocket', label: 'Berdiri Santai (High Angle), Pegang Kopi & Tangan di Saku', allowedTypes: ['urban', 'indoor', 'nature'] },
-    { id: 'Standing and leaning slightly forward, looking down, hands busy picking and sorting through items or vinyl records on a display table', label: 'Menunduk Santai, Tangan Memilah Piringan Hitam/Barang', allowedTypes: ['indoor', 'urban'] },
     { id: 'Sitting cross-legged, looking down focused on typing on a smartphone held with both hands', label: 'Duduk Kaki Menyilang, Menunduk Fokus Mengetik HP', allowedTypes: ['urban', 'indoor', 'nature'] },
     { id: 'Walking casually towards the camera, looking slightly to the right, holding the strap of a sling bag', label: 'Berjalan Menuju Kamera, Pegang Tali Tas Selempang', allowedTypes: ['urban', 'nature', 'indoor'] },
-    { id: 'Walking forward, looking to the right side, holding both straps of a backpack', label: 'Berjalan Memegang Tali Ransel, Menoleh ke Samping', allowedTypes: ['nature', 'urban', 'indoor'] },
-    { id: 'Walking towards the camera, looking straight ahead, casually holding a smartphone', label: 'Berjalan Lurus Menatap Kamera Sambil Pegang HP', allowedTypes: ['urban', 'indoor', 'nature'] },
-    { id: 'Walking casually towards the camera, looking slightly down at a smartphone in hand', label: 'Berjalan Santai Menunduk Sambil Pegang HP', allowedTypes: ['urban', 'indoor', 'nature'] },
-    { id: 'Walking and balancing on a narrow wooden beam over water, arms outstretched, one hand touching a railing, cheerful smile', label: 'Berjalan Menyeimbangkan Diri di Jembatan Kayu', allowedTypes: ['nature'] },
-    { id: 'Standing at a ship railing, one hand holding the rail, the other arm raised high in the air, eyes closed, laughing happily in the wind', label: 'Berdiri di Kapal, Satu Tangan Diangkat Tinggi, Tertawa Lepas', allowedTypes: ['yacht'] },
-    { id: 'Sitting casually on a picnic mat, right hand resting on thigh holding a digital pocket camera, sweet smile to the camera', label: 'Duduk di Tikar Piknik, Pegang Kamera Saku Digital', allowedTypes: ['nature'] },
+    { id: 'Walking towards the camera, looking straight ahead, casually holding a smartphone', label: 'Berjalan Lurus Menatap Kamera Sambil Pegang HP', allowedTypes: ['urban', 'indoor', 'nature'] }
   ]},
   { group: 'Edgy & Subkultur', items: [
     { id: 'Edgy punk rock pose, rebellious attitude', label: 'Edgy Punk/Rocker Pose', allowedTypes: ['studio', 'urban', 'indoor'] },
@@ -158,7 +136,7 @@ const LIGHTING_STYLES = [
     { id: 'Bright sunny daylight with hard sharp shadows', label: 'Cahaya Terik Siang Hari (Bayangan Keras)', allowedTypes: ['urban', 'nature', 'yacht', 'sports'] },
     { id: 'Warm golden hour sunlight', label: 'Golden Hour (Cahaya Sore)', allowedTypes: ['all', 'urban', 'nature', 'yacht', 'sports', 'escalator'] },
     { id: 'Warm golden hour backlighting, creating a beautiful glowing rim light effect around the subject\'s hair and shoulders', label: 'Golden Hour Backlighting (Rim Light)', allowedTypes: ['urban', 'nature', 'yacht', 'sports'] },
-    { id: 'Hard natural side lighting, creating strong crisp shadows on half the face', label: 'Hard Natural Side Light (Cahaya Tajam Samping)', allowedTypes: ['urban', 'nature', 'yacht', 'sports', 'indoor'] },
+    { id: 'Hard natural side lighting, creating strong crisp shadows on half the face', label: 'Hard Natural Side Light (Cahaya Tajam Samping)', allowedTypes: ['all', 'urban', 'nature', 'yacht', 'sports', 'indoor'] },
     { id: 'Beautiful pastel sunset sky lighting', label: 'Sunset Pastel (Cahaya Senja Lembut)', allowedTypes: ['all', 'nature', 'yacht', 'urban'] },
   ]},
   { group: 'Studio & Dramatic', items: [
@@ -170,7 +148,7 @@ const LIGHTING_STYLES = [
     { id: 'Professional studio softbox lighting with gentle fill light, creating perfectly soft diffused shadows on the face', label: 'Softbox & Fill Light (Studio Lembut)', allowedTypes: ['all', 'studio', 'indoor'] },
   ]},
   { group: 'Creative & Effects', items: [
-    { id: 'Sharp, dramatic shadow patterns cast across the face and body (Gobo lighting effect / Window blind shadows)', label: 'Pola Bayangan Tajam Jendela (Gobo Lighting)', allowedTypes: ['studio', 'indoor', 'urban'] },
+    { id: 'Sharp, dramatic shadow patterns cast across the face and body (Gobo lighting effect / Window blind shadows)', label: 'Pola Bayangan Tajam Jendela (Gobo Lighting)', allowedTypes: ['all', 'studio', 'indoor', 'urban'] },
     { id: 'Ring light illumination, showing prominent circular catchlights clearly visible in the subject\'s eyes', label: 'Ring Light (Catchlight Mata)', allowedTypes: ['studio', 'indoor'] },
     { id: 'Honeycomb grid lighting, focused dramatic beam highlighting the face with deep shadows', label: 'Honeycomb Grid Lighting', allowedTypes: ['studio', 'indoor'] },
     { id: 'Vibrant dual-tone color gel lighting (split red and blue lighting on the face)', label: 'Dual-tone Red & Blue Gel Lighting', allowedTypes: ['studio', 'indoor', 'urban'] },
@@ -275,7 +253,10 @@ const ACCESSORIES_DATABASE = [
     { id: 'Leather bracelet', label: 'Gelang Kulit' },
     { id: 'Chrome Hearts silver rings on fingers', label: 'Cincin Chrome Hearts' },
     { id: 'Diamond engagement ring', label: 'Cincin Berlian' },
-    { id: 'Gold signet ring', label: 'Cincin Emas (Signet)' }
+    { id: 'Gold signet ring', label: 'Cincin Emas (Signet)' },
+    { id: 'Elegant pearl necklace', label: 'Kalung Mutiara Elegan' },
+    { id: 'Pearl stud earrings', label: 'Anting Mutiara (Perhiasan Mutiara)' },
+    { id: 'Vintage pearl brooch pinned on chest', label: 'Bros Mutiara (Vintage Brooch)' }
   ]},
   { group: 'Dasi, Syal & Kaos Kaki', items: [
     { id: 'Knit tie', label: 'Dasi Rajut (Knit Tie)' },
@@ -312,13 +293,17 @@ const LUXURY_WATCHES = [
   { id: 'Rolex Submariner watch', label: 'Rolex Submariner' },
   { id: 'Rolex Daytona watch', label: 'Rolex Daytona' },
   { id: 'Rolex Datejust watch', label: 'Rolex Datejust' },
+  { id: 'Rolex Lady-Datejust watch', label: 'Rolex Lady-Datejust (Wanita)' },
   { id: 'Audemars Piguet Royal Oak watch', label: 'Audemars Piguet Royal Oak' },
   { id: 'Patek Philippe Nautilus watch', label: 'Patek Philippe Nautilus' },
   { id: 'Patek Philippe Aquanaut watch', label: 'Patek Philippe Aquanaut' },
   { id: 'Cartier Tank watch', label: 'Cartier Tank' },
   { id: 'Cartier Santos watch', label: 'Cartier Santos' },
   { id: 'Cartier Crash watch', label: 'Cartier Crash (Ikonik)' },
+  { id: 'Cartier Panthère watch', label: 'Cartier Panthère (Ikonik Wanita)' },
   { id: 'Richard Mille watch', label: 'Richard Mille' },
+  { id: 'Bvlgari Serpenti watch', label: 'Bvlgari Serpenti (Gelang Ular Wanita)' },
+  { id: 'Chopard Happy Diamonds watch', label: 'Chopard Happy Diamonds (Wanita)' },
   { id: 'Casio G-Shock watch', label: 'G-Shock (Kasual)' },
   { id: 'Smartwatch (Apple Watch style)', label: 'Smartwatch (Apple Watch)' }
 ];
@@ -378,6 +363,14 @@ const BACKGROUNDS = [
     { id: 'custom_bg', type: 'all', label: 'Tulis Lokasi / Latar Belakang Sendiri' },
     { id: 'image_ref_bg', type: 'all', label: '📸 Gunakan Latar dari Gambar Upload (Match BG/Angle)' }
   ]},
+  { group: 'Inspirasi dari Foto Anda', items: [
+    { id: 'Plain minimalist blue wall indoors with a simple wooden bench', type: 'indoor', label: 'Tembok Biru Minimalis & Bangku Kayu' },
+    { id: 'Bright hotel bedroom with a white bed, open balcony door revealing a breathtaking ocean view', type: 'indoor', label: 'Kamar Hotel Terang (Pemandangan Laut dari Balkon)' },
+    { id: 'Sunny outdoor balcony terrace with wooden chairs and glass railings, overlooking a vast blue ocean and distant coastal hills', type: 'urban', label: 'Teras Balkon Outdoor (Pemandangan Laut & Bukit)' },
+    { id: 'Modern dark futuristic staircase illuminated by sleek neon LED strip lighting on the handrails and steps', type: 'indoor', label: 'Tangga Gelap Modern (Cahaya Strip LED/Neon)' },
+    { id: 'Inside an art gallery or museum, framed art prints on the white walls, motion-blurred silhouettes of people walking by', type: 'indoor', label: 'Galeri Seni / Museum (Siluet Orang Berjalan)' },
+    { id: 'Stunning outdoor cafe terrace with iron chairs, overlooking the breathtaking Amalfi Coast (Positano) with colorful cliffside houses and ocean', type: 'urban', label: 'Kafe Outdoor Amalfi Coast (Positano, Italia)' }
+  ]},
   { group: 'Basic & Studio', items: [
     { id: 'Original background from the reference image', type: 'all', label: 'Original Background' },
     { id: 'Clean white studio background', type: 'studio', label: 'Studio Putih Bersih' },
@@ -387,6 +380,13 @@ const BACKGROUNDS = [
     { id: 'Dramatic dark red studio background, moody lighting', type: 'studio', label: 'Latar Studio Merah Gelap Dramatis' },
     { id: 'Solid red background (Official ID photo style)', type: 'studio', label: 'Latar Merah (Pasfoto)' },
     { id: 'Solid blue background (Official ID photo style)', type: 'studio', label: 'Latar Biru (Pasfoto)' },
+  ]},
+  { group: 'Tema Hari Raya & Perayaan (Festive)', items: [
+    { id: 'Cozy living room elegantly decorated for Eid al-Fitr (Lebaran) with warm lighting, subtle ketupat ornaments, and beautiful Islamic geometric patterns', type: 'indoor', label: 'Lebaran / Idul Fitri (Ruang Tamu Hangat)' },
+    { id: 'Warm living room with a glowing beautifully decorated Christmas tree, wrapped presents, and a cozy fireplace', type: 'indoor', label: 'Natal / Christmas (Pohon Natal & Perapian)' },
+    { id: 'Traditional Chinese interior elegantly decorated for Lunar New Year with glowing red lanterns and gold accents', type: 'indoor', label: 'Imlek / Lunar New Year (Lampion Merah)' },
+    { id: 'Balinese traditional pavilion (Bale) beautifully decorated for Galungan with woven palm leaves and majestic Penjor', type: 'nature', label: 'Galungan / Kuningan (Bale Bali & Penjor)' },
+    { id: 'Festive room setup with party decorations, subtle confetti, and sparkling New Year lights', type: 'indoor', label: 'Tahun Baru / New Year Eve (Dekorasi Pesta)' }
   ]},
   { group: 'Luxury & Transport', items: [
     { id: 'Nighttime indoors, luxurious velvet sofa in a warm and cozy living room', type: 'indoor', label: 'Sofa Beludru Mewah di Ruang Tamu (Malam/Hangat)' },
@@ -458,12 +458,12 @@ const BACKGROUNDS = [
   ]},
   { group: 'Nature & Scenic', items: [
     { id: 'Middle of calm open sea on a white paddleboard, distant island during daytime', type: 'yacht', label: 'Di Atas Paddleboard Tengah Laut (Pulau Jauh)' },
-    { id: 'Turquoise glacier mountain lake with pine trees and snowy peaks (Moraine Lake style)', type: 'nature', label: 'Danau Pegunungan Biru Toska (Moraine Lake)' },
+    { id: 'Turquoise glacier mountain lake with pine trees and snowy peaks (Moraine Lake style)', type: 'nature', label: 'Danau Pegunungan Biru Toska' },
     { id: 'Pine forest with a rushing waterfall in the background', type: 'nature', label: 'Hutan Pinus & Air Terjun Mengalir' },
     { id: 'High rocky mountain peak overlooking a vast pine forest valley', type: 'nature', label: 'Puncak Gunung Berbatu (Pemandangan Lembah)' },
     { id: 'Standing in the vast sea of sand at Mount Bromo during sunrise, epic volcanic landscape', type: 'nature', label: 'Lautan Pasir Gunung Bromo (Sunrise)' },
     { id: 'Tropical white sand beach in Okinawa, Japan, with crystal clear blue water and sunny sky', type: 'nature', label: 'Pantai Tropis Okinawa, Jepang' },
-    { id: 'Snowy arctic landscape near the North Pole at night, illuminated by a breathtaking green Aurora Borealis', type: 'nature', label: 'Malam Kutub Utara (Aurora Borealis / Northern Lights)' },
+    { id: 'Snowy arctic landscape near the North Pole at night, illuminated by a breathtaking green Aurora Borealis', type: 'nature', label: 'Malam Kutub Utara (Aurora Borealis)' },
     { id: 'Outside a cozy wooden cabin by the shores of Loch Ness, misty and atmospheric landscape', type: 'nature', label: 'Kabin Tepi Danau (Loch Ness / Berkabut)' },
     { id: 'Walking through the towering green Arashiyama Bamboo Grove in Kyoto, Japan, ethereal natural light', type: 'nature', label: 'Hutan Bambu (Arashiyama, Jepang)' },
     { id: 'Green meadow in a national park with a small wooden bridge over a stream', type: 'nature', label: 'Padang Rumput & Jembatan Kayu (Taman Nasional)' },
@@ -482,7 +482,7 @@ const BACKGROUNDS = [
     { id: 'Lush city park pathway with shady green trees during daytime', type: 'nature', label: 'Jalan Setapak Taman Kota yang Asri' },
     { id: 'Beautiful natural park with blurred trees and soft bokeh', type: 'nature', label: 'Taman Natural (Bokeh Umum)' },
     { id: 'A field of tall golden grass at sunset', type: 'nature', label: 'Ladang Rumput Ilalang (Sunset)' },
-    { id: 'Foggy green grassy hillside with towering mountain cliffs in the background', type: 'nature', label: 'Lereng Bukit Hijau Berkabut & Tebing Pegunungan' },
+    { id: 'Foggy green grassy hillside with towering mountain cliffs in the background', type: 'nature', label: 'Lereng Bukit Hijau Berkabut & Tebing Pegunungan' }
   ]},
   { group: 'Bawah Air (Underwater)', items: [
     { id: 'Underwater looking at a vibrant coral reef with swimming fish', type: 'underwater', label: 'Bawah Air (Terumbu Karang & Ikan)' },
@@ -523,21 +523,24 @@ const COLOR_THEMES = [
 ];
 
 const CLOTHING_DATABASE = [
+  { group: 'Bawaan Asli (Original)', items: [
+    { id: 'Original clothing from reference', label: 'Pakaian Sesuai Referensi Asli', tags: ['male', 'female', 'unisex', 'hijab_approved'] }
+  ]},
   { group: 'Resort & Beach Bohemian', items: [
     { id: 'Loose long-sleeve linen shirt with the sleeves rolled up and partially unbuttoned', label: 'Kemeja Linen Lengan Digulung (Longgar)', tags: ['male', 'female', 'unisex'] },
-    { id: 'Blue long-sleeve off-shoulder Sabrina top paired with a white tiered maxi skirt and woven straw slip-on shoes', label: 'Atasan Off-Shoulder Sabrina Biru + Rok Maxi Putih', tags: ['female'] },
-    { id: 'Long-sleeve linen shirt knotted at the waist with tailored shorts', label: 'Kemeja Linen Diikat & Celana Pendek', tags: ['female'] },
+    { id: 'Floral two-piece outfit featuring a crop top and a matching short skirt', label: 'Setelan Floral Two-Piece (Crop Top & Rok Mini)', tags: ['female'] },
+    { id: 'Floral sundress with a beautiful sweetheart neckline', label: 'Gaun Terusan Motif Bunga (Floral Sundress)', tags: ['female'] },
     { id: 'Flowy modest long-sleeve linen maxi dress', label: 'Maxi Dress Linen Panjang (Modest)', tags: ['female', 'hijab_approved'] },
+    { id: 'Blue long-sleeve off-shoulder Sabrina top paired with a white tiered maxi skirt and woven straw slip-on shoes', label: 'Atasan Off-Shoulder Sabrina Biru + Rok Maxi Putih', tags: ['female'] },
     { id: 'White cotton linen trousers paired with a relaxed button-up shirt and brown leather slide sandals', label: 'Celana Linen Putih & Kemeja Santai + Sandal Kulit', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
-    { id: 'Tailored short pants paired with a breezy summer shirt', label: 'Celana Pendek Tailored & Kemeja Santai', tags: ['male', 'female', 'unisex'] },
-    { id: 'Wide brim hat, denim jacket, shorts, and a casual beach outfit', label: 'Jaket Denim + Celana Pendek + Topi Pantai Lebar', tags: ['female'] }
+    { id: 'Tailored short pants paired with a breezy summer shirt', label: 'Celana Pendek Tailored & Kemeja Santai', tags: ['male', 'female', 'unisex'] }
   ]},
   { group: 'Smart-Casual & Preppy / Schoolgirl', items: [
     { id: 'Polo shirt paired with tailored cream trousers and a knit sweater draped elegantly over the shoulders', label: 'Polo Shirt + Celana Krem + Sweater Disampirkan (Preppy)', tags: ['male', 'female', 'unisex'] },
+    { id: 'Classic blue denim jacket layered over a striped shirt and a dark knit tie, paired with dark tailored trousers', label: 'Jaket Denim + Kemeja & Dasi Rajut + Celana Bahan', tags: ['male', 'unisex'] },
     { id: 'Navy blue short-sleeve polo shirt tucked into a grey pleated mini skirt, paired with black leather loafers and white knee-high socks', label: 'Polo Shirt Navy + Rok Lipit Abu + Kaos Kaki Selutut', tags: ['female'] },
     { id: 'Classic school uniform style featuring a white shirt, black pleated skirt, and a red necktie, worn with loafers', label: 'Seragam Sekolah (Kemeja Putih, Dasi Merah, Rok Hitam)', tags: ['female'] },
     { id: 'Cable-knit crewneck sweater layered over a light blue collared shirt', label: 'Sweater Rajut Cable-Knit di Atas Kemeja (Layering)', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
-    { id: 'Classic blue denim jacket layered over a striped shirt and a dark knit tie, paired with dark tailored trousers', label: 'Jaket Denim + Kemeja & Dasi Rajut + Celana Bahan', tags: ['male', 'unisex'] },
     { id: 'Olive green corduroy suit paired with a black turtleneck', label: 'Setelan Jas Corduroy Hijau Olive + Turtleneck', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
     { id: 'Sleeveless silk blouse paired with a dark pleated midi skirt', label: 'Blus Sutra Tanpa Lengan + Rok Plisket', tags: ['female'] },
     { id: 'Relaxed striped cotton shirt layered under a classic denim jacket with straight-leg trousers', label: 'Kemeja Garis + Jaket Denim + Celana Lurus', tags: ['female', 'hijab_approved'] }
@@ -555,19 +558,22 @@ const CLOTHING_DATABASE = [
     { id: 'Plain white t-shirt layered under a brown barista apron, paired with dark trousers', label: 'Kaos Putih Polos dilapis Celemek (Apron) Barista Cokelat', tags: ['male', 'female', 'unisex', 'hijab_approved'] }
   ]},
   { group: 'Urban Casual & Workwear', items: [
+    { id: 'Classic plain white t-shirt with straight-leg jeans and white canvas sneakers', label: 'Kaos Polos Klasik + Celana Jeans Lurus', tags: ['male', 'female', 'unisex'] },
     { id: 'Thick olive green chore jacket/overshirt left open over a plain t-shirt, paired with jeans', label: 'Chore Jacket Terbuka + Kaos Polos + Jeans', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
+    { id: 'Long dark trench coat/overcoat worn over a plain black t-shirt', label: 'Trench Coat Panjang + Kaos Hitam', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
     { id: 'Thick canvas overshirt left open over a ribbed tank top, paired with straight-leg mom jeans', label: 'Overshirt Kanvas + Tank Top berusuk + Mom Jeans', tags: ['female'] },
-    { id: 'Classic plain t-shirt with straight-leg jeans and white canvas sneakers', label: 'Kaos Polos Klasik + Celana Jeans Lurus', tags: ['male', 'female', 'unisex'] },
     { id: 'Retro bottle green camp collar short-sleeve shirt paired with straight cream trousers', label: 'Kemeja Lengan Pendek Kerah Camp Retro + Celana Krem', tags: ['male', 'unisex'] },
     { id: 'Oversized t-shirt with a pink shirt tied around the waist or arm (festival style)', label: 'Kaos Oversize + Kemeja Pink Diikat (Gaya Festival)', tags: ['female', 'unisex'] },
     { id: 'Light blue denim jacket over a camisole, paired with blue denim shorts', label: 'Jaket Denim Biru Muda + Camisole + Celana Pendek', tags: ['female', 'unisex'] },
-    { id: 'Casual dress', label: 'Gaun Kasual', tags: ['female'] },
+    { id: 'Casual dress', label: 'Gaun Kasual', tags: ['female'] }
   ]},
   { group: 'Business Casual & Formal', items: [
+    { id: 'Sleek dark tailored suit with a matching tie and a vest (three-piece suit)', label: 'Setelan Jas Tiga Potong (Jas, Rompi, Dasi)', tags: ['male'] },
+    { id: 'Navy blue tailored blazer jacket over a crisp white dress shirt', label: 'Blazer Jas Navy + Kemeja Putih Rapi', tags: ['male', 'female', 'hijab_approved'] },
     { id: 'Formal button-up shirt (No Tie)', label: 'Kemeja Formal (Tanpa Dasi)', tags: ['male', 'female', 'hijab_approved'] },
+    { id: 'Sleek all-black tailored suit with a fitted black turtleneck underneath', label: 'All-Black Sleek: Jas Hitam + Turtleneck Hitam', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
     { id: 'Light blue striped dress shirt with a navy striped necktie, khaki chinos, and carrying a navy blazer in hand', label: 'Kemeja Garis + Dasi + Chino + Jas di Tangan', tags: ['male', 'unisex'] },
     { id: 'Light blue striped shirt neatly tucked into a khaki pencil skirt, carrying a structured navy blazer', label: 'Kemeja Garis + Rok Pensil + Blazer di Tangan', tags: ['female'] },
-    { id: 'Sleek all-black tailored suit with a fitted black turtleneck underneath', label: 'All-Black Sleek: Jas Hitam + Turtleneck Hitam', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
     { id: 'Sleek all-black pantsuit with a fine-knit fitted turtleneck', label: 'All-Black Pantsuit + Turtleneck Halus', tags: ['female', 'hijab_approved'] },
     { id: 'Dress shirt with a suit vest (waistcoat) and a tie', label: 'Kemeja + Rompi Jas (Vest) + Dasi', tags: ['male'] },
     { id: 'Turtleneck sweater worn under a tailored blazer jacket', label: 'Turtleneck + Blazer', tags: ['male', 'female', 'hijab_approved'] },
@@ -575,7 +581,7 @@ const CLOTHING_DATABASE = [
     { id: 'Elegant evening gown', label: 'Gaun Malam Elegance', tags: ['female'] },
     { id: 'Modest elegant long evening gown, fully covered with long sleeves', label: 'Gaun Malam Tertutup (Modest)', tags: ['female', 'hijab_approved'] },
     { id: 'Elegant modest style with a long trench coat', label: 'Trench Coat Panjang (Gaya Elegan)', tags: ['female', 'hijab_approved'] },
-    { id: 'Intricately beaded formal black jacket', label: 'Jaket Formal Manik-manik Hitam', tags: ['male', 'unisex'] },
+    { id: 'Intricately beaded formal black jacket', label: 'Jaket Formal Manik-manik Hitam', tags: ['male', 'unisex'] }
   ]},
   { group: 'Streetwear & 90s', items: [
     { id: 'Oversized Varsity jacket layered over a polo shirt, paired with black jeans and a baseball cap', label: 'Jaket Varsity Oversized + Polo + Jeans + Topi', tags: ['male', 'unisex', 'hijab_approved'] },
@@ -585,20 +591,20 @@ const CLOTHING_DATABASE = [
     { id: 'Black sweatshirt paired with casual shorts and bright yellow sneakers', label: 'Sweatshirt Hitam + Celana Pendek + Sepatu Kuning', tags: ['male', 'unisex'] },
     { id: 'White ribbed singlet tank top (wife beater)', label: 'Kaos Singlet Putih (Rapper)', tags: ['male', 'unisex'] },
     { id: 'Oversized baggy hip-hop t-shirt', label: 'Kaos Oversize (Rapper Style)', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
-    { id: 'Oversized American football jersey', label: 'Jersey American Football', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
+    { id: 'Oversized American football jersey', label: 'Jersey American Football', tags: ['male', 'female', 'unisex', 'hijab_approved'] }
   ]},
   { group: 'Olahraga, Gym & Renang', items: [
     { id: 'Shirtless, bare-chested, revealing well-defined torso muscles and abs', label: 'Topless / Tanpa Baju (Mengekspos Otot)', tags: ['male'] },
     { id: 'Tight athletic compression tank top emphasizing the physique', label: 'Tank Top Ketat (Compression / Muscle Shirt)', tags: ['male', 'unisex'] },
     { id: 'Sports bra and athletic compression leggings', label: 'Sports Bra & Legging Olahraga', tags: ['female'] },
-    { id: 'Athletic sports t-shirt and running shorts', label: 'Setelan Lari (Kaos Olahraga & Celana Pendek)', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
+    { id: 'Athletic sports t-shirt and running shorts', label: 'Setelan Lari (Kaos Olahraga & Celana Pendek)', tags: ['male', 'female', 'unisex', 'hijab_approved'] }
   ]},
   { group: 'Pakaian Renang & Penyelam', items: [
     { id: 'One-piece swimsuit', label: 'Baju Renang One-Piece', tags: ['female'] },
     { id: 'Bikini swimsuit', label: 'Baju Renang Bikini', tags: ['female'] },
     { id: 'Swimming trunks / board shorts', label: 'Celana Renang (Board Shorts)', tags: ['male'] },
     { id: 'Full body black neoprene wetsuit', label: 'Wetsuit Penyelam (Scuba Penuh)', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
-    { id: 'Modest swimwear / burkini', label: 'Baju Renang Muslimah (Burkini)', tags: ['female', 'hijab_approved'] },
+    { id: 'Modest swimwear / burkini', label: 'Baju Renang Muslimah (Burkini)', tags: ['female', 'hijab_approved'] }
   ]},
   { group: 'Gorpcore & Outdoor / Hiking', items: [
     { id: 'Dark grey and olive green fleece polar jacket layered over a t-shirt, paired with olive green sweatshorts and brown hiking boots with cream socks', label: 'Jaket Fleece/Polar Hijau Abu + Celana Pendek + Sepatu Gunung', tags: ['male', 'female', 'unisex'] },
@@ -611,7 +617,7 @@ const CLOTHING_DATABASE = [
     { id: 'Long camel overcoat paired with dark trousers, a cream shirt, and a patterned silk ascot at the neck', label: 'Mantel Overcoat Panjang + Celana Bahan + Syal Sutra Ascot', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
     { id: 'Long black wrap overcoat with a tied belt, paired with a dark turtleneck', label: 'Mantel Wrap Hitam Panjang + Turtleneck Gelap', tags: ['female', 'unisex', 'hijab_approved'] },
     { id: 'Dark grey wind-resistant trench coat paired with a black top and a thick striped wool scarf', label: 'Trench Coat Tahan Angin + Baju Hitam + Syal Wol Tebal', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
-    { id: 'Thick knit turtleneck sweater featuring a geometric argyle pattern', label: 'Sweater Rajut Tebal Kerah Turtleneck (Motif Wajik Geometris)', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
+    { id: 'Thick knit turtleneck sweater featuring a geometric argyle pattern', label: 'Sweater Rajut Tebal Kerah Turtleneck (Motif Wajik Geometris)', tags: ['male', 'female', 'unisex', 'hijab_approved'] }
   ]},
   { group: 'Edgy & Modern Minimalist', items: [
     { id: 'Grey half-zip mock neck knit top, fitted black trousers with a subtle flare, and black leather gloves', label: 'Atasan Mock Neck Half-Zip + Celana Flare Hitam + Sarung Tangan Kulit', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
@@ -632,6 +638,13 @@ const CLOTHING_DATABASE = [
     { id: 'Nautical style navy blue blazer with gold buttons over a crisp white shirt', label: 'Blazer Nautical Navy (Gaya Pelaut/Yacht)', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
     { id: 'Bohemian patterned woven poncho layered over casual outdoor wear', label: 'Ponco Tenun Bohemian (Gaya Bromo/Gurun)', tags: ['male', 'female', 'unisex', 'hijab_approved'] }
   ]},
+  { group: 'Hari Raya & Perayaan (Festive)', items: [
+    { id: 'Elegant modest Muslim attire for Eid al-Fitr, beautiful Kaftan for women and stylish Baju Koko for men, pastel and earthy colors', label: 'Lebaran (Kaftan, Gamis, & Koko Elegan)', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
+    { id: 'Cozy matching Christmas sweaters (Festive Sweaters) in red and green hues', label: 'Natal Kasual (Matching Christmas Sweater)', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
+    { id: 'Elegant Christmas evening wear, dark red dresses and sharp tailored suits', label: 'Natal Formal (Gaun Merah & Jas Rapi)', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
+    { id: 'Traditional Chinese New Year attire, elegant red and gold Cheongsam and Tangzhuang jackets', label: 'Imlek (Cheongsam & Jas Tangzhuang)', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
+    { id: 'Traditional Balinese ceremonial attire for Galungan, beautiful Kebaya Bali with sash and Kamen', label: 'Galungan (Pakaian Adat Bali Lengkap)', tags: ['male', 'female', 'unisex', 'hijab_approved'] }
+  ]},
   { group: 'Tradisional & Kultural', items: [
     { id: 'Indonesian Batik shirt', label: 'Kemeja Batik (Indonesia)', tags: ['male', 'female', 'unisex'] },
     { id: 'Long-sleeve Indonesian Batik shirt', label: 'Batik Lengan Panjang', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
@@ -649,7 +662,7 @@ const CLOTHING_DATABASE = [
     { id: 'Japanese Yukata', label: 'Yukata', tags: ['male', 'female', 'unisex'] },
     { id: 'Korean traditional Hanbok', label: 'Hanbok Korea', tags: ['male', 'female', 'hijab_approved'] },
     { id: 'Vietnamese Ao Dai dress', label: 'Ao Dai Vietnam', tags: ['female'] },
-    { id: 'Traditional Thai Chut Thai dress', label: 'Chut Thai', tags: ['female'] },
+    { id: 'Traditional Thai Chut Thai dress', label: 'Chut Thai', tags: ['female'] }
   ]},
   { group: 'Seragam Spesifik & Maskapai', items: [
     { id: 'Indonesian TNI military uniform', label: 'Seragam Militer TNI', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
@@ -668,7 +681,7 @@ const CLOTHING_DATABASE = [
     { id: 'Super Air Jet flight attendant uniform (Khaki safari style, casual)', label: 'Pramugari Super Air Jet (Khaki)', tags: ['female', 'male', 'unisex'] },
     { id: 'Super Air Jet modest flight attendant uniform (Long-sleeve khaki safari style)', label: 'Pramugari Super Air Jet (Modest)', tags: ['female', 'hijab_approved'] },
     { id: 'Batik Air flight attendant uniform (White cheongsam-style top and batik skirt)', label: 'Pramugari Batik Air', tags: ['female'] },
-    { id: 'Batik Air modest flight attendant uniform (Long-sleeve white top and batik skirt)', label: 'Pramugari Batik Air (Modest)', tags: ['female', 'hijab_approved'] },
+    { id: 'Batik Air modest flight attendant uniform (Long-sleeve white top and batik skirt)', label: 'Pramugari Batik Air (Modest)', tags: ['female', 'hijab_approved'] }
   ]}
 ];
 
@@ -684,7 +697,6 @@ const getBgType = (bgId) => {
 const filterOptionsByBg = (optionsArray, bgType) => {
   return optionsArray.map(group => {
     if (!group.items) return group;
-
     const filteredItems = group.items.filter(item => 
       !item.allowedTypes || item.allowedTypes.includes('all') || item.allowedTypes.includes(bgType)
     );
@@ -704,7 +716,7 @@ export default function App() {
   const [isCopied, setIsCopied] = useState(false);
   const [showSmartAlert, setShowSmartAlert] = useState(false);
 
-  const [gender, setGender] = useState('Wanita');
+  const [gender, setGender] = useState('Pria');
   const [bodyType, setBodyType] = useState(BODY_TYPES[0].id);
   const [viewMode, setViewMode] = useState('1-photo');
   
@@ -738,13 +750,14 @@ export default function App() {
   const [manualColor3, setManualColor3] = useState('#10b981');
   const [clothing, setClothing] = useState('Original clothing from reference');
   
-  // Perubahan Latar Belakang menjadi sistem Kategori
-  const [bgCategory, setBgCategory] = useState(BACKGROUNDS[0].group);
-  const [background, setBackground] = useState(BACKGROUNDS[0].items[0].id);
+  const [bgCategory, setBgCategory] = useState(BACKGROUNDS[1].group);
+  const [background, setBackground] = useState(BACKGROUNDS[1].items[0].id);
   const [customBackground, setCustomBackground] = useState('');
   
-  // PENAMBAHAN: Kategori Aksesori
   const [accCategory, setAccCategory] = useState(ACCESSORIES_DATABASE[0].group);
+  
+  // STATE BARU UNTUK KATEGORI BAJU
+  const [clothCategory, setClothCategory] = useState(CLOTHING_DATABASE[0].group);
 
   const triggerSmartAlert = () => {
     setShowSmartAlert(true);
@@ -782,6 +795,7 @@ export default function App() {
 
     if (!isValidClothing && clothing !== 'Original clothing from reference') {
        setClothing('Original clothing from reference');
+       setClothCategory(CLOTHING_DATABASE[0].group);
        triggerSmartAlert();
     }
   };
@@ -802,6 +816,7 @@ export default function App() {
 
     if (!isValidClothing && clothing !== 'Original clothing from reference') {
        setClothing('Original clothing from reference');
+       setClothCategory(CLOTHING_DATABASE[0].group);
        triggerSmartAlert();
     }
   };
@@ -846,7 +861,6 @@ export default function App() {
   const randomizeThemeColors = (themeId) => {
     let c1, c2, c3;
     const randHue = () => Math.floor(Math.random() * 360);
-    
     const hslToHexLocal = (h, s, l) => {
       l /= 100;
       const a = s * Math.min(l, 1 - l) / 100;
@@ -857,30 +871,21 @@ export default function App() {
       };
       return `#${f(0)}${f(8)}${f(4)}`;
     };
-
     switch(themeId) {
         case 'Monochrome color scheme':
             const h = randHue();
-            c1 = hslToHexLocal(h, 80, 20); 
-            c2 = hslToHexLocal(h, 80, 50); 
-            c3 = hslToHexLocal(h, 80, 80); 
+            c1 = hslToHexLocal(h, 80, 20); c2 = hslToHexLocal(h, 80, 50); c3 = hslToHexLocal(h, 80, 80); 
             break;
         case 'Complementary color scheme':
             const hC = randHue();
-            c1 = hslToHexLocal(hC, 80, 50);
-            c2 = hslToHexLocal((hC + 180) % 360, 80, 50);
-            c3 = hslToHexLocal(hC, 10, 95); 
+            c1 = hslToHexLocal(hC, 80, 50); c2 = hslToHexLocal((hC + 180) % 360, 80, 50); c3 = hslToHexLocal(hC, 10, 95); 
             break;
         case 'Analogous color scheme':
             const hA = randHue();
-            c1 = hslToHexLocal(hA, 80, 50);
-            c2 = hslToHexLocal((hA + 30) % 360, 80, 50);
-            c3 = hslToHexLocal((hA + 330) % 360, 80, 50);
+            c1 = hslToHexLocal(hA, 80, 50); c2 = hslToHexLocal((hA + 30) % 360, 80, 50); c3 = hslToHexLocal((hA + 330) % 360, 80, 50);
             break;
         case 'Pastel color palette':
-            c1 = hslToHexLocal(randHue(), 70, 85);
-            c2 = hslToHexLocal(randHue(), 70, 85);
-            c3 = hslToHexLocal(randHue(), 70, 85);
+            c1 = hslToHexLocal(randHue(), 70, 85); c2 = hslToHexLocal(randHue(), 70, 85); c3 = hslToHexLocal(randHue(), 70, 85);
             break;
         case 'Vibrant Neon color palette':
             const neons = [300, 180, 280, 60, 120, 15]; 
@@ -898,22 +903,17 @@ export default function App() {
             break;
         case 'Manual':
         default:
-            c1 = hslToHexLocal(randHue(), 70, 50);
-            c2 = hslToHexLocal(randHue(), 70, 50);
-            c3 = hslToHexLocal(randHue(), 70, 50);
+            c1 = hslToHexLocal(randHue(), 70, 50); c2 = hslToHexLocal(randHue(), 70, 50); c3 = hslToHexLocal(randHue(), 70, 50);
             break;
     }
-    setManualColor1(c1);
-    setManualColor2(c2);
-    setManualColor3(c3);
+    setManualColor1(c1); setManualColor2(c2); setManualColor3(c3);
   };
 
   const getDynamicAccessories = () => {
     let groups = JSON.parse(JSON.stringify(ACCESSORIES_DATABASE));
-    if (gender === 'Wanita' || gender === 'Campur (Pria & Wanita)') {
+    if (gender === 'Wanita') {
       const headwearGroup = groups.find(g => g.group === 'Topi & Kepala');
       const jewelryGroup = groups.find(g => g.group === 'Perhiasan & Tindik');
-      
       if (useHijab && headwearGroup) {
         headwearGroup.items.push({ id: 'Decorative hijab brooch', label: 'Bros Hijab (Brooch)' });
       } else if (!useHijab && jewelryGroup) {
@@ -935,6 +935,14 @@ export default function App() {
       })
     };
   }).filter(group => group.items.length > 0);
+  
+  // Mengamankan state kategori baju jika berpindah gender
+  React.useEffect(() => {
+    const isValidCategory = dynamicClothingGroups.some(g => g.group === clothCategory);
+    if (!isValidCategory && dynamicClothingGroups.length > 0) {
+      setClothCategory(dynamicClothingGroups[0].group);
+    }
+  }, [gender, useHijab, dynamicClothingGroups, clothCategory]);
 
   const currentBgType = getBgType(background);
   const dynamicPoses = filterOptionsByBg(POSES, currentBgType);
@@ -967,7 +975,9 @@ export default function App() {
     
     promptText += `STRICT FACIAL CONSISTENCY MODE: Prioritize the exact facial features, identity, and core facial structure from the provided **Face Reference Image** for all generations. Maintain the primary subject's identity accurately while adapting the pose, lighting, and background. Do not alter the core facial structure. `;
     
-    promptText += `\nSubject: ${gender === 'Pria' ? 'Male' : gender === 'Wanita' ? 'Female' : 'Androgynous/Unisex'}. `;
+    promptText += `\nSubject: Single Subject (${gender === 'Pria' ? 'Male' : gender === 'Wanita' ? 'Female' : 'Androgynous/Unisex'}). `;
+    promptText += `\n[ENTITY COUNT VALIDATION]: CRITICAL: There MUST be EXACTLY ONE person in the final image. NO extra background characters, NO clones. The number of generated people MUST strictly match the Face Reference Photo provided. Do NOT hallucinate extra people. `;
+    
     if (bodyType !== BODY_TYPES[0].id) promptText += `Body Type: ${bodyType}. `;
 
     if (accessoriesString !== 'None') promptText += `Accessories: ${accessoriesString}. `;
@@ -997,100 +1007,97 @@ export default function App() {
       }
       
       if (colorTheme !== 'Original colors') {
-      if (colorTheme === 'Manual') {
-        outfitDesc += `The outfit and overall styling must strictly follow a color palette of hex colors ${manualColor1}, ${manualColor2}, and ${manualColor3}. `;
-      } else {
-        outfitDesc += `The outfit and overall styling must feature a ${colorTheme} (incorporating hex colors ${manualColor1}, ${manualColor2}, and ${manualColor3}). `;
-      }
-    }
-    promptText += outfitDesc;
-  }
-
-  if (background === 'image_ref_bg') {
-    promptText += `Background, Lighting & Camera Angle: EXACTLY match the environment, lighting conditions, and camera perspective shown in the provided **Background Reference Image**. `;
-    promptText += `\n[CRITICAL IDENTITY OVERRIDE]: Do NOT copy the face from the Background Reference Image. The generated face MUST flawlessly match **Image 1: Face Reference**. Image 3 is ONLY for the environment. `;
-  } else if (finalBackground !== 'Original background from the reference image') {
-    promptText += `Background Setting: ${finalBackground}. `;
-  }
-
-  if (viewMode === '1-photo') {
-    let currentStyle = '';
-    if (useHijab) {
-      currentStyle = `Wearing ${hijabs[0]}`;
-    } else {
-      if (hairstyles[0].includes('Original hairstyle')) {
-        currentStyle = `Hairstyle: ${hairstyles[0]}`;
-      } else {
-        currentStyle = `Hairstyle: ${hairstyles[0]}, Hair Color: ${colors}`;
-      }
-    }
-    promptText += `\nStyle: ${currentStyle}. `;
-    promptText += `\nPhotography Style & Vibe: ${shootStyle}. `;
-    
-    if (composition !== COMPOSITIONS[0].id) promptText += `Composition Rule: ${composition}. `; 
-    
-    if (background !== 'image_ref_bg') {
-      if (cameraLens !== CAMERA_LENSES[0].id) promptText += `Camera Lens / Perspective: Use a ${cameraLens}. `;
-      
-      if (pose !== 'Pose matching the original reference') {
-          promptText += `Camera Angle & Pose: ${pose}. `;
-      }
-      
-      if (lighting !== 'Standard natural daylight') {
-        promptText += `Lighting & Art Direction: ${lighting}. `;
-        
-        if (lighting.includes('Chiaroscuro')) {
-            promptText += `(CRITICAL: Strong chiaroscuro effect, face bright, background dark). `;
-          }
-          if (lighting.includes('gobo lighting')) {
-            promptText += `(CRITICAL: Ensure clear, aesthetic shadow stripes across the subject). `;
-          }
-          if (lighting.includes('Golden Hour Backlighting')) {
-            promptText += `(CRITICAL: Ensure strong, warm rim light highlighting the subject's hair and shoulders). `;
-          }
-          if (lighting.includes('Colored backlighting') || lighting.includes('Dual-tone')) {
-            promptText += `(CRITICAL: The background MUST be completely dark or pitch black to make the colored gel/backlighting pop and create a striking contrast). `;
-          }
-          if (lighting.includes('Softbox') || lighting.includes('Ring light') || lighting.includes('Honeycomb') || lighting.includes('fill light')) {
-          promptText += `(CRITICAL: Do NOT render or show any physical lighting equipment like softboxes, ring lights, or grids in the frame. Only show the light effect reflecting on the subject). `;
+        if (colorTheme === 'Manual') {
+          outfitDesc += `The outfit and overall styling must strictly follow a color palette of hex colors ${manualColor1}, ${manualColor2}, and ${manualColor3}. `;
+        } else {
+          outfitDesc += `The outfit and overall styling must feature a ${colorTheme} (incorporating hex colors ${manualColor1}, ${manualColor2}, and ${manualColor3}). `;
         }
       }
-    } else {
-      if (pose === 'match_bg_pose') {
-          promptText += `Camera Angle & Pose: MATCH the pose of the subject in the Background Reference Image. `;
-      } else if (pose !== 'Pose matching the original reference') {
-          promptText += `Camera Angle & Pose: ${pose} (Adapt this pose into the provided background reference). `;
-      }
+      promptText += outfitDesc;
     }
-    promptText += `\nLayout Instruction: SINGLE image only.`;
-  } else if (viewMode === '4-angles') {
-    let currentStyle = '';
-    if (useHijab) {
-      currentStyle = `Wearing ${hijabs[0]}`;
-    } else {
-      if (hairstyles[0].includes('Original hairstyle')) {
-        currentStyle = `Hairstyle: ${hairstyles[0]}`;
+
+    if (background === 'image_ref_bg') {
+      promptText += `Background, Lighting & Camera Angle: EXACTLY match the environment, lighting conditions, and camera perspective shown in the provided **Background Reference Image**. `;
+      promptText += `\n[CRITICAL IDENTITY OVERRIDE]: Do NOT copy the face from the Background Reference Image. The generated face MUST flawlessly match **Image 1: Face Reference**. Image 3 is ONLY for the environment. `;
+    } else if (finalBackground !== 'Original background from the reference image') {
+      promptText += `Background Setting: ${finalBackground}. `;
+    }
+
+    if (viewMode === '1-photo') {
+      let currentStyle = '';
+      if (useHijab) {
+        currentStyle = `Wearing ${hijabs[0]}`;
       } else {
-        currentStyle = `Hairstyle: ${hairstyles[0]}, Hair Color: ${colors}`;
+        if (hairstyles[0].includes('Original hairstyle')) {
+          currentStyle = `Hairstyle: ${hairstyles[0]}`;
+        } else {
+          currentStyle = `Hairstyle: ${hairstyles[0]}, Hair Color: ${colors}`;
+        }
+      }
+      promptText += `\nStyle: ${currentStyle}. `;
+      promptText += `\nPhotography Style & Vibe: ${shootStyle}. `;
+      
+      if (composition !== COMPOSITIONS[0].id) promptText += `Composition Rule: ${composition}. `; 
+      
+      if (background !== 'image_ref_bg') {
+        if (cameraLens !== CAMERA_LENSES[0].id) promptText += `Camera Lens / Perspective: Use a ${cameraLens}. `;
+        
+        if (pose !== 'Pose matching the original reference') {
+            promptText += `Camera Angle & Pose: ${pose}. `;
+        }
+        
+        if (lighting !== 'Standard natural daylight') {
+          promptText += `Lighting: ${lighting}. `;
+          
+          if (lighting.includes('Chiaroscuro')) {
+              promptText += `(CRITICAL: Strong chiaroscuro effect, face bright, background dark). `;
+          }
+          if (lighting.includes('gobo lighting') || lighting.includes('Gobo')) {
+              promptText += `(CRITICAL: Ensure clear, aesthetic shadow stripes across the subject). `;
+          }
+          if (lighting.includes('Golden Hour Backlighting')) {
+              promptText += `(CRITICAL: Ensure strong, warm rim light highlighting the subject's hair and shoulders). `;
+          }
+          if (lighting.toLowerCase().includes('softbox') || lighting.toLowerCase().includes('lighting') || lighting.toLowerCase().includes('ring light')) {
+            promptText += `\n(CRITICAL INSTRUCTION: Do NOT render or show any physical lighting equipment, softboxes, umbrellas, or light stands in the frame. Only render the lighting EFFECT on the subjects and environment).`;
+          }
+        }
+      } else {
+        if (pose === 'match_bg_pose') {
+            promptText += `Camera Angle & Pose: MATCH the pose of the subject in the Background Reference Image. `;
+        } else if (pose !== 'Pose matching the original reference') {
+            promptText += `Camera Angle & Pose: ${pose} (Adapt this pose into the provided background reference). `;
+        }
+      }
+      promptText += `\nLayout Instruction: SINGLE image only.`;
+    } else if (viewMode === '4-angles') {
+      let currentStyle = '';
+      if (useHijab) {
+        currentStyle = `Wearing ${hijabs[0]}`;
+      } else {
+        if (hairstyles[0].includes('Original hairstyle')) {
+          currentStyle = `Hairstyle: ${hairstyles[0]}`;
+        } else {
+          currentStyle = `Hairstyle: ${hairstyles[0]}, Hair Color: ${colors}`;
+        }
+      }
+      promptText += `\nStyle: ${currentStyle}. `;
+      promptText += `\nLayout Instruction: The 2x2 grid must show the EXACT SAME person and style from 4 different angles: Top-Left (Front view), Top-Right (Left Profile), Bottom-Left (Right Profile), Bottom-Right (Back of head).`;
+    } else {
+      promptText += `\nLayout Instruction: The 2x2 grid must show 4 slightly different stylistic variations on the exact same person. Front-facing portrait for ALL panels.`;
+      if (useHijab) {
+        promptText += `\n- Top-Left: ${hijabs[0]}.`;
+        promptText += `\n- Top-Right: ${hijabs[1]}.`;
+        promptText += `\n- Bottom-Left: ${hijabs[2]}.`;
+        promptText += `\n- Bottom-Right: ${hijabs[3]}.`;
+      } else {
+        promptText += `\n- Top-Left: ${hairstyles[0]}.`;
+        promptText += `\n- Top-Right: ${hairstyles[1]}.`;
+        promptText += `\n- Bottom-Left: ${hairstyles[2]}.`;
+        promptText += `\n- Bottom-Right: ${hairstyles[3]}.`;
+        promptText += `\nHair Color for all panels: ${colors} (Unless original hairstyle is selected).`;
       }
     }
-    promptText += `\nStyle: ${currentStyle}. `;
-    promptText += `\nLayout Instruction: The 2x2 grid must show the EXACT SAME person and style from 4 different angles: Top-Left (Front view), Top-Right (Left Profile), Bottom-Left (Right Profile), Bottom-Right (Back of head).`;
-  } else {
-    promptText += `\nLayout Instruction: The 2x2 grid must show 4 slightly different stylistic variations on the exact same person. Front-facing portrait for ALL panels.`;
-    if (useHijab) {
-      promptText += `\n- Top-Left: ${hijabs[0]}.`;
-      promptText += `\n- Top-Right: ${hijabs[1]}.`;
-      promptText += `\n- Bottom-Left: ${hijabs[2]}.`;
-      promptText += `\n- Bottom-Right: ${hijabs[3]}.`;
-    } else {
-      promptText += `\n- Top-Left: ${hairstyles[0]}.`;
-      promptText += `\n- Top-Right: ${hairstyles[1]}.`;
-      promptText += `\n- Bottom-Left: ${hairstyles[2]}.`;
-      promptText += `\n- Bottom-Right: ${hairstyles[3]}.`;
-      promptText += `\nHair Color for all panels: ${colors} (Unless original hairstyle is selected).`;
-    }
-  }
 
     const requiredInputs = ["Image 1: Face Reference (For Identity)"];
     if (useClothingReference) requiredInputs.push("Image 2: Style Reference (For Clothing/Outfit)");
@@ -1102,6 +1109,7 @@ export default function App() {
       required_inputs: requiredInputs,
       parameters: {
         subject_gender: gender === 'Pria' ? 'Male' : gender === 'Wanita' ? 'Female' : 'Unisex',
+        entity_count_constraint: "CRITICAL: EXACTLY ONE person in the final image. NO extra background characters.",
         body_type: bodyType,
         layout_mode: viewMode === '1-photo' ? 'Single Portrait' : viewMode === '4-angles' ? 'Grid 2x2 (4 Angles)' : 'Grid 2x2 (4 Styles)',
         hair_or_hijab: useHijab ? 'Hijab' : 'Hair',
@@ -1134,6 +1142,7 @@ ${requiredInputs.map(req => `- ${req}`).join('\n')}
 
 [SUBJECT DETAILS]
 - Gender: ${jsonObj.parameters.subject_gender}
+- Entity Constraint: ${jsonObj.parameters.entity_count_constraint}
 - Body Type: ${jsonObj.parameters.body_type}
 - Expression: ${jsonObj.parameters.expression}
 ${gender !== 'Wanita' ? `- Facial Hair: ${jsonObj.parameters.facial_hair}` : ''}
@@ -1345,9 +1354,9 @@ ${promptText}
             </div>
 
             <div className="space-y-4 pt-4 border-t border-neutral-700">
-              <div className="flex items-center gap-2 text-indigo-400 font-medium">
-                <Glasses className="w-5 h-5" /> Aksesori & Properti
-              </div>
+              <label className="text-sm font-medium text-neutral-400 flex items-center gap-2">
+                <Glasses className="w-4 h-4" /> Aksesori & Properti
+              </label>
 
               <div className="space-y-3 pb-2">
                 <label className="text-sm font-medium text-indigo-300">Kategori Aksesori</label>
@@ -1407,7 +1416,7 @@ ${promptText}
                   ))}
                 </div>
                 
-                <label className="text-sm font-medium text-indigo-300 block mt-3">Pilih Latar Belakang</label>
+                <label className="text-sm font-medium text-indigo-300 block mt-3">Pilih Latar Belakang ({bgCategory})</label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-64 overflow-y-auto custom-scrollbar pr-2">
                   {BACKGROUNDS.find(g => g.group === bgCategory)?.items.map(item => (
                     <button
@@ -1464,53 +1473,75 @@ ${promptText}
                 </label>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
                 {!useClothingReference && (
-                  <div className="space-y-2 animate-in fade-in zoom-in duration-300">
-                    <label className="text-sm font-medium text-neutral-400">Pilih Pakaian / Seragam</label>
-                    <select value={clothing} onChange={(e) => setClothing(e.target.value)} className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                      {dynamicClothingGroups.map(group => (
-                        <optgroup key={group.group} label={`--- ${group.group} ---`}>
-                          {group.items.map(item => <option key={item.id} value={item.id}>{item.label}</option>)}
-                        </optgroup>
+                  <div className="space-y-3 animate-in fade-in zoom-in duration-300">
+                    <label className="text-sm font-medium text-neutral-400">Kategori Pakaian / Seragam</label>
+                    <div className="flex flex-wrap gap-2">
+                      {dynamicClothingGroups.map(cGroup => (
+                        <button
+                          key={cGroup.group}
+                          onClick={() => setClothCategory(cGroup.group)}
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                            clothCategory === cGroup.group ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-neutral-800 border-neutral-700 text-neutral-400 hover:bg-neutral-700 hover:text-neutral-200'
+                          }`}
+                        >
+                          {cGroup.group}
+                        </button>
                       ))}
-                    </select>
-                    {useHijab && <p className="text-[10px] text-indigo-400/80 mt-1">✨ Hijab aktif: Hanya menampilkan Modest fashion.</p>}
+                    </div>
+                    
+                    <label className="text-sm font-medium text-neutral-400 block mt-3">Pilih Pakaian ({clothCategory})</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-64 overflow-y-auto custom-scrollbar pr-2">
+                      {dynamicClothingGroups.find(g => g.group === clothCategory)?.items.map(item => (
+                        <button
+                          key={item.id}
+                          onClick={() => setClothing(item.id)}
+                          className={`text-left px-3 py-2.5 rounded-lg text-xs leading-tight transition-colors border ${
+                            clothing === item.id ? 'bg-indigo-500/20 border-indigo-500 text-indigo-200 shadow-inner' : 'bg-neutral-800 border-neutral-700 text-neutral-400 hover:border-indigo-500/50 hover:text-neutral-200'
+                          }`}
+                        >
+                          {item.label}
+                        </button>
+                      ))}
+                    </div>
+                    {useHijab && <p className="text-[10px] text-indigo-400/80 mt-1">✨ Hijab aktif: Modest fashion.</p>}
                   </div>
                 )}
                 
-                <div className={`space-y-2 ${useClothingReference ? 'md:col-span-2' : ''}`}>
-                  <label className="text-sm font-medium text-neutral-400">Bahan Kain (Fabric/Material)</label>
-                  <select value={clothingMaterial} onChange={(e) => setClothingMaterial(e.target.value)} className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                    {CLOTHING_MATERIALS.map(mat => <option key={mat.id} value={mat.id}>{mat.label}</option>)}
-                  </select>
-                </div>
-                
-                <div className={`space-y-2 md:col-span-2 ${useClothingReference ? 'opacity-50 pointer-events-none' : ''}`}>
-                  <label className="text-sm font-medium text-neutral-400">Tema Warna Pakaian / Estetika</label>
-                  <select value={colorTheme} onChange={handleThemeChange} disabled={useClothingReference} className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                    {COLOR_THEMES.map(theme => <option key={theme.id} value={theme.id}>{theme.label}</option>)}
-                  </select>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className={`space-y-2 ${useClothingReference ? 'md:col-span-2' : ''}`}>
+                    <label className="text-sm font-medium text-neutral-400">Bahan Kain (Fabric/Material)</label>
+                    <select value={clothingMaterial} onChange={(e) => setClothingMaterial(e.target.value)} className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                      {CLOTHING_MATERIALS.map(mat => <option key={mat.id} value={mat.id}>{mat.label}</option>)}
+                    </select>
+                  </div>
                   
-                  {colorTheme !== 'Original colors' && !useClothingReference && (
-                    <div className="flex items-center gap-4 mt-3 bg-neutral-800/50 p-3 rounded-lg border border-neutral-700">
-                      <div className="flex gap-3">
-                        <input type="color" value={manualColor1} onChange={(e) => { setManualColor1(e.target.value); setColorTheme('Manual'); }} className="w-10 h-10 rounded cursor-pointer bg-transparent border-0 p-0" title="Warna 1" />
-                        <input type="color" value={manualColor2} onChange={(e) => { setManualColor2(e.target.value); setColorTheme('Manual'); }} className="w-10 h-10 rounded cursor-pointer bg-transparent border-0 p-0" title="Warna 2" />
-                        <input type="color" value={manualColor3} onChange={(e) => { setManualColor3(e.target.value); setColorTheme('Manual'); }} className="w-10 h-10 rounded cursor-pointer bg-transparent border-0 p-0" title="Warna 3" />
-                      </div>
-                      
-                      <button onClick={() => randomizeThemeColors(colorTheme)} className="p-2.5 bg-neutral-700 hover:bg-neutral-600 rounded-lg text-indigo-400 hover:text-indigo-300 transition-colors shadow-sm" title="Acak Variasi Warna Tema">
-                         <RefreshCcw className="w-4 h-4" />
-                      </button>
-
-                      <span className="text-[11px] text-neutral-400 leading-tight">
-                        {colorTheme === 'Manual' ? 'Pilih 3 warna dominan secara manual.' : 'Klik warna untuk mengubah, atau tekan "Acak" untuk variasi baru.'}
-                      </span>
-                    </div>
-                  )}
-                  {useClothingReference && <p className="text-[10px] text-indigo-400/80 mt-1">⚠️ Tema warna dinonaktifkan karena mengikuti palet referensi pakaian eksternal.</p>}
+                  <div className={`space-y-2 ${useClothingReference ? 'opacity-50 pointer-events-none' : ''}`}>
+                    <label className="text-sm font-medium text-neutral-400">Tema Warna Pakaian</label>
+                    <select value={colorTheme} onChange={handleThemeChange} disabled={useClothingReference} className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                      {COLOR_THEMES.map(theme => <option key={theme.id} value={theme.id}>{theme.label}</option>)}
+                    </select>
+                  </div>
                 </div>
+
+                {colorTheme !== 'Original colors' && !useClothingReference && (
+                  <div className="flex items-center gap-4 bg-neutral-800/50 p-3 rounded-lg border border-neutral-700 animate-in fade-in zoom-in duration-300">
+                    <div className="flex gap-3">
+                      <input type="color" value={manualColor1} onChange={(e) => { setManualColor1(e.target.value); setColorTheme('Manual'); }} className="w-10 h-10 rounded cursor-pointer bg-transparent border-0 p-0" title="Warna 1" />
+                      <input type="color" value={manualColor2} onChange={(e) => { setManualColor2(e.target.value); setColorTheme('Manual'); }} className="w-10 h-10 rounded cursor-pointer bg-transparent border-0 p-0" title="Warna 2" />
+                      <input type="color" value={manualColor3} onChange={(e) => { setManualColor3(e.target.value); setColorTheme('Manual'); }} className="w-10 h-10 rounded cursor-pointer bg-transparent border-0 p-0" title="Warna 3" />
+                    </div>
+                    
+                    <button onClick={() => randomizeThemeColors(colorTheme)} className="p-2.5 bg-neutral-700 hover:bg-neutral-600 rounded-lg text-indigo-400 hover:text-indigo-300 transition-colors shadow-sm" title="Acak Variasi Warna Tema">
+                        <RefreshCcw className="w-4 h-4" />
+                    </button>
+
+                    <span className="text-[11px] text-neutral-400 leading-tight">
+                      {colorTheme === 'Manual' ? 'Pilih 3 warna dominan secara manual.' : 'Klik warna untuk mengubah, atau tekan "Acak" untuk variasi baru.'}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {viewMode === '1-photo' && (
