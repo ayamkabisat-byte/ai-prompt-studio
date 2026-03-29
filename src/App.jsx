@@ -50,23 +50,79 @@ const POSES = [
   { group: 'Dasar & Referensi', items: [
     { id: 'Pose matching the original reference', label: 'Sesuai Referensi Asli (Default)', allowedTypes: ['all'] },
     { id: 'Front-facing close-up headshot', label: 'Front-Facing Close-up (Pasfoto)', allowedTypes: ['all'] },
-    { id: 'match_bg_pose', label: 'Ikuti Pose dari Gambar Latar Upload', allowedTypes: ['all'] },
+    { id: 'match_bg_pose', label: 'Ikuti Pose dari Gambar Latar Upload', allowedTypes: ['all'] }
   ]},
-  { group: 'Inspirasi Upload (Custom Poses)', items: [
+  { group: 'Kasual & Dinamis', items: [
+    { id: 'Casual half-body medium shot, arms and hands naturally visible in frame', label: 'Casual Half-Body (Original / Tangan Terlihat)', allowedTypes: ['all'] },
+    { id: 'Casual half-body medium shot, highly natural and fluid candid posture, perfectly formed hand anatomy, avoiding stiff or awkward poses', label: 'Casual Half-Body (Tangan Natural & Dinamis)', allowedTypes: ['all'] },
+    { id: 'Casual half-body portrait, standing with a relaxed natural curve, hands resting comfortably, candid lifestyle photography', label: 'Casual Half-Body (Santai & Rileks)', allowedTypes: ['all'] },
+    { id: 'Standing perfectly straight facing the camera in an open landscape, both arms resting naturally by the sides', label: 'Berdiri Lurus Menatap Kamera, Lengan Natural', allowedTypes: ['nature', 'urban'] },
+    { id: 'Side profile shot, looking 45 degrees away', label: 'Side Profile (Menyamping 45°)', allowedTypes: ['all'] },
+    { id: 'Side profile shot, looking far into the distance, explicitly not looking at the camera', label: 'Side Profile, Memandang Jauh (Tidak Menatap Kamera)', allowedTypes: ['nature', 'urban', 'yacht', 'sports'] },
+    { id: 'Standing sideways looking off-camera (three-quarter profile), both hands tucked inside coat pockets, candid observation', label: 'Berdiri Menyamping Mengamati, Tangan di Saku Mantel', allowedTypes: ['indoor', 'urban', 'nature', 'all'] },
+    { id: 'Candid shot, subject looking away from the camera', label: 'Candid Looking Away', allowedTypes: ['all'] },
+    { id: 'Standing straight facing the camera, both hands tucked fully and deeply inside the pockets', label: 'Berdiri Lurus, Kedua Tangan Masuk Penuh ke Saku', allowedTypes: ['all'] },
+    { id: 'Standing relaxed in the middle of the street facing the camera, one leg slightly bent, both hands in pockets', label: 'Berdiri Santai di Tengah Jalan, Satu Kaki Ditekuk', allowedTypes: ['urban'] },
+    { id: 'Standing naturally on an escalator, hands in pockets, looking casually to the side', label: 'Berdiri di Eskalator, Tangan di Saku, Menoleh ke Samping', allowedTypes: ['escalator'] },
+    { id: 'Looking slightly up and smiling gently', label: 'Melihat ke Atas Sambil Tersenyum', allowedTypes: ['all'] },
+    { id: 'Standing facing the camera laughing happily, giving a double thumbs up', label: 'Berdiri Tertawa Gembira, Pose Dua Jempol (Double Thumbs Up)', allowedTypes: ['all'] },
+    { id: 'Dynamic candid shot, subject walking forward naturally towards the camera with a confident strut', label: 'Berjalan ke Arah Kamera (Dynamic Strut)', allowedTypes: ['urban', 'nature', 'indoor'] },
+    { id: 'Candid walking, stepping forward confidently, looking straight ahead with natural arm swings', label: 'Candid Berjalan Mantap Menatap Lurus', allowedTypes: ['urban', 'nature', 'indoor'] }
+  ]},
+  { group: 'Profesional & Ekspresif', items: [
+    { id: 'Confident professional pose, arms crossed over chest', label: 'Professional Confident (Tangan Bersilang)', allowedTypes: ['studio', 'urban', 'indoor'] },
+    { id: 'Standing straight formally in the middle of the frame, both hands neatly clasped or stacked below the stomach', label: 'Berdiri Formal, Tangan Bertautan di Bawah Perut', allowedTypes: ['studio', 'indoor', 'urban'] },
+    { id: 'Standing perfectly straight and symmetrical, staring intensely straight into the camera, arms flat by the sides', label: 'Berdiri Simetris Tegap (Menatap Lurus)', allowedTypes: ['all'] },
     { id: 'Adjusting suit jacket and tie with both hands, looking serious and confident directly at the camera', label: 'Membenarkan Jas/Dasi dengan Dua Tangan (Serius)', allowedTypes: ['all'] },
-    { id: 'Sitting casually on a wooden bench, holding a basketball in the lap, looking directly at the camera', label: 'Duduk di Bangku Kayu, Memangku Bola Basket', allowedTypes: ['all'] },
+    { id: 'Standing, both hands holding the front lapels of a trench coat, soft smile looking at camera', label: 'Berdiri Lembut, Kedua Tangan Memegang Bagian Depan Mantel', allowedTypes: ['urban', 'nature'] },
+    { id: 'Low angle shot, subject looking slightly up, establishing a dominant presence', label: 'Low Angle (Mendongak Sedikit)', allowedTypes: ['all'] },
+    { id: 'Low-angle shot, standing tall facing the camera, looking down with a sharp, dominant and powerful gaze', label: 'Low Angle Dominan (Menunduk Tajam)', allowedTypes: ['studio', 'urban'] },
+    { id: 'Powerful boss pose, looking slightly down at the camera with confidence', label: 'Pose Wibawa/Bos (Melihat ke Bawah)', allowedTypes: ['studio', 'indoor', 'urban'] },
+    { id: 'Hand gently resting on the jawline, highlighting facial bone structure', label: 'Tangan Menunjukkan Jawline', allowedTypes: ['all'] },
+    { id: 'Resting chin on hand, looking pensive and thoughtful', label: 'Menopang Pipi/Dagu (Pensive)', allowedTypes: ['all'] },
+    { id: 'Masculine confident pose, one hand combing or running fingers backward through the hair', label: 'Menyisir Rambut ke Belakang (Confident)', allowedTypes: ['studio', 'urban', 'vehicle_interior'] }
+  ]},
+  { group: 'Duduk & Bersandar', items: [
+    { id: 'Sitting gracefully on a chair with legs crossed, looking casually at the camera', label: 'Duduk di Kursi, Kaki Menyilang (Graceful)', allowedTypes: ['studio', 'indoor', 'urban'] },
+    { id: 'Sitting cross-legged on a wooden bench, both hands resting softly on thighs', label: 'Duduk Sila di Bangku Kayu, Tangan di Paha', allowedTypes: ['nature', 'urban', 'indoor'] },
     { id: 'Sitting casually on a tall wooden stool, both hands resting relaxed on the knees, soft smile', label: 'Duduk Santai di Kursi Kayu Tinggi, Tangan di Lutut', allowedTypes: ['all'] },
+    { id: 'Sitting casually on a modern chair, legs slightly spread apart in a relaxed posture', label: 'Duduk Santai di Kursi (Relaxed/Spread)', allowedTypes: ['studio', 'indoor', 'urban'] },
+    { id: 'Sitting relaxed on a folding chair, legs comfortably spread apart in a casual open posture', label: 'Duduk Santai di Kursi Lipat (Open Posture)', allowedTypes: ['urban', 'nature', 'studio'] },
+    { id: 'Sitting relaxed and leaning back on a plush sofa, right leg casually crossed over the left', label: 'Duduk Bersandar di Sofa, Kaki Menyilang', allowedTypes: ['indoor', 'studio'] },
     { id: 'Sitting gracefully on the edge of a bed, one hand playfully running through the hair near the neck', label: 'Duduk di Tepi Kasur, Tangan Memainkan Rambut', allowedTypes: ['indoor', 'studio', 'all'] },
     { id: 'Sitting elegantly on an outdoor wooden chair, legs crossed, hands resting relaxed in the lap', label: 'Duduk Elegan di Kursi Kayu Outdoor, Kaki Bersilang', allowedTypes: ['urban', 'nature', 'all'] },
+    { id: 'Sitting relaxed in a comfortable seat, looking out a window pensively', label: 'Duduk Rileks, Pandangan ke Jendela (Candid)', allowedTypes: ['indoor', 'vehicle_interior'] },
+    { id: 'Sitting relaxed on the edge of an object, body leaning slightly forward, hands resting softly on the thighs or knees, smiling at the camera', label: 'Duduk di Tepi, Condong ke Depan, Tangan di Atas Lutut', allowedTypes: ['urban', 'nature', 'yacht'] },
     { id: 'Sitting confidently in the middle of modern stairs, leaning slightly forward, hands clasped together resting between the knees', label: 'Duduk Confident di Tengah Tangga, Tangan Bertautan', allowedTypes: ['indoor', 'urban', 'all'] },
-    { id: 'Standing sideways looking off-camera (three-quarter profile), both hands tucked inside coat pockets, candid observation', label: 'Berdiri Menyamping Mengamati, Tangan di Saku Mantel', allowedTypes: ['indoor', 'urban', 'nature', 'all'] },
-    { id: 'Sitting at a cafe table leaning slightly forward, one hand playfully resting on the table as if holding a partner\'s hand', label: 'Duduk di Kafe, Condong ke Depan (POV Pasangan)', allowedTypes: ['urban', 'nature', 'all'] }
+    { id: 'Sitting on a street guardrail, playfully holding an electric guitar, cheerful smile', label: 'Duduk di Pembatas Jalan, Pegang Gitar Elektrik', allowedTypes: ['urban'] },
+    { id: 'Sitting on a large rock, both hands holding the brim of a hat, looking away upwards thoughtfully', label: 'Duduk di Batu, Pegang Pinggiran Topi, Memandang ke Atas', allowedTypes: ['nature'] },
+    { id: 'Sitting upright on a rock, legs crossed at ankles, wearing a backpack, one hand on the rock, one hand on thigh, calm expression facing camera', label: 'Duduk Tegak di Batu, Bersilang Kaki, Memakai Ransel', allowedTypes: ['nature'] },
+    { id: 'Sitting casually on a rock or surface, one leg slightly bent, one hand relaxed on knee, the other hand supporting body weight backwards', label: 'Duduk Santai, Satu Tangan Menopang ke Belakang', allowedTypes: ['nature', 'urban', 'yacht'] },
+    { id: 'Sitting casually on a metal street object, both hands clasped together resting relaxed between the knees', label: 'Duduk Santai di Objek Jalanan, Tangan Bertautan di Paha', allowedTypes: ['urban'] },
+    { id: 'Sitting and leaning back comfortably on the hood of a car, legs crossed loosely forward, both hands inside pockets', label: 'Duduk Bersandar di Kap Mobil, Kaki Menyilang', allowedTypes: ['urban'] },
+    { id: 'Sitting on the floor leaning back against an iron railing, legs stretched to the side, one hand casually fixing hair behind the ear, soft gaze', label: 'Duduk Bersandar di Pagar Besi, Merapikan Rambut (Candid)', allowedTypes: ['urban', 'indoor'] },
+    { id: 'Sitting sideways hugging knees, looking back over the shoulder with a soft smile', label: 'Duduk Menyamping Memeluk Lutut, Menoleh ke Belakang', allowedTypes: ['nature', 'yacht', 'urban', 'indoor'] },
+    { id: 'Sitting sweetly on a wooden swing, hands resting politely in lap, looking straight with a slight smile', label: 'Duduk Manis di Ayunan Kayu', allowedTypes: ['nature', 'urban'] },
+    { id: 'Casual pose, leaning comfortably against a wall or object', label: 'Bersandar Santai di Dinding/Objek', allowedTypes: ['urban', 'indoor', 'studio'] },
+    { id: 'Cool pose leaning casually against a car or surface, hands clasped loosely together in front of the waist', label: 'Bersandar Santai, Tangan Bertautan di Depan', allowedTypes: ['urban'] },
+    { id: 'Leaning casually on a glass railing with back towards the camera, looking back over the shoulder', label: 'Bersandar di Pagar Kaca, Membelakangi Kamera & Menoleh', allowedTypes: ['urban', 'yacht', 'indoor'] },
+    { id: 'Leaning back comfortably with one hand resting on the head or running through hair, relaxed high-fashion vibe', label: 'Bersandar, Tangan di Kepala (Editorial)', allowedTypes: ['studio', 'urban', 'vehicle_interior', 'indoor'] },
+    { id: 'Leaning on a concrete pillar, arms crossed over chest, legs slightly crossed, looking down with a cool and melancholic expression', label: 'Bersandar di Pilar, Lengan Bersilang, Menunduk Cool', allowedTypes: ['urban', 'indoor'] }
   ]},
-  { group: 'Bawah Air (Underwater)', items: [
-    { id: 'Floating weightlessly underwater, relaxed limbs, looking up towards the light source', label: 'Mengambang Bebas (Menatap Cahaya Permukaan)', allowedTypes: ['underwater'] },
-    { id: 'Swimming gracefully underwater horizontally', label: 'Berenang Horizontal Bawah Air', allowedTypes: ['underwater'] },
-    { id: 'Diving downwards into the deep water', label: 'Menyelam ke Bawah (Diving)', allowedTypes: ['underwater'] },
-    { id: 'Standing on the pool floor underwater, looking at the camera', label: 'Berdiri di Dasar Kolam Bawah Air', allowedTypes: ['underwater'] }
+  { group: 'Aktivitas & Interaksi', items: [
+    { id: 'Sitting casually on a wooden bench, holding a basketball in the lap, looking directly at the camera', label: 'Duduk di Bangku Kayu, Memangku Bola Basket', allowedTypes: ['all'] },
+    { id: 'Sitting at a cafe table leaning slightly forward, one hand playfully resting on the table as if holding a partner\'s hand', label: 'Duduk di Kafe, Condong ke Depan (POV Pasangan)', allowedTypes: ['urban', 'nature', 'all'] },
+    { id: 'Standing for a mirror selfie, legs casually crossed, both hands holding a smartphone at chest height', label: 'Mirror Selfie, Kaki Bersilang, Pegang HP', allowedTypes: ['indoor', 'vehicle_interior', 'urban'] },
+    { id: 'Sitting on the edge of a boat with legs dangling, extending one arm holding a smartphone for a selfie', label: 'Duduk di Tepi Kapal, Selfie dengan HP', allowedTypes: ['yacht'] },
+    { id: 'Lying prone on a paddleboard, legs bent upwards showing soles, one hand making a peace sign, the other holding an action camera, sweet smile', label: 'Tengkurap di Papan Selancar, Pegang Action Cam & Peace Sign', allowedTypes: ['nature', 'yacht'] },
+    { id: 'Standing, right hand shading eyes from the sun, left hand making a peace sign', label: 'Tangan Menghalangi Matahari & Peace Sign', allowedTypes: ['nature', 'urban', 'sports', 'yacht'] },
+    { id: 'Side profile shot looking forward, right hand holding a black umbrella, left hand tucked into coat pocket', label: 'Menyamping Pegang Payung, Tangan Kiri di Saku', allowedTypes: ['urban', 'nature'] },
+    { id: 'Slightly turned sideways looking at a billboard, right hand holding a newspaper at waist level, left index finger pointing', label: 'Menyamping Menunjuk Layar, Pegang Koran', allowedTypes: ['urban', 'indoor'] },
+    { id: 'Standing straight and sporty, both hands holding a padel racket and a ball in front of the stomach', label: 'Berdiri Tegap, Memegang Raket Padel & Bola', allowedTypes: ['sports'] },
+    { id: 'Standing facing the camera, holding a small coffee or tea cup near the chest with both hands, sweet smile', label: 'Berdiri, Pegang Cangkir Hangat di Dada, Senyum Manis', allowedTypes: ['urban', 'indoor', 'nature'] },
+    { id: 'Sitting cross-legged, looking down focused on typing on a smartphone held with both hands', label: 'Duduk Kaki Menyilang, Menunduk Fokus Mengetik HP', allowedTypes: ['urban', 'indoor', 'nature'] },
+    { id: 'Walking casually towards the camera, looking slightly to the right, holding the strap of a sling bag', label: 'Berjalan Menuju Kamera, Pegang Tali Tas Selempang', allowedTypes: ['urban', 'nature', 'indoor'] },
+    { id: 'Walking towards the camera, looking straight ahead, casually holding a smartphone', label: 'Berjalan Lurus Menatap Kamera Sambil Pegang HP', allowedTypes: ['urban', 'indoor', 'nature'] }
   ]},
   { group: 'Hari Raya & Perayaan (Festive)', items: [
     { id: 'Standing with hands clasped together in front of the chest in a traditional Indonesian greeting/apology gesture (Gestur salam / sungkem / minta maaf)', label: 'Gestur Minta Maaf / Sungkem (Lebaran)', allowedTypes: ['all', 'indoor', 'studio', 'nature'] },
@@ -74,41 +130,11 @@ const POSES = [
     { id: 'Standing joyfully with hands pressed together in front of the chest in a traditional Balinese greeting (Om Swastiastu)', label: 'Gestur Salam Panganjali (Galungan/Bali)', allowedTypes: ['all', 'nature', 'indoor', 'studio'] },
     { id: 'Holding a beautifully wrapped gift box and smiling warmly', label: 'Memegang Kotak Kado (Natal / Hadiah)', allowedTypes: ['all', 'indoor', 'studio'] }
   ]},
-  { group: 'Kasual & Dinamis', items: [
-    { id: 'Casual half-body medium shot, arms and hands naturally visible in frame', label: 'Casual Half-Body (Original / Tangan Terlihat)', allowedTypes: ['all'] },
-    { id: 'Casual half-body portrait, standing with a relaxed natural curve, hands resting comfortably, candid lifestyle photography', label: 'Casual Half-Body (Santai & Rileks)', allowedTypes: ['all'] },
-    { id: 'Standing perfectly straight facing the camera in an open landscape, both arms resting naturally by the sides', label: 'Berdiri Lurus Menatap Kamera, Lengan Natural', allowedTypes: ['nature', 'urban'] },
-    { id: 'Side profile shot, looking 45 degrees away', label: 'Side Profile (Menyamping 45°)', allowedTypes: ['all'] },
-    { id: 'Standing straight facing the camera, both hands tucked fully and deeply inside the pockets', label: 'Berdiri Lurus, Kedua Tangan Masuk Penuh ke Saku', allowedTypes: ['all'] },
-    { id: 'Standing relaxed in the middle of the street facing the camera, one leg slightly bent, both hands in pockets', label: 'Berdiri Santai di Tengah Jalan, Satu Kaki Ditekuk', allowedTypes: ['urban'] },
-    { id: 'Dynamic candid shot, subject walking forward naturally towards the camera with a confident strut', label: 'Berjalan ke Arah Kamera (Dynamic Strut)', allowedTypes: ['urban', 'nature', 'indoor'] }
-  ]},
-  { group: 'Profesional & Ekspresif', items: [
-    { id: 'Confident professional pose, arms crossed over chest', label: 'Professional Confident (Tangan Bersilang)', allowedTypes: ['studio', 'urban', 'indoor'] },
-    { id: 'Standing straight formally in the middle of the frame, both hands neatly clasped or stacked below the stomach', label: 'Berdiri Formal, Tangan Bertautan di Bawah Perut', allowedTypes: ['studio', 'indoor', 'urban'] },
-    { id: 'Low-angle shot, standing tall facing the camera, looking down with a sharp, dominant and powerful gaze', label: 'Low Angle Dominan (Menunduk Tajam)', allowedTypes: ['studio', 'urban'] },
-    { id: 'Powerful boss pose, looking slightly down at the camera with confidence', label: 'Pose Wibawa/Bos (Melihat ke Bawah)', allowedTypes: ['studio', 'indoor', 'urban'] },
-    { id: 'Masculine confident pose, one hand combing or running fingers backward through the hair', label: 'Menyisir Rambut ke Belakang (Confident)', allowedTypes: ['studio', 'urban', 'vehicle_interior'] }
-  ]},
-  { group: 'Duduk & Bersandar', items: [
-    { id: 'Sitting gracefully on a chair with legs crossed, looking casually at the camera', label: 'Duduk di Kursi, Kaki Menyilang (Graceful)', allowedTypes: ['studio', 'indoor', 'urban'] },
-    { id: 'Sitting cross-legged on a wooden bench, both hands resting softly on thighs', label: 'Duduk Sila di Bangku Kayu, Tangan di Paha', allowedTypes: ['nature', 'urban', 'indoor'] },
-    { id: 'Sitting relaxed and leaning back on a plush sofa, right leg casually crossed over the left', label: 'Duduk Bersandar di Sofa, Kaki Menyilang', allowedTypes: ['indoor', 'studio'] },
-    { id: 'Sitting relaxed on the edge of an object, body leaning slightly forward, hands resting softly on the thighs or knees, smiling at the camera', label: 'Duduk di Tepi, Condong ke Depan, Tangan di Atas Lutut', allowedTypes: ['urban', 'nature', 'yacht'] },
-    { id: 'Sitting and leaning back comfortably on the hood of a car, legs crossed loosely forward, both hands inside pockets', label: 'Duduk Bersandar di Kap Mobil, Kaki Menyilang', allowedTypes: ['urban'] },
-    { id: 'Sitting sweetly on a wooden swing, hands resting politely in lap, looking straight with a slight smile', label: 'Duduk Manis di Ayunan Kayu', allowedTypes: ['nature', 'urban'] },
-    { id: 'Casual pose, leaning comfortably against a wall or object', label: 'Bersandar Santai di Dinding/Objek', allowedTypes: ['urban', 'indoor', 'studio'] }
-  ]},
-  { group: 'Aktivitas & Interaksi', items: [
-    { id: 'Standing for a mirror selfie, legs casually crossed, both hands holding a smartphone at chest height', label: 'Mirror Selfie, Kaki Bersilang, Pegang HP', allowedTypes: ['indoor', 'vehicle_interior', 'urban'] },
-    { id: 'Sitting on the edge of a boat with legs dangling, extending one arm holding a smartphone for a selfie', label: 'Duduk di Tepi Kapal, Selfie dengan HP', allowedTypes: ['yacht'] },
-    { id: 'Standing, right hand shading eyes from the sun, left hand making a peace sign', label: 'Tangan Menghalangi Matahari & Peace Sign', allowedTypes: ['nature', 'urban', 'sports', 'yacht'] },
-    { id: 'Side profile shot looking forward, right hand holding a black umbrella, left hand tucked into coat pocket', label: 'Menyamping Pegang Payung, Tangan Kiri di Saku', allowedTypes: ['urban', 'nature'] },
-    { id: 'Standing straight and sporty, both hands holding a padel racket and a ball in front of the stomach', label: 'Berdiri Tegap, Memegang Raket Padel & Bola', allowedTypes: ['sports'] },
-    { id: 'Standing facing the camera, holding a small coffee or tea cup near the chest with both hands, sweet smile', label: 'Berdiri, Pegang Cangkir Hangat di Dada, Senyum Manis', allowedTypes: ['urban', 'indoor', 'nature'] },
-    { id: 'Sitting cross-legged, looking down focused on typing on a smartphone held with both hands', label: 'Duduk Kaki Menyilang, Menunduk Fokus Mengetik HP', allowedTypes: ['urban', 'indoor', 'nature'] },
-    { id: 'Walking casually towards the camera, looking slightly to the right, holding the strap of a sling bag', label: 'Berjalan Menuju Kamera, Pegang Tali Tas Selempang', allowedTypes: ['urban', 'nature', 'indoor'] },
-    { id: 'Walking towards the camera, looking straight ahead, casually holding a smartphone', label: 'Berjalan Lurus Menatap Kamera Sambil Pegang HP', allowedTypes: ['urban', 'indoor', 'nature'] }
+  { group: 'Bawah Air (Underwater)', items: [
+    { id: 'Floating weightlessly underwater, relaxed limbs, looking up towards the light source', label: 'Mengambang Bebas (Menatap Cahaya Permukaan)', allowedTypes: ['underwater'] },
+    { id: 'Swimming gracefully underwater horizontally', label: 'Berenang Horizontal Bawah Air', allowedTypes: ['underwater'] },
+    { id: 'Diving downwards into the deep water', label: 'Menyelam ke Bawah (Diving)', allowedTypes: ['underwater'] },
+    { id: 'Standing on the pool floor underwater, looking at the camera', label: 'Berdiri di Dasar Kolam Bawah Air', allowedTypes: ['underwater'] }
   ]},
   { group: 'Edgy & Subkultur', items: [
     { id: 'Edgy punk rock pose, rebellious attitude', label: 'Edgy Punk/Rocker Pose', allowedTypes: ['studio', 'urban', 'indoor'] },
@@ -363,14 +389,6 @@ const BACKGROUNDS = [
     { id: 'custom_bg', type: 'all', label: 'Tulis Lokasi / Latar Belakang Sendiri' },
     { id: 'image_ref_bg', type: 'all', label: '📸 Gunakan Latar dari Gambar Upload (Match BG/Angle)' }
   ]},
-  { group: 'Inspirasi dari Foto Anda', items: [
-    { id: 'Plain minimalist blue wall indoors with a simple wooden bench', type: 'indoor', label: 'Tembok Biru Minimalis & Bangku Kayu' },
-    { id: 'Bright hotel bedroom with a white bed, open balcony door revealing a breathtaking ocean view', type: 'indoor', label: 'Kamar Hotel Terang (Pemandangan Laut dari Balkon)' },
-    { id: 'Sunny outdoor balcony terrace with wooden chairs and glass railings, overlooking a vast blue ocean and distant coastal hills', type: 'urban', label: 'Teras Balkon Outdoor (Pemandangan Laut & Bukit)' },
-    { id: 'Modern dark futuristic staircase illuminated by sleek neon LED strip lighting on the handrails and steps', type: 'indoor', label: 'Tangga Gelap Modern (Cahaya Strip LED/Neon)' },
-    { id: 'Inside an art gallery or museum, framed art prints on the white walls, motion-blurred silhouettes of people walking by', type: 'indoor', label: 'Galeri Seni / Museum (Siluet Orang Berjalan)' },
-    { id: 'Stunning outdoor cafe terrace with iron chairs, overlooking the breathtaking Amalfi Coast (Positano) with colorful cliffside houses and ocean', type: 'urban', label: 'Kafe Outdoor Amalfi Coast (Positano, Italia)' }
-  ]},
   { group: 'Basic & Studio', items: [
     { id: 'Original background from the reference image', type: 'all', label: 'Original Background' },
     { id: 'Clean white studio background', type: 'studio', label: 'Studio Putih Bersih' },
@@ -380,13 +398,7 @@ const BACKGROUNDS = [
     { id: 'Dramatic dark red studio background, moody lighting', type: 'studio', label: 'Latar Studio Merah Gelap Dramatis' },
     { id: 'Solid red background (Official ID photo style)', type: 'studio', label: 'Latar Merah (Pasfoto)' },
     { id: 'Solid blue background (Official ID photo style)', type: 'studio', label: 'Latar Biru (Pasfoto)' },
-  ]},
-  { group: 'Tema Hari Raya & Perayaan (Festive)', items: [
-    { id: 'Cozy living room elegantly decorated for Eid al-Fitr (Lebaran) with warm lighting, subtle ketupat ornaments, and beautiful Islamic geometric patterns', type: 'indoor', label: 'Lebaran / Idul Fitri (Ruang Tamu Hangat)' },
-    { id: 'Warm living room with a glowing beautifully decorated Christmas tree, wrapped presents, and a cozy fireplace', type: 'indoor', label: 'Natal / Christmas (Pohon Natal & Perapian)' },
-    { id: 'Traditional Chinese interior elegantly decorated for Lunar New Year with glowing red lanterns and gold accents', type: 'indoor', label: 'Imlek / Lunar New Year (Lampion Merah)' },
-    { id: 'Balinese traditional pavilion (Bale) beautifully decorated for Galungan with woven palm leaves and majestic Penjor', type: 'nature', label: 'Galungan / Kuningan (Bale Bali & Penjor)' },
-    { id: 'Festive room setup with party decorations, subtle confetti, and sparkling New Year lights', type: 'indoor', label: 'Tahun Baru / New Year Eve (Dekorasi Pesta)' }
+    { id: 'Plain minimalist blue wall indoors with a simple wooden bench', type: 'studio', label: 'Tembok Biru Minimalis & Bangku Kayu' }
   ]},
   { group: 'Luxury & Transport', items: [
     { id: 'Nighttime indoors, luxurious velvet sofa in a warm and cozy living room', type: 'indoor', label: 'Sofa Beludru Mewah di Ruang Tamu (Malam/Hangat)' },
@@ -401,7 +413,7 @@ const BACKGROUNDS = [
     { id: 'Standing next to a classic vintage car on a city street', type: 'urban', label: 'Bersandar di Mobil Klasik/Vintage' },
     { id: 'Asphalt city street at night next to a modified sports car, illuminated by vibrant street lights', type: 'urban', label: 'Jalanan Kota Malam (Mobil Sport & Lampu Jalan)' },
     { id: 'Modern escalator in a bright shopping mall or airport', type: 'escalator', label: 'Di Atas Eskalator (Mall / Bandara Modern)' },
-    { id: 'Luxury airline business class cabin, spacious private seat pods', type: 'vehicle_interior', label: 'Kabin Business Class Maskapai' },
+    { id: 'Luxury airline business class cabin, spacious private seat pods', type: 'vehicle_interior', label: 'Kabin Business Class Maskapai' }
   ]},
   { group: 'Architecture & City Vibe', items: [
     { id: 'Urban pedestrian bridge or walkway with iron railings, city apartment background', type: 'urban', label: 'Jembatan Penyeberangan Kota (Railing Besi & Apartemen)' },
@@ -443,6 +455,8 @@ const BACKGROUNDS = [
     { id: 'Traditional Japanese alleyway with wooden houses and hanging lanterns', type: 'urban', label: 'Lorong Jalan Tradisional Jepang (Rumah Kayu & Lampion)' },
     { id: 'Vibrant futuristic city street at night', type: 'urban', label: 'Jalanan Kota Futuristik (Malam)' },
     { id: 'Open train station platform on a cloudy day with wet floors from recent rain, a green train in the background', type: 'urban', label: 'Peron Stasiun Terbuka (Mendung, Lantai Basah Hujan)' },
+    { id: 'Modern dark futuristic staircase illuminated by sleek neon LED strip lighting on the handrails and steps', type: 'indoor', label: 'Tangga Gelap Modern (Cahaya Strip LED/Neon)' },
+    { id: 'Stunning outdoor cafe terrace with iron chairs, overlooking the breathtaking Amalfi Coast (Positano) with colorful cliffside houses and ocean', type: 'urban', label: 'Kafe Outdoor Amalfi Coast (Positano, Italia)' }
   ]},
   { group: 'High-End Lifestyle & Events', items: [
     { id: 'High-end fine dining restaurant in a tall skyscraper overlooking the bright city skyline of New York City at night', type: 'indoor', label: 'Fine Dining Gedung Tinggi (New York Skyline Malam)' },
@@ -455,6 +469,7 @@ const BACKGROUNDS = [
     { id: 'Luxury Jakarta apartment bedroom with floor-to-ceiling windows showing city skyline', type: 'indoor', label: 'Kamar Apartemen Mewah (City Skyline)' },
     { id: 'Aesthetic fine dining restaurant booth with warm vintage lighting', type: 'indoor', label: 'Restoran Mewah (Fine Dining Booth)' },
     { id: 'Luxury high-end hair salon interior', type: 'indoor', label: 'Luxury Hair Salon' },
+    { id: 'Bright hotel bedroom with a white bed, open balcony door revealing a breathtaking ocean view', type: 'indoor', label: 'Kamar Hotel Terang (Pemandangan Laut dari Balkon)' }
   ]},
   { group: 'Nature & Scenic', items: [
     { id: 'Middle of calm open sea on a white paddleboard, distant island during daytime', type: 'yacht', label: 'Di Atas Paddleboard Tengah Laut (Pulau Jauh)' },
@@ -482,7 +497,8 @@ const BACKGROUNDS = [
     { id: 'Lush city park pathway with shady green trees during daytime', type: 'nature', label: 'Jalan Setapak Taman Kota yang Asri' },
     { id: 'Beautiful natural park with blurred trees and soft bokeh', type: 'nature', label: 'Taman Natural (Bokeh Umum)' },
     { id: 'A field of tall golden grass at sunset', type: 'nature', label: 'Ladang Rumput Ilalang (Sunset)' },
-    { id: 'Foggy green grassy hillside with towering mountain cliffs in the background', type: 'nature', label: 'Lereng Bukit Hijau Berkabut & Tebing Pegunungan' }
+    { id: 'Foggy green grassy hillside with towering mountain cliffs in the background', type: 'nature', label: 'Lereng Bukit Hijau Berkabut & Tebing Pegunungan' },
+    { id: 'Sunny outdoor balcony terrace with wooden chairs and glass railings, overlooking a vast blue ocean and distant coastal hills', type: 'nature', label: 'Teras Balkon Outdoor (Pemandangan Laut & Bukit)' }
   ]},
   { group: 'Bawah Air (Underwater)', items: [
     { id: 'Underwater looking at a vibrant coral reef with swimming fish', type: 'underwater', label: 'Bawah Air (Terumbu Karang & Ikan)' },
@@ -490,10 +506,18 @@ const BACKGROUNDS = [
     { id: 'Underwater inside a clear blue tiled swimming pool', type: 'underwater', label: 'Bawah Air (Kolam Renang Jernih)' },
     { id: 'Underwater in a mystical cenote with light beams hitting the bottom', type: 'underwater', label: 'Bawah Air (Gua Cenote / Sinar Masuk)' },
   ]},
+  { group: 'Tema Hari Raya & Perayaan (Festive)', items: [
+    { id: 'Cozy living room elegantly decorated for Eid al-Fitr (Lebaran) with warm lighting, subtle ketupat ornaments, and beautiful Islamic geometric patterns', type: 'indoor', label: 'Lebaran / Idul Fitri (Ruang Tamu Hangat)' },
+    { id: 'Warm living room with a glowing beautifully decorated Christmas tree, wrapped presents, and a cozy fireplace', type: 'indoor', label: 'Natal / Christmas (Pohon Natal & Perapian)' },
+    { id: 'Traditional Chinese interior elegantly decorated for Lunar New Year with glowing red lanterns and gold accents', type: 'indoor', label: 'Imlek / Lunar New Year (Lampion Merah)' },
+    { id: 'Balinese traditional pavilion (Bale) beautifully decorated for Galungan with woven palm leaves and majestic Penjor', type: 'nature', label: 'Galungan / Kuningan (Bale Bali & Penjor)' },
+    { id: 'Festive room setup with party decorations, subtle confetti, and sparkling New Year lights', type: 'indoor', label: 'Tahun Baru / New Year Eve (Dekorasi Pesta)' }
+  ]},
   { group: 'Thematic Settings', items: [
     { id: 'Inside a cozy vintage record store or bookstore with warm lighting', type: 'indoor', label: 'Toko Piringan Hitam / Toko Buku Vintage (Cozy)' },
     { id: 'Professional vintage barbershop background', type: 'indoor', label: 'Professional Barbershop' },
-    { id: 'Abstract elegant gradient background', type: 'studio', label: 'Gradient Abstract' }
+    { id: 'Abstract elegant gradient background', type: 'studio', label: 'Gradient Abstract' },
+    { id: 'Inside an art gallery or museum, framed art prints on the white walls, motion-blurred silhouettes of people walking by', type: 'indoor', label: 'Galeri Seni / Museum (Siluet Orang Berjalan)' }
   ]}
 ];
 
@@ -755,8 +779,6 @@ export default function App() {
   const [customBackground, setCustomBackground] = useState('');
   
   const [accCategory, setAccCategory] = useState(ACCESSORIES_DATABASE[0].group);
-  
-  // STATE BARU UNTUK KATEGORI BAJU
   const [clothCategory, setClothCategory] = useState(CLOTHING_DATABASE[0].group);
 
   const triggerSmartAlert = () => {
@@ -936,7 +958,6 @@ export default function App() {
     };
   }).filter(group => group.items.length > 0);
   
-  // Mengamankan state kategori baju jika berpindah gender
   React.useEffect(() => {
     const isValidCategory = dynamicClothingGroups.some(g => g.group === clothCategory);
     if (!isValidCategory && dynamicClothingGroups.length > 0) {
@@ -1375,7 +1396,7 @@ ${promptText}
                 </div>
                 
                 <label className="text-sm font-medium text-indigo-300 block mt-3">Pilih Item ({accCategory})</label>
-                <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto custom-scrollbar pr-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-64 overflow-y-auto custom-scrollbar pr-2">
                   {dynamicAccessoryGroups.find(g => g.group === accCategory)?.items.map(item => (
                     <label key={item.id} className="flex items-center gap-2 text-sm bg-neutral-900 p-2 rounded-lg border border-neutral-700 cursor-pointer hover:border-pink-500/50 transition-colors">
                       <input type="checkbox" checked={accessories.includes(item.id)} onChange={() => toggleAccessory(item.id)} className="rounded text-pink-500 bg-neutral-800 border-neutral-600 focus:ring-pink-500 focus:ring-offset-neutral-900" />
@@ -1417,7 +1438,7 @@ ${promptText}
                 </div>
                 
                 <label className="text-sm font-medium text-indigo-300 block mt-3">Pilih Latar Belakang ({bgCategory})</label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-64 overflow-y-auto custom-scrollbar pr-2">
+                <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto custom-scrollbar pr-2">
                   {BACKGROUNDS.find(g => g.group === bgCategory)?.items.map(item => (
                     <button
                       key={item.id}
@@ -1492,7 +1513,7 @@ ${promptText}
                     </div>
                     
                     <label className="text-sm font-medium text-neutral-400 block mt-3">Pilih Pakaian ({clothCategory})</label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-64 overflow-y-auto custom-scrollbar pr-2">
+                    <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto custom-scrollbar pr-2">
                       {dynamicClothingGroups.find(g => g.group === clothCategory)?.items.map(item => (
                         <button
                           key={item.id}
@@ -1505,7 +1526,7 @@ ${promptText}
                         </button>
                       ))}
                     </div>
-                    {useHijab && <p className="text-[10px] text-indigo-400/80 mt-1">✨ Hijab aktif: Modest fashion.</p>}
+                    {useHijab && <p className="text-[10px] text-indigo-400/80 mt-1">✨ Hijab aktif: Menampilkan Modest fashion / Hijab approved.</p>}
                   </div>
                 )}
                 
@@ -1565,7 +1586,7 @@ ${promptText}
                       </select>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div className="space-y-1">
                         <label className="text-xs font-medium text-indigo-300">Lensa Kamera</label>
                         <select disabled={background === 'image_ref_bg'} value={background === 'image_ref_bg' ? '' : cameraLens} onChange={(e) => setCameraLens(e.target.value)} className="w-full bg-indigo-950/30 border border-indigo-800 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed">
