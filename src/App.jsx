@@ -147,7 +147,7 @@ const POSES = [
 const CAMERA_LENSES = [
   { id: 'Standard portrait lens (50mm)', label: 'Standard Lens (Normal)', allowedTypes: ['all'] },
   { id: 'Wide angle lens, capturing more of the subject and environment', label: 'Wide Angle Lens (Ekspansif)', allowedTypes: ['all'] },
-  { id: 'Fisheye lens, distorted ultra-wide perspective with bulging center', label: 'Fisheye Lens (Distorsi Melengkung)', allowedTypes: ['all'] },
+  { id: 'Full-frame fisheye lens, distorted ultra-wide perspective with bulging center, 10mm ultra-wide lens with barrel distortion, edge-to-edge frame coverage, bright corners, absolutely zero vignette and no black borders', label: 'Fisheye Lens (Distorsi Melengkung)', allowedTypes: ['all'] },
   { id: 'Telephoto lens (85mm), compressed background with strong bokeh blur', label: 'Telephoto Lens (Fokus, Background Blur)', allowedTypes: ['all'] },
   { id: 'Telephoto zoom lens (200mm), paparazzi editorial style with high compression', label: 'Telephoto Paparazzi (Jarak Jauh)', allowedTypes: ['urban', 'nature', 'sports', 'yacht'] },
   { id: 'Macro lens, extreme close-up details', label: 'Macro Lens (Extreme Close-up)', allowedTypes: ['all'] },
