@@ -239,60 +239,72 @@ const BASE_COLORS = [
   'Vibrant Violet', 'Mint Green', 'Rose Gold'
 ];
 
-const COMMON_ACCESSORIES = [
-  { id: 'Reading glasses', label: 'Kacamata Baca' },
-  { id: 'Thin round frame glasses', label: 'Kacamata Bingkai Bulat Tipis' },
-  { id: 'Sunglasses', label: 'Kacamata Hitam' },
-  { id: 'Oversized sunglasses', label: 'Kacamata Hitam Oversized' },
-  { id: 'White frame sunglasses', label: 'Kacamata Bingkai Putih' },
-  { id: 'Blue sunglasses resting on head', label: 'Kacamata Biru di Atas Kepala' },
-  { id: 'Black wireless headphones worn over the ears or around the neck', label: 'Headphone Nirkabel Hitam' },
-  { id: 'Pink and yellow flower hair clip', label: 'Jepit Rambut Bunga (Pink/Kuning)' },
-  { id: 'Cream and white hair scrunchie', label: 'Scrunchie Rambut Krem/Putih' },
-  { id: 'Green plain beanie hat', label: 'Beanie/Kupluk Hijau' },
-  { id: 'Black-and-white knit beanie hat', label: 'Beanie/Kupluk Rajut Hitam-Putih' },
-  { id: 'White baseball cap', label: 'Topi Bisbol Putih' },
-  { id: 'Green baseball cap', label: 'Topi Bisbol Hijau' },
-  { id: 'Khaki bucket hat with a neck strap', label: 'Topi Bucket Khaki (dengan Tali)' },
-  { id: 'Nose piercing', label: 'Tindik Hidung' },
-  { id: 'Septum piercing', label: 'Tindik Septum' },
-  { id: 'Eyebrow piercing', label: 'Tindik Alis' },
-  { id: 'Lip piercing', label: 'Tindik Bibir' },
-  { id: 'Single ear piercing (stud)', label: 'Tindik Satu Telinga (Stud)' },
-  { id: 'Double ear piercings', label: 'Tindik Dua Telinga' },
-  { id: 'Large punk style hoop earrings', label: 'Anting Ring Besar (Punk/Edgy)' },
-  { id: 'Tupac style tied bandana on head', label: 'Bandana Ikat (Tupac Style)' },
-  { id: 'Silky durag tied on head', label: 'Durag Penutup Kepala (Rapper Style)' },
-  { id: 'Gold chain necklace', label: 'Kalung Emas (Chain)' },
-  { id: 'Silver necklace', label: 'Kalung Perak' },
-  { id: 'Chunky hip-hop chain with a massive iced-out diamond pendant', label: 'Kalung Rantai Besar + Permata (Rapper)' },
-  { id: 'Diamond iced-out teeth grillz', label: 'Grillz Gigi (Iced Out/Diamond)' },
-  { id: 'Leather bracelet', label: 'Gelang Kulit' },
-  { id: 'Festival wristbands', label: 'Gelang Festival' },
-  { id: 'Chrome Hearts silver rings on fingers', label: 'Cincin Chrome Hearts' },
-  { id: 'Diamond engagement ring', label: 'Cincin Berlian' },
-  { id: 'Gold signet ring', label: 'Cincin Emas (Signet)' },
-  { id: 'Knit tie', label: 'Dasi Rajut (Knit Tie)' },
-  { id: 'Striped necktie', label: 'Dasi Motif Garis' },
-  { id: 'Red necktie', label: 'Dasi Merah' },
-  { id: 'Blue necktie', label: 'Dasi Biru' },
-  { id: 'Elegant silk neckerchief or ascot tie', label: 'Syal Sutra / Ascot (Elegan)' },
-  { id: 'Thick wool winter scarf', label: 'Syal Wol Musim Dingin' },
-  { id: 'High white calf-length socks', label: 'Kaos Kaki Putih Sebetis' },
-  { id: 'White knee-high socks', label: 'Kaos Kaki Putih Selutut' },
-  { id: 'Woven rattan or straw tote bag', label: 'Tote Bag Anyaman Rotan/Jerami' },
-  { id: 'Pink canvas tote bag', label: 'Tote Bag Kanvas Pink' },
-  { id: 'Cream backpack', label: 'Tas Ransel Krem' },
-  { id: 'Black leather shoulder bag', label: 'Shoulder Bag Kulit Hitam' },
-  { id: 'White crossbody sling bag', label: 'Tas Selempang Putih (Crossbody)' },
-  { id: 'Sports duffel bag', label: 'Tas Duffel Olahraga' },
-  { id: 'Black leather driving gloves', label: 'Sarung Tangan Kulit Hitam' },
-  { id: 'Red electric guitar', label: 'Gitar Elektrik Merah' },
-  { id: 'Action camera (GoPro)', label: 'Kamera Aksi (GoPro)' },
-  { id: 'Alfamart plastic shopping bag', label: 'Kantong Kresek Alfamart' },
-  { id: 'Indomaret plastic shopping bag', label: 'Kantong Kresek Indomaret' },
-  { id: 'FamilyMart plastic shopping bag', label: 'Kantong Kresek FamilyMart' },
-  { id: 'Watsons plastic shopping bag', label: 'Kantong Kresek Watsons' }
+const ACCESSORIES_DATABASE = [
+  { group: 'Kacamata (Eyewear)', items: [
+    { id: 'Reading glasses', label: 'Kacamata Baca' },
+    { id: 'Thin round frame glasses', label: 'Kacamata Bingkai Bulat Tipis' },
+    { id: 'Sunglasses', label: 'Kacamata Hitam' },
+    { id: 'Oversized sunglasses', label: 'Kacamata Hitam Oversized' },
+    { id: 'White frame sunglasses', label: 'Kacamata Bingkai Putih' },
+    { id: 'Blue sunglasses resting on head', label: 'Kacamata Biru di Atas Kepala' }
+  ]},
+  { group: 'Topi & Kepala', items: [
+    { id: 'Pink and yellow flower hair clip', label: 'Jepit Rambut Bunga (Pink/Kuning)' },
+    { id: 'Cream and white hair scrunchie', label: 'Scrunchie Rambut Krem/Putih' },
+    { id: 'Green plain beanie hat', label: 'Beanie/Kupluk Hijau' },
+    { id: 'Black-and-white knit beanie hat', label: 'Beanie/Kupluk Rajut Hitam-Putih' },
+    { id: 'White baseball cap', label: 'Topi Bisbol Putih' },
+    { id: 'Green baseball cap', label: 'Topi Bisbol Hijau' },
+    { id: 'Khaki bucket hat with a neck strap', label: 'Topi Bucket Khaki (dengan Tali)' },
+    { id: 'Tupac style tied bandana on head', label: 'Bandana Ikat (Tupac Style)' },
+    { id: 'Silky durag tied on head', label: 'Durag Penutup Kepala (Rapper Style)' },
+    { id: 'Black wireless headphones worn over the ears or around the neck', label: 'Headphone Nirkabel Hitam' }
+  ]},
+  { group: 'Perhiasan & Tindik', items: [
+    { id: 'Nose piercing', label: 'Tindik Hidung' },
+    { id: 'Septum piercing', label: 'Tindik Septum' },
+    { id: 'Eyebrow piercing', label: 'Tindik Alis' },
+    { id: 'Lip piercing', label: 'Tindik Bibir' },
+    { id: 'Single ear piercing (stud)', label: 'Tindik Satu Telinga (Stud)' },
+    { id: 'Double ear piercings', label: 'Tindik Dua Telinga' },
+    { id: 'Large punk style hoop earrings', label: 'Anting Ring Besar (Punk/Edgy)' },
+    { id: 'Gold chain necklace', label: 'Kalung Emas (Chain)' },
+    { id: 'Silver necklace', label: 'Kalung Perak' },
+    { id: 'Chunky hip-hop chain with a massive iced-out diamond pendant', label: 'Kalung Rantai Besar + Permata (Rapper)' },
+    { id: 'Diamond iced-out teeth grillz', label: 'Grillz Gigi (Iced Out/Diamond)' },
+    { id: 'Leather bracelet', label: 'Gelang Kulit' },
+    { id: 'Chrome Hearts silver rings on fingers', label: 'Cincin Chrome Hearts' },
+    { id: 'Diamond engagement ring', label: 'Cincin Berlian' },
+    { id: 'Gold signet ring', label: 'Cincin Emas (Signet)' }
+  ]},
+  { group: 'Dasi, Syal & Kaos Kaki', items: [
+    { id: 'Knit tie', label: 'Dasi Rajut (Knit Tie)' },
+    { id: 'Striped necktie', label: 'Dasi Motif Garis' },
+    { id: 'Red necktie', label: 'Dasi Merah' },
+    { id: 'Blue necktie', label: 'Dasi Biru' },
+    { id: 'Elegant silk neckerchief or ascot tie', label: 'Syal Sutra / Ascot (Elegan)' },
+    { id: 'Thick wool winter scarf', label: 'Syal Wol Musim Dingin' },
+    { id: 'High white calf-length socks', label: 'Kaos Kaki Putih Sebetis' },
+    { id: 'White knee-high socks', label: 'Kaos Kaki Putih Selutut' }
+  ]},
+  { group: 'Tas & Kantong', items: [
+    { id: 'Woven rattan or straw tote bag', label: 'Tote Bag Anyaman Rotan/Jerami' },
+    { id: 'Pink canvas tote bag', label: 'Tote Bag Kanvas Pink' },
+    { id: 'Cream backpack', label: 'Tas Ransel Krem' },
+    { id: 'Black leather shoulder bag', label: 'Shoulder Bag Kulit Hitam' },
+    { id: 'White crossbody sling bag', label: 'Tas Selempang Putih (Crossbody)' },
+    { id: 'Sports duffel bag', label: 'Tas Duffel Olahraga' },
+    { id: 'Alfamart plastic shopping bag', label: 'Kantong Kresek Alfamart' },
+    { id: 'Indomaret plastic shopping bag', label: 'Kantong Kresek Indomaret' },
+    { id: 'FamilyMart plastic shopping bag', label: 'Kantong Kresek FamilyMart' },
+    { id: 'Watsons plastic shopping bag', label: 'Kantong Kresek Watsons' }
+  ]},
+  { group: 'Lainnya (Properti)', items: [
+    { id: 'Black leather driving gloves', label: 'Sarung Tangan Kulit Hitam' },
+    { id: 'Red electric guitar', label: 'Gitar Elektrik Merah' },
+    { id: 'Action camera (GoPro)', label: 'Kamera Aksi (GoPro)' },
+    { id: 'Festival wristbands', label: 'Gelang Festival' }
+  ]}
 ];
 
 const LUXURY_WATCHES = [
@@ -730,6 +742,9 @@ export default function App() {
   const [bgCategory, setBgCategory] = useState(BACKGROUNDS[0].group);
   const [background, setBackground] = useState(BACKGROUNDS[0].items[0].id);
   const [customBackground, setCustomBackground] = useState('');
+  
+  // PENAMBAHAN: Kategori Aksesori
+  const [accCategory, setAccCategory] = useState(ACCESSORIES_DATABASE[0].group);
 
   const triggerSmartAlert = () => {
     setShowSmartAlert(true);
@@ -893,14 +908,22 @@ export default function App() {
     setManualColor3(c3);
   };
 
-  const dynamicAccessories = [...COMMON_ACCESSORIES]; 
-  if (gender === 'Wanita') {
-    if (useHijab) dynamicAccessories.push({ id: 'Decorative hijab brooch', label: 'Bros Hijab (Brooch)' });
-    else {
-      dynamicAccessories.push({ id: 'Small stud earrings', label: 'Anting Stud Kecil' });
-      dynamicAccessories.push({ id: 'Dangling earrings', label: 'Anting Panjang (Dangling)' });
+  const getDynamicAccessories = () => {
+    let groups = JSON.parse(JSON.stringify(ACCESSORIES_DATABASE));
+    if (gender === 'Wanita' || gender === 'Campur (Pria & Wanita)') {
+      const headwearGroup = groups.find(g => g.group === 'Topi & Kepala');
+      const jewelryGroup = groups.find(g => g.group === 'Perhiasan & Tindik');
+      
+      if (useHijab && headwearGroup) {
+        headwearGroup.items.push({ id: 'Decorative hijab brooch', label: 'Bros Hijab (Brooch)' });
+      } else if (!useHijab && jewelryGroup) {
+        jewelryGroup.items.push({ id: 'Small stud earrings', label: 'Anting Stud Kecil' });
+        jewelryGroup.items.push({ id: 'Dangling earrings', label: 'Anting Panjang (Dangling)' });
+      }
     }
-  }
+    return groups;
+  };
+  const dynamicAccessoryGroups = getDynamicAccessories();
 
   const dynamicClothingGroups = CLOTHING_DATABASE.map(group => {
     return {
@@ -1322,19 +1345,38 @@ ${promptText}
             </div>
 
             <div className="space-y-4 pt-4 border-t border-neutral-700">
-              <label className="text-sm font-medium text-neutral-400 flex items-center gap-2">
-                <Glasses className="w-4 h-4" /> Aksesoris (Perhiasan & Kepala)
-              </label>
-              <div className="grid grid-cols-2 gap-2">
-                {dynamicAccessories.map(acc => (
-                  <label key={acc.id} className="flex items-center gap-2 text-sm bg-neutral-900 p-2 rounded-lg border border-neutral-700 cursor-pointer hover:border-pink-500/50 transition-colors">
-                    <input type="checkbox" checked={accessories.includes(acc.id)} onChange={() => toggleAccessory(acc.id)} className="rounded text-pink-500 bg-neutral-800 border-neutral-600 focus:ring-pink-500 focus:ring-offset-neutral-900" />
-                    <span className="text-neutral-300 select-none text-xs leading-tight">{acc.label}</span>
-                  </label>
-                ))}
+              <div className="flex items-center gap-2 text-indigo-400 font-medium">
+                <Glasses className="w-5 h-5" /> Aksesori & Properti
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-3 pb-2">
+                <label className="text-sm font-medium text-indigo-300">Kategori Aksesori</label>
+                <div className="flex flex-wrap gap-2">
+                  {dynamicAccessoryGroups.map(accGroup => (
+                    <button
+                      key={accGroup.group}
+                      onClick={() => setAccCategory(accGroup.group)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                        accCategory === accGroup.group ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-neutral-800 border-neutral-700 text-neutral-400 hover:bg-neutral-700 hover:text-neutral-200'
+                      }`}
+                    >
+                      {accGroup.group}
+                    </button>
+                  ))}
+                </div>
+                
+                <label className="text-sm font-medium text-indigo-300 block mt-3">Pilih Item ({accCategory})</label>
+                <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto custom-scrollbar pr-2">
+                  {dynamicAccessoryGroups.find(g => g.group === accCategory)?.items.map(item => (
+                    <label key={item.id} className="flex items-center gap-2 text-sm bg-neutral-900 p-2 rounded-lg border border-neutral-700 cursor-pointer hover:border-pink-500/50 transition-colors">
+                      <input type="checkbox" checked={accessories.includes(item.id)} onChange={() => toggleAccessory(item.id)} className="rounded text-pink-500 bg-neutral-800 border-neutral-600 focus:ring-pink-500 focus:ring-offset-neutral-900" />
+                      <span className="text-neutral-300 select-none text-xs leading-tight">{item.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2 pt-2 border-t border-neutral-800">
                 <label className="text-sm font-medium text-neutral-400 flex items-center gap-2">
                   <Watch className="w-4 h-4" /> Jam Tangan Mewah (Luxury Watches)
                 </label>
