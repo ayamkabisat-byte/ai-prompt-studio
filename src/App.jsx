@@ -567,6 +567,7 @@ const CLOTHING_DATABASE = [
     { id: 'Cable-knit crewneck sweater layered over a light blue collared shirt', label: 'Sweater Rajut Cable-Knit di Atas Kemeja (Layering)', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
     { id: 'Olive green corduroy suit paired with a black turtleneck', label: 'Setelan Jas Corduroy Hijau Olive + Turtleneck', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
     { id: 'Sleeveless silk blouse paired with a dark pleated midi skirt', label: 'Blus Sutra Tanpa Lengan + Rok Plisket', tags: ['female'] },
+    { id: 'Crop top white denim short', label: 'Crop top putih dengan celana denim pendek', tags: ['female'] },
     { id: 'Relaxed striped cotton shirt layered under a classic denim jacket with straight-leg trousers', label: 'Kemeja Garis + Jaket Denim + Celana Lurus', tags: ['female', 'hijab_approved'] }
   ]},
   { group: 'Cozy & Knitwear Casual', items: [
