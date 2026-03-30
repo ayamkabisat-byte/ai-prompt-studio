@@ -558,6 +558,12 @@ const CLOTHING_DATABASE = [
     { id: 'Blue long-sleeve off-shoulder Sabrina top paired with a white tiered maxi skirt and woven straw slip-on shoes', label: 'Atasan Off-Shoulder Sabrina Biru + Rok Maxi Putih', tags: ['female'] },
     { id: 'White cotton linen trousers paired with a relaxed button-up shirt and brown leather slide sandals', label: 'Celana Linen Putih & Kemeja Santai + Sandal Kulit', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
     { id: 'Tailored short pants paired with a breezy summer shirt', label: 'Celana Pendek Tailored & Kemeja Santai', tags: ['male', 'female', 'unisex'] }
+	{ id: 'Crochet halter top in earthy tones paired with flowy wide-leg pants featuring a paisley print and gladiator sandals', label: 'Atasan Halter Rajut (Crochet) + Celana Kulot Motif Paisley + Sandal Gladiator', tags: ['female'] },
+    { id: 'Unbuttoned short-sleeve viscose shirt with a tropical leaf print over a plain white tank top, paired with beige linen shorts and woven espadrilles', label: 'Kemeja Tropis Terbuka + Tank Top Putih + Celana Pendek Linen + Sepatu Espadrille', tags: ['male'] },
+    { id: 'Loose embroidered bohemian tunic in terracotta worn over wide-leg linen palazzo pants, paired with flat sandals', label: 'Tunik Boho Bordir Terakota + Celana Palazzo Linen + Sandal Teplek', tags: ['female', 'hijab_approved'] },
+    { id: 'Flowy silk kaftan dress with a vibrant geometric bohemian print and deep V-neck, cinched at the waist with a tasseled rope belt', label: 'Gaun Kaftan Sutra Motif Geometris Boho + Sabuk Tali Rumbai', tags: ['female'] },
+    { id: 'Relaxed fit cream seersucker shirt with short sleeves, paired with olive green drawstring shorts and brown leather boat shoes', label: 'Kemeja Seersucker Krem + Celana Pendek Tali Serut Olive + Sepatu Boat Kulit', tags: ['male', 'unisex'] },
+    { id: 'Long fringed sheer floral kimono worn over a simple camisole and distressed denim cut-off shorts, paired with suede ankle boots', label: 'Kimono Transparan Rumbai Motif Bunga + Kamisol + Celana Denim Pendek + Sepatu Boots Suede', tags: ['female'] }
   ]},
   { group: 'Smart-Casual & Preppy / Schoolgirl', items: [
     { id: 'Polo shirt paired with tailored cream trousers and a knit sweater draped elegantly over the shoulders', label: 'Polo Shirt + Celana Krem + Sweater Disampirkan (Preppy)', tags: ['male', 'female', 'unisex'] },
@@ -569,6 +575,12 @@ const CLOTHING_DATABASE = [
     { id: 'Sleeveless silk blouse paired with a dark pleated midi skirt', label: 'Blus Sutra Tanpa Lengan + Rok Plisket', tags: ['female'] },
     { id: 'Crop top white denim short', label: 'Crop top putih dengan celana denim pendek', tags: ['female'] },
     { id: 'Relaxed striped cotton shirt layered under a classic denim jacket with straight-leg trousers', label: 'Kemeja Garis + Jaket Denim + Celana Lurus', tags: ['female', 'hijab_approved'] }
+	{ id: 'Navy tailored blazer over a crisp white button-up shirt and a red tartan pleated mini skirt, paired with black oxford shoes', label: 'Blazer Navy + Kemeja Putih + Rok Tartan Merah + Sepatu Oxford', tags: ['female'] },
+    { id: 'Light blue oxford button-down shirt with rolled-up sleeves, neatly tucked into beige chino pants, paired with brown suede loafers', label: 'Kemeja Oxford Biru Muda + Celana Chino Beige + Sepatu Loafers Suede', tags: ['male', 'unisex'] },
+    { id: 'Houndstooth knit vest layered over a white long-sleeve balloon-sleeve blouse, paired with wide-leg beige trousers', label: 'Rompi Rajut Houndstooth + Blus Lengan Balon + Celana Lebar', tags: ['female', 'hijab_approved'] },
+    { id: 'Brown tweed blazer layered over a burgundy V-neck sweater vest and a white shirt, paired with dark wash straight jeans and leather brogues', label: 'Jas Tweed Cokelat + Rompi V-Neck Burgundy + Celana Jeans Lurus', tags: ['male'] },
+    { id: 'Dark grey pinafore dress layered over a white short-sleeve blouse with a Peter Pan collar, paired with Mary Jane shoes and ruffled ankle socks', label: 'Pinafore Dress Abu + Blus Kerah Peter Pan + Sepatu Mary Jane', tags: ['female'] },
+    { id: 'Classic beige double-breasted trench coat worn open over a black turtleneck midi dress, paired with pointed-toe ankle boots', label: 'Trench Coat Beige + Gaun Midi Turtleneck + Sepatu Boots', tags: ['female', 'hijab_approved'] }
   ]},
   { group: 'Cozy & Knitwear Casual', items: [
     { id: 'Fuzzy knit cardigan over a plain tank top, paired with loose light blue baggy jeans', label: 'Kardigan Rajut Berbulu + Tank Top + Baggy Jeans', tags: ['female', 'unisex', 'hijab_approved'] },
@@ -581,6 +593,13 @@ const CLOTHING_DATABASE = [
     { id: 'Light yellow oversized t-shirt with cute pastel graphics, paired with black sweatshorts and slip-on white shoes with black polka dots', label: 'Kaos Oversize Kuning (Grafis Lucu) + Celana Pendek + Slip-on Polkadot', tags: ['female', 'unisex'] },
     { id: 'White Y2K style baby tee with brown trims and graphics, paired with a pleated mini skirt and chunky white sneakers with mid-calf socks', label: 'Y2K Baby Tee Putih + Rok Lipit Mini + Sepatu Chunky', tags: ['female'] },
     { id: 'Plain white t-shirt layered under a brown barista apron, paired with dark trousers', label: 'Kaos Putih Polos dilapis Celemek (Apron) Barista Cokelat', tags: ['male', 'female', 'unisex', 'hijab_approved'] }
+	{ id: 'Pastel pink corduroy overalls worn over a white long-sleeve striped shirt, paired with white canvas sneakers', label: 'Celana Kodok Pink Pastel Korduroi + Kaos Garis Lengan Panjang + Sepatu Kanvas', tags: ['female', 'hijab_approved'] },
+    { id: 'Oversized mint green hoodie with a cartoon bear graphic, paired with loose light blue denim shorts and chunky colorful sneakers', label: 'Hoodie Oversize Mint (Grafis Beruang) + Celana Pendek Denim + Sepatu Chunky', tags: ['male', 'unisex'] },
+    { id: 'Chunky knit strawberry-patterned cardigan over a simple white midi dress, paired with Mary Jane shoes and frilly socks', label: 'Kardigan Rajut Stroberi + Gaun Midi Putih + Sepatu Mary Jane', tags: ['female'] },
+    { id: 'Color-blocked windbreaker jacket in pastel pink, yellow, and blue, paired with light wash baggy jeans and retro sneakers', label: 'Jaket Windbreaker Blok Warna Pastel + Celana Jeans Baggy + Sepatu Retro', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
+    { id: 'Short-sleeve button-up shirt with a playful doodle pattern, worn open over a plain white tee, paired with mustard yellow shorts', label: 'Kemeja Lengan Pendek Motif Doodle + Kaos Putih + Celana Pendek Mustard', tags: ['male'] },
+    { id: 'Fleece vest with cute animal patches worn over a long-sleeve turtleneck, paired with wide-leg corduroy pants', label: 'Rompi Bulu (Fleece) Patch Hewan Lucu + Turtleneck + Celana Korduroi Lebar', tags: ['female', 'unisex', 'hijab_approved'] },
+    { id: 'Floral print sleeveless playsuit with a tie-front detail, paired with strappy sandals and a woven crossbody bag', label: 'Playsuit Motif Bunga (Tanpa Lengan) + Sandal Tali + Tas Selempang Anyam', tags: ['female'] }
   ]},
   { group: 'Urban Casual & Workwear', items: [
     { id: 'Classic plain white t-shirt with straight-leg jeans and white canvas sneakers', label: 'Kaos Polos Klasik + Celana Jeans Lurus', tags: ['male', 'female', 'unisex'] },
@@ -591,6 +610,12 @@ const CLOTHING_DATABASE = [
     { id: 'Oversized t-shirt with a pink shirt tied around the waist or arm (festival style)', label: 'Kaos Oversize + Kemeja Pink Diikat (Gaya Festival)', tags: ['female', 'unisex'] },
     { id: 'Light blue denim jacket over a camisole, paired with blue denim shorts', label: 'Jaket Denim Biru Muda + Camisole + Celana Pendek', tags: ['female', 'unisex'] },
     { id: 'Casual dress', label: 'Gaun Kasual', tags: ['female'] }
+	{ id: 'Heavyweight black hoodie layered under a tan utility vest with multiple pockets, paired with dark green cargo pants and chunky black combat boots', label: 'Hoodie Hitam + Rompi Utilitas (Banyak Saku) + Celana Cargo Hijau + Sepatu Boots Tempur', tags: ['male', 'unisex', 'hijab_approved'] },
+    { id: 'Navy blue canvas boiler suit (coveralls) with the top half unzipped, revealing a white ribbed tank top, paired with classic high-top canvas sneakers', label: 'Boiler Suit Kanvas Navy (Setengah Terbuka) + Tank Top + Sepatu Kanvas High-top', tags: ['male', 'female', 'unisex'] },
+    { id: 'Sage green oversized nylon bomber jacket over a black turtleneck, paired with baggy faded black jeans and retro running sneakers', label: 'Jaket Bomber Oversize Hijau Sage + Turtleneck Hitam + Jeans Baggy Pudar', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
+    { id: 'Classic blue denim dungarees worn over a fitted long-sleeve striped mock neck shirt, paired with sturdy brown leather work boots', label: 'Celana Kodok Denim (Dungarees) + Kaos Lengan Panjang Garis + Sepatu Boots Kerja Kulit', tags: ['female', 'hijab_approved'] },
+    { id: 'Thick red and black plaid flannel shirt worn open over a graphic vintage tee, paired with distressed slim-fit black jeans and skate shoes', label: 'Kemeja Flannel Kotak-kotak Tebal Terbuka + Kaos Vintage + Jeans Hitam Sobek + Sepatu Skate', tags: ['male', 'unisex'] },
+    { id: 'Ribbed knit bodycon midi dress in charcoal grey, layered under an oversized faded black denim jacket, paired with chunky white sneakers', label: 'Gaun Midi Rajut Ketat Abu Tua + Jaket Denim Hitam Oversize + Sepatu Sneakers Chunky', tags: ['female'] }
   ]},
   { group: 'Business Casual & Formal', items: [
     { id: 'Sleek dark tailored suit with a matching tie and a vest (three-piece suit)', label: 'Setelan Jas Tiga Potong (Jas, Rompi, Dasi)', tags: ['male'] },
@@ -626,10 +651,16 @@ const CLOTHING_DATABASE = [
   ]},
   { group: 'Pakaian Renang & Penyelam', items: [
     { id: 'One-piece swimsuit', label: 'Baju Renang One-Piece', tags: ['female'] },
+	{ id: 'Tankini set', label: 'Set Tankini', tags: ['female'] },
+	{ id: 'Beach co-ord set', label: 'Setelan Pakaian Pantai', tags: ['female'] },
+	{ id: 'Swimsuit and sarong set', label: 'Set Baju Renang & Kain Pantai', tags: ['female'] },
     { id: 'Bikini swimsuit', label: 'Baju Renang Bikini', tags: ['female'] },
     { id: 'Swimming trunks / board shorts', label: 'Celana Renang (Board Shorts)', tags: ['male'] },
     { id: 'Full body black neoprene wetsuit', label: 'Wetsuit Penyelam (Scuba Penuh)', tags: ['male', 'female', 'unisex', 'hijab_approved'] },
     { id: 'Modest swimwear / burkini', label: 'Baju Renang Muslimah (Burkini)', tags: ['female', 'hijab_approved'] }
+	{ id: 'Cabana set', label: 'Setelan Cabana', tags: ['male'] },
+	{ id: 'Summer co-ord set', label: 'Setelan Musim Panas Pria', tags: ['male'] },
+	{ id: 'Rash guard set', label: 'Set Baju & Celana Selancar', tags: ['male'] },
   ]},
   { group: 'Gorpcore & Outdoor / Hiking', items: [
     { id: 'Dark grey and olive green fleece polar jacket layered over a t-shirt, paired with olive green sweatshorts and brown hiking boots with cream socks', label: 'Jaket Fleece/Polar Hijau Abu + Celana Pendek + Sepatu Gunung', tags: ['male', 'female', 'unisex'] },
