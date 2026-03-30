@@ -141,7 +141,21 @@ const POSES = [
     { id: 'Heavy metal pose, aggressive and energetic', label: 'Metalhead Pose', allowedTypes: ['studio', 'urban', 'indoor'] },
     { id: 'One hand covering the mouth, mysterious and edgy vibe', label: 'Menutup Mulut dengan Tangan', allowedTypes: ['all'] },
     { id: 'High-fashion editorial pose, one hand confidently on the hip', label: 'Satu Tangan di Pinggang (High-Fashion)', allowedTypes: ['studio', 'urban', 'indoor', 'nature'] },
-  ]}
+  ]},
+  { group: 'Pose Tambahan (Dari Gambar)', items: [
+    { id: 'Sitting on stairs, leaning forward, resting on forearms at the knees, one hand supporting the chin in a pensive pose', label: 'Duduk di Tangga, Condong ke Depan, Menopang Dagu', allowedTypes: ['urban', 'indoor'] },
+    { id: 'Half-body medium portrait, standing, smiling, one hand raised to lips in a "blowing a kiss" gesture', label: 'Half-Body: Senyum, Tangan ke Bibir Meniup Ciuman', allowedTypes: ['all'] },
+    { id: 'Half-body medium portrait, standing sideways, resting one hand on the waist area, one hand on thigh', label: 'Half-Body: Berdiri Miring, Bertumpu di Pinggang', allowedTypes: ['all'] },
+    { id: 'Half-body medium portrait, looking slightly upwards with closed eyes, one hand resting on the opposite shoulder, fingers touching the face', label: 'Half-Body: Mendongak, Mata Terpejam, Tangan di Wajah', allowedTypes: ['all'] },
+    { id: 'Half-body medium portrait, standing, leaning against a wall, one hand playfully holding the collar area', label: 'Half-Body: Bersandar di Dinding, Memegang Area Kerah', allowedTypes: ['urban', 'indoor'] },
+    { id: 'Standing, with both hands raised high behind the head, elbows pulled back, a slight stretching, and smiling', label: 'Berdiri, Kedua Tangan di Belakang Kepala, Peregangan', allowedTypes: ['all'] },
+    { id: 'Standing sideways, leaning slightly forward, hands resting relaxed on thighs', label: 'Berdiri Miring, Condong ke Depan, Tangan di Paha', allowedTypes: ['indoor', 'urban'] },
+    { id: 'Half-body medium portrait, standing sideways, one hand resting softly near the chest or collar bone', label: 'Half-Body: Berdiri Miring, Satu Tangan di Dada/Kerah', allowedTypes: ['all'] },
+    { id: 'Half-body medium portrait, standing, facing the camera, one index finger placed to the lips in a "shush" gesture', label: 'Half-Body: Berdiri, Satu Jari di Bibir, Pose "Diam"', allowedTypes: ['all'] },
+	{ id: 'Half-body medium portrait, standing perfectly straight facing the camera, both arms resting down naturally by the sides, calm and composed expression', label: 'Half-Body: Berdiri Tegap, Lengan Natural di Sisi', allowedTypes: ['all'] },
+    { id: 'Half-body medium portrait, standing facing the camera with a cheerful smile, one arm raised with the hand gently resting near the ear or side of the head, relaxed posture', label: 'Half-Body: Tersenyum, Satu Tangan Terangkat ke Samping Kepala', allowedTypes: ['all'] },
+	{ id: 'Crouching low on the floor, sideways, looking back over the shoulder from a rear low angle', label: 'Duduk Jongkok Rendah, Miring, Menoleh ke Belakang', allowedTypes: ['urban', 'indoor'] }
+  ]},
 ];
 
 const CAMERA_LENSES = [
