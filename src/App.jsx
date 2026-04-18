@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import {
   Sparkles, RefreshCcw, Scissors, Palette, Glasses, CheckCircle2,
   Copy, Check, Image as ImageIcon, User, Camera, Watch, FileJson,
-  FileText, Layers, Scan, Cpu, AlertTriangle, Coffee, MapPin
+  FileText, Layers, Scan, Cpu, AlertTriangle, Coffee, MapPin, Lock,
+  Users, ChevronDown, ChevronUp, Shield
 } from 'lucide-react';
 import {
   GENDERS, VIEW_MODES, COMPOSITIONS, BODY_TYPES, SHOOT_STYLES,
@@ -12,6 +13,17 @@ import {
   CLOTHING_MATERIALS, COLOR_THEMES, CLOTHING_DATABASE,
   getClothingSceneScore
 } from './data.js';
+
+// ─── CONSTANTS ────────────────────────────────────────────────────────────────
+
+const ID_PHOTO_SHOOT_STYLE_ID = 'Official ID photo style, front-facing, formal';
+
+const ID_PHOTO_LOCKED = {
+  pose: 'Front-facing close-up headshot',
+  composition: 'Perfect Symmetry and Balance, subject perfectly centered',
+  cameraLens: 'Standard portrait lens (50mm)',
+  lighting: 'Bright, even flat studio lighting, no shadows on face',
+};
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 
@@ -55,7 +67,8 @@ const isClothingValidForGender = (clothingId, gender, isHijab) => {
   for (const group of CLOTHING_DATABASE) {
     for (const item of group.items) {
       if (item.id === clothingId) {
-        if (gender === 'Wanita') return isHijab ? item.tags.includes('hijab_approved') : (item.tags.includes('female') || item.tags.includes('unisex'));
+        if (gender === 'Wanita') return isHijab ?
+          item.tags.includes('hijab_approved') : (item.tags.includes('female') || item.tags.includes('unisex'));
         if (gender === 'Pria') return item.tags.includes('male') || item.tags.includes('unisex');
         return true;
       }
@@ -75,10 +88,29 @@ const hslToHex = (h, s, l) => {
   return `#${f(0)}${f(8)}${f(4)}`;
 };
 
+// ─── DEFAULT SUBJECT FACTORY ──────────────────────────────────────────────────
+
+const createDefaultSubject = (idx) => ({
+  id: idx,
+  gender: 'Pria',
+  expression: 'Natural neutral expression',
+  useHijab: false,
+  hairstyle: (HAIRSTYLES['Pria'] || HAIRSTYLES['Unisex'] || [])[0] || '',
+  hijab: (HIJAB_STYLES || [])[0]?.id || '',
+  facialHair: (FACIAL_HAIR || [])[0]?.id || '',
+  makeup: (MAKEUP_STYLES || [])[0]?.id || '',
+  clothing: 'Original clothing from reference',
+  clothingMaterial: (CLOTHING_MATERIALS || [])[0]?.id || '',
+  colorTheme: (COLOR_THEMES || [])[0]?.id || 'Original colors',
+  manualColor1: '#8b5cf6',
+  manualColor2: '#ec4899',
+  manualColor3: '#10b981',
+});
+
 // ─── SCENE BADGE ──────────────────────────────────────────────────────────────
 
 const SceneBadge = ({ score }) => {
-  if (score === 2) return null; // perfect match — no badge needed
+  if (score === 2) return null;
   if (score === 1) return (
     <span className="ml-1 text-[9px] px-1.5 py-0.5 rounded-full bg-amber-900/50 text-amber-300 border border-amber-700/50 font-bold shrink-0">
       ~ cocok
@@ -88,6 +120,217 @@ const SceneBadge = ({ score }) => {
     <span className="ml-1 text-[9px] px-1.5 py-0.5 rounded-full bg-red-900/40 text-red-300 border border-red-700/40 font-bold shrink-0 flex items-center gap-0.5">
       <AlertTriangle className="w-2.5 h-2.5" /> kurang cocok
     </span>
+  );
+};
+
+// ─── LOCK BADGE ──────────────────────────────────────────────────────────────
+
+const LockBadge = () => (
+  <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-amber-900/40 text-amber-300 border border-amber-600/40 font-bold">
+    <Lock className="w-2.5 h-2.5" /> Terkunci
+  </span>
+);
+
+// ─── SUBJECT PANEL COMPONENT ──────────────────────────────────────────────────
+
+const SubjectPanel = ({ subject, idx, onChange }) => {
+  const [expanded, setExpanded] = useState(true);
+  const [clothCategory, setClothCategory] = useState('');
+
+  const subjectDynamicClothing = useMemo(() => {
+    return CLOTHING_DATABASE.map(group => ({
+      group: group.group,
+      items: group.items.filter(item => {
+        if (subject.gender === 'Wanita') return subject.useHijab ?
+          item.tags.includes('hijab_approved') : (item.tags.includes('female') || item.tags.includes('unisex'));
+        if (subject.gender === 'Pria') return item.tags.includes('male') || item.tags.includes('unisex');
+        return true;
+      }),
+    })).filter(group => group.items.length > 0);
+  }, [subject.gender, subject.useHijab]);
+
+  // sync clothCategory when dynamicClothing changes
+  useEffect(() => {
+    if (subjectDynamicClothing.length > 0) {
+      const valid = subjectDynamicClothing.some(g => g.group === clothCategory);
+      if (!valid) setClothCategory(subjectDynamicClothing[0].group);
+    }
+  }, [subjectDynamicClothing, clothCategory]);
+
+  const hairstyleList = useMemo(() => HAIRSTYLES[subject.gender] || HAIRSTYLES['Unisex'] || [], [subject.gender]);
+
+  const handleGenderChange = (e) => {
+    const newGender = e.target.value;
+    const list = HAIRSTYLES[newGender] || HAIRSTYLES['Unisex'] || [];
+    const newHijab = newGender !== 'Wanita' ? false : subject.useHijab;
+    onChange(idx, {
+      gender: newGender,
+      useHijab: newHijab,
+      hairstyle: list[0] || '',
+      clothing: 'Original clothing from reference',
+    });
+  };
+
+  const personAccents = [
+    { border: 'border-indigo-500', text: 'text-indigo-400', bg: 'bg-indigo-500', gradient: 'from-indigo-500/10 to-purple-500/5 border-indigo-500/30' },
+    { border: 'border-pink-500', text: 'text-pink-400', bg: 'bg-pink-500', gradient: 'from-pink-500/10 to-rose-500/5 border-pink-500/30' },
+    { border: 'border-emerald-500', text: 'text-emerald-400', bg: 'bg-emerald-500', gradient: 'from-emerald-500/10 to-teal-500/5 border-emerald-500/30' },
+    { border: 'border-amber-500', text: 'text-amber-400', bg: 'bg-amber-500', gradient: 'from-amber-500/10 to-orange-500/5 border-amber-500/30' },
+  ];
+  const accent = personAccents[idx] || personAccents[0];
+
+  return (
+    <div className={`rounded-2xl border bg-gradient-to-br ${accent.gradient} overflow-hidden transition-all duration-300`}>
+      {/* Header toggle */}
+      <button
+        onClick={() => setExpanded(v => !v)}
+        className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <div className={`w-8 h-8 rounded-full bg-neutral-800/80 border-2 ${accent.border} flex items-center justify-center text-sm font-bold ${accent.text}`}>
+            {idx + 1}
+          </div>
+          <div className="text-left">
+            <div className={`font-semibold text-sm ${accent.text}`}>
+              Orang ke-{idx + 1}
+            </div>
+            <div className="text-xs text-neutral-400">
+              {subject.gender} · {subject.useHijab ? 'Berhijab' : 'Non-hijab'} · {(subject.expression || '').split(',')[0]}
+            </div>
+          </div>
+        </div>
+        {expanded
+          ? <ChevronUp className="w-4 h-4 text-neutral-400" />
+          : <ChevronDown className="w-4 h-4 text-neutral-400" />}
+      </button>
+
+      {/* Body */}
+      {expanded && (
+        <div className="px-4 pb-5 space-y-4 border-t border-white/5 pt-4">
+
+          {/* Gender + Expression */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-neutral-400">Gender</label>
+              <select value={subject.gender} onChange={handleGenderChange}
+                className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                {GENDERS.map(g => <option key={g} value={g}>{g}</option>)}
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-neutral-400">Ekspresi</label>
+              <select value={subject.expression} onChange={e => onChange(idx, { expression: e.target.value })}
+                className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                {EXPRESSIONS.map(ex => <option key={ex.id} value={ex.id}>{ex.label}</option>)}
+              </select>
+            </div>
+          </div>
+
+          {/* Hijab toggle */}
+          {subject.gender === 'Wanita' && (
+            <label className="flex items-center gap-2 text-sm bg-neutral-900/50 px-3 py-2 rounded-lg border border-neutral-700 cursor-pointer hover:border-indigo-500/50 transition-colors">
+              <input type="checkbox" checked={subject.useHijab}
+                onChange={e => onChange(idx, { useHijab: e.target.checked, clothing: 'Original clothing from reference' })}
+                className="rounded text-indigo-500 bg-neutral-800 border-neutral-600" />
+              <span className="text-neutral-300 text-sm">Gunakan Hijab</span>
+            </label>
+          )}
+
+          {/* Hair / Hijab selector */}
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-neutral-400">
+              {subject.useHijab ? 'Gaya Hijab' : 'Gaya Rambut'}
+            </label>
+            {subject.useHijab ? (
+              <select value={subject.hijab} onChange={e => onChange(idx, { hijab: e.target.value })}
+                className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                {HIJAB_STYLES.map(h => <option key={h.id} value={h.id}>{h.label}</option>)}
+              </select>
+            ) : (
+              <select value={subject.hairstyle} onChange={e => onChange(idx, { hairstyle: e.target.value })}
+                className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                {hairstyleList.map((h, i) => (
+                  <option key={i} value={h}>{h.length > 60 ? h.substring(0, 60) + '…' : h}</option>
+                ))}
+              </select>
+            )}
+          </div>
+
+          {/* Facial Hair (male only) */}
+          {subject.gender !== 'Wanita' && (
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-neutral-400">Kumis & Janggut</label>
+              <select value={subject.facialHair} onChange={e => onChange(idx, { facialHair: e.target.value })}
+                className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                {FACIAL_HAIR.map(fh => <option key={fh.id} value={fh.id}>{fh.label}</option>)}
+              </select>
+            </div>
+          )}
+
+          {/* Makeup */}
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-neutral-400">Makeup & Efek Wajah</label>
+            <select value={subject.makeup} onChange={e => onChange(idx, { makeup: e.target.value })}
+              className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+              {MAKEUP_STYLES.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
+            </select>
+          </div>
+
+          {/* Clothing */}
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-neutral-400">Pakaian</label>
+            <div className="flex gap-1.5 flex-wrap">
+              {subjectDynamicClothing.map(g => (
+                <button key={g.group} onClick={() => setClothCategory(g.group)}
+                  className={`text-xs px-2.5 py-1 rounded-full border transition-all ${clothCategory === g.group
+                    ? 'bg-indigo-600/80 border-indigo-500 text-white'
+                    : 'bg-neutral-900/50 border-neutral-700 text-neutral-400 hover:border-neutral-500'}`}>
+                  {g.group}
+                </button>
+              ))}
+            </div>
+            <select value={subject.clothing} onChange={e => onChange(idx, { clothing: e.target.value })}
+              className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+              <option value="Original clothing from reference">Original clothing from reference</option>
+              {subjectDynamicClothing
+                .filter(g => g.group === clothCategory)
+                .flatMap(g => g.items)
+                .map(item => (
+                  <option key={item.id} value={item.id}>
+                    {item.label.length > 65 ? item.label.substring(0, 65) + '…' : item.label}
+                  </option>
+                ))}
+            </select>
+          </div>
+
+          {/* Color Theme */}
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-neutral-400">Tema Warna Pakaian</label>
+            <select value={subject.colorTheme} onChange={e => onChange(idx, { colorTheme: e.target.value })}
+              className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+              {COLOR_THEMES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+            </select>
+          </div>
+
+          {subject.colorTheme !== 'Original colors' && (
+            <div className="flex gap-3 items-center">
+              {[
+                ['manualColor1', subject.manualColor1],
+                ['manualColor2', subject.manualColor2],
+                ['manualColor3', subject.manualColor3],
+              ].map(([key, val]) => (
+                <div key={key} className="flex flex-col items-center gap-1">
+                  <input type="color" value={val}
+                    onChange={e => onChange(idx, { [key]: e.target.value })}
+                    className="w-10 h-10 rounded-lg cursor-pointer border border-neutral-700 bg-transparent" />
+                  <span className="text-[9px] text-neutral-500">{val}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -101,6 +344,7 @@ export default function App() {
   const [smartAlertMsg, setSmartAlertMsg] = useState('');
   const alertTimerRef = useRef(null);
 
+  // ── Primary (Single) Subject State ────────────────────────────────────────
   const [gender, setGender] = useState('Pria');
   const [bodyType, setBodyType] = useState(BODY_TYPES[0].id);
   const [viewMode, setViewMode] = useState('1-photo');
@@ -125,7 +369,9 @@ export default function App() {
   const [watch, setWatch] = useState('No watch');
   const [facialHair, setFacialHair] = useState(FACIAL_HAIR[0].id);
   const [useHijab, setUseHijab] = useState(false);
-  const [hijabs, setHijabs] = useState([HIJAB_STYLES[0].id, HIJAB_STYLES[1].id, HIJAB_STYLES[2].id, HIJAB_STYLES[3].id]);
+  const [hijabs, setHijabs] = useState([
+    HIJAB_STYLES[0].id, HIJAB_STYLES[1].id, HIJAB_STYLES[2].id, HIJAB_STYLES[3].id,
+  ]);
   const [expression, setExpression] = useState(EXPRESSIONS[0].id);
   const [makeup, setMakeup] = useState(MAKEUP_STYLES[0].id);
 
@@ -143,7 +389,28 @@ export default function App() {
   const [accCategory, setAccCategory] = useState(ACCESSORIES_DATABASE[0].group);
   const [clothCategory, setClothCategory] = useState(CLOTHING_DATABASE[0].group);
 
-  // FIX: debounced single alert
+  // ── Multi-Subject State ───────────────────────────────────────────────────
+  const [subjectCount, setSubjectCount] = useState(1);
+  const [subjects, setSubjects] = useState(() => [
+    createDefaultSubject(0),
+    createDefaultSubject(1),
+    createDefaultSubject(2),
+    createDefaultSubject(3),
+  ]);
+
+  // ── ID Photo Lock ─────────────────────────────────────────────────────────
+  const isIdPhotoMode = useMemo(() => shootStyle === ID_PHOTO_SHOOT_STYLE_ID, [shootStyle]);
+
+  useEffect(() => {
+    if (isIdPhotoMode) {
+      setPose(ID_PHOTO_LOCKED.pose);
+      setComposition(ID_PHOTO_LOCKED.composition);
+      setCameraLens(ID_PHOTO_LOCKED.cameraLens);
+      setLighting(ID_PHOTO_LOCKED.lighting);
+    }
+  }, [isIdPhotoMode]);
+
+  // ── Alert ─────────────────────────────────────────────────────────────────
   const triggerSmartAlert = useCallback((msg = 'Logika Cerdas Aktif: Pilihan yang tidak cocok otomatis direset.') => {
     if (alertTimerRef.current) clearTimeout(alertTimerRef.current);
     setSmartAlertMsg(msg);
@@ -151,15 +418,16 @@ export default function App() {
     alertTimerRef.current = setTimeout(() => setShowSmartAlert(false), 3500);
   }, []);
 
-  // ── Derived data (memoized) ────────────────────────────────────────────────
-
+  // ── Derived data ──────────────────────────────────────────────────────────
   const currentBgType = useMemo(() => getBgType(background), [background]);
 
   const dynamicClothingGroups = useMemo(() => {
     return CLOTHING_DATABASE.map(group => ({
       group: group.group,
       items: group.items.filter(item => {
-        if (gender === 'Wanita') return useHijab ? item.tags.includes('hijab_approved') : (item.tags.includes('female') || item.tags.includes('unisex'));
+        if (gender === 'Wanita') return useHijab
+          ? item.tags.includes('hijab_approved')
+          : (item.tags.includes('female') || item.tags.includes('unisex'));
         if (gender === 'Pria') return item.tags.includes('male') || item.tags.includes('unisex');
         return true;
       }),
@@ -185,14 +453,12 @@ export default function App() {
   const dynamicLighting = useMemo(() => filterOptionsByBg(LIGHTING_STYLES, currentBgType), [currentBgType]);
   const dynamicLenses = useMemo(() => filterArrayByBg(CAMERA_LENSES, currentBgType), [currentBgType]);
 
-  // Smart scene-clothing score for current outfit
   const currentClothingSceneScore = useMemo(() => {
     const clothItem = CLOTHING_DATABASE.flatMap(g => g.items).find(i => i.id === clothing);
     if (!clothItem) return 2;
     return getClothingSceneScore(clothItem, currentBgType);
   }, [clothing, currentBgType]);
 
-  // FIX: useEffect with memoized dep
   useEffect(() => {
     const isValidCategory = dynamicClothingGroups.some(g => g.group === clothCategory);
     if (!isValidCategory && dynamicClothingGroups.length > 0) {
@@ -201,7 +467,6 @@ export default function App() {
   }, [dynamicClothingGroups, clothCategory]);
 
   // ── Handlers ──────────────────────────────────────────────────────────────
-
   const handleGenderChange = useCallback((e) => {
     const newGender = e.target.value;
     setGender(newGender);
@@ -218,58 +483,26 @@ export default function App() {
   const handleHijabChange = useCallback((e) => {
     const checked = e.target.checked;
     setUseHijab(checked);
-    setAccessories(prev => prev.filter(a => !['Decorative hijab brooch', 'Small stud earrings', 'Dangling earrings'].includes(a)));
     if (!isClothingValidForGender(clothing, gender, checked)) {
       setClothing('Original clothing from reference');
-      triggerSmartAlert('Mode Hijab berubah: Pakaian direset ke Referensi Asli.');
+      triggerSmartAlert('Mode Hijab berubah: Pakaian direset.');
     }
   }, [clothing, gender, triggerSmartAlert]);
 
-  const handleBgSelection = useCallback((newBg) => {
-    setBackground(newBg);
-    const newBgType = getBgType(newBg);
-    let didReset = false;
-
-    const filteredPoses = filterPosesByBg(newBg, newBgType);
-    const validPoseIds = filteredPoses.flatMap(g => g.items.map(i => i.id));
-    if (!validPoseIds.includes(pose)) { setPose(validPoseIds[0] || POSES[0].items[0].id); didReset = true; }
-
-    const filteredLighting = filterOptionsByBg(LIGHTING_STYLES, newBgType);
-    const validLightIds = filteredLighting.flatMap(g => g.items.map(i => i.id));
-    if (!validLightIds.includes(lighting)) { setLighting(validLightIds[0] || LIGHTING_STYLES[0].items[0].id); didReset = true; }
-
-    const filteredLenses = filterArrayByBg(CAMERA_LENSES, newBgType);
-    const validLensIds = filteredLenses.map(l => l.id);
-    if (!validLensIds.includes(cameraLens)) { setCameraLens(validLensIds[0] || CAMERA_LENSES[0].id); didReset = true; }
-
-    if (didReset) triggerSmartAlert('Lokasi berubah: Beberapa pengaturan tidak kompatibel direset otomatis.');
-  }, [pose, lighting, cameraLens, triggerSmartAlert]);
-
-  const handleThemeChange = useCallback((e) => {
-    const themeId = e.target.value;
-    setColorTheme(themeId);
-    const t = COLOR_THEMES.find(t => t.id === themeId);
-    if (t?.colors) { setManualColor1(t.colors[0]); setManualColor2(t.colors[1]); setManualColor3(t.colors[2] || t.colors[0]); }
+  const handleHairstyleChange = useCallback((idx, value) => {
+    setHairstyles(prev => { const next = [...prev]; next[idx] = value; return next; });
   }, []);
 
-  const randomizeThemeColors = useCallback((themeId) => {
-    const randHue = () => Math.floor(Math.random() * 360);
-    let c1, c2, c3;
-    switch (themeId) {
-      case 'Monochrome color scheme': { const h = randHue(); c1 = hslToHex(h,80,20); c2 = hslToHex(h,80,50); c3 = hslToHex(h,80,80); break; }
-      case 'Complementary color scheme': { const h = randHue(); c1 = hslToHex(h,80,50); c2 = hslToHex((h+180)%360,80,50); c3 = hslToHex(h,10,95); break; }
-      case 'Analogous color scheme': { const h = randHue(); c1 = hslToHex(h,80,50); c2 = hslToHex((h+30)%360,80,50); c3 = hslToHex((h+330)%360,80,50); break; }
-      case 'Pastel color palette': c1 = hslToHex(randHue(),70,85); c2 = hslToHex(randHue(),70,85); c3 = hslToHex(randHue(),70,85); break;
-      case 'Vibrant Neon color palette': { const n=[300,180,280,60,120,15]; const g=()=>hslToHex(n[Math.floor(Math.random()*n.length)],100,50); c1=g();c2=g();c3=g(); break; }
-      case 'Earth tones color palette': { const e=()=>hslToHex(20+Math.random()*30,30+Math.random()*30,20+Math.random()*40); c1=e();c2=e();c3=e(); break; }
-      case 'Jewel tones color palette': { const j=[350,160,240,20,280]; const g=()=>hslToHex(j[Math.floor(Math.random()*j.length)],90,35); c1=g();c2=g();c3=g(); break; }
-      default: c1=hslToHex(randHue(),70,50); c2=hslToHex(randHue(),70,50); c3=hslToHex(randHue(),70,50);
-    }
-    setManualColor1(c1); setManualColor2(c2); setManualColor3(c3);
+  const handleHijabStyleChange = useCallback((idx, value) => {
+    setHijabs(prev => { const next = [...prev]; next[idx] = value; return next; });
   }, []);
 
-  const toggleAccessory = useCallback((id) => {
+  const handleAccessoryToggle = useCallback((id) => {
     setAccessories(prev => prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]);
+  }, []);
+
+  const handleSubjectChange = useCallback((idx, changes) => {
+    setSubjects(prev => prev.map((s, i) => i === idx ? { ...s, ...changes } : s));
   }, []);
 
   const handleCopy = useCallback(async () => {
@@ -282,10 +515,7 @@ export default function App() {
         const ta = document.createElement('textarea');
         ta.value = textToCopy;
         ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px';
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
       }
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
@@ -293,8 +523,12 @@ export default function App() {
   }, [generatedPrompt, outputFormat]);
 
   // ── Generate ──────────────────────────────────────────────────────────────
-
   const handleGenerate = useCallback(() => {
+    const effectivePose = isIdPhotoMode ? ID_PHOTO_LOCKED.pose : pose;
+    const effectiveComposition = isIdPhotoMode ? ID_PHOTO_LOCKED.composition : composition;
+    const effectiveLens = isIdPhotoMode ? ID_PHOTO_LOCKED.cameraLens : cameraLens;
+    const effectiveLighting = isIdPhotoMode ? ID_PHOTO_LOCKED.lighting : lighting;
+
     let colors = color1;
     if (colorType.includes('Two') || colorType === 'Highlight') colors += ` and ${color2} ${colorType}`;
     if (colorType.includes('Tri')) colors += `, ${color2}, and ${color3} ${colorType}`;
@@ -307,106 +541,185 @@ export default function App() {
       ? customBackground
       : (background === 'custom_bg' ? 'A studio background' : background);
 
+    const isMulti = subjectCount > 1;
+    const activeSubjects = subjects.slice(0, subjectCount);
+
     let promptText = '';
-    if (viewMode === '1-photo') {
-      promptText += 'Create a single high-quality photographic image. Do NOT create a grid. ';
+
+    // ── ID Photo strict header ────────────────────────────────────────────
+    if (isIdPhotoMode) {
+      promptText += 'OFFICIAL ID PHOTO / PASSPORT PHOTO GENERATION. ';
+      promptText += 'This is a STRICTLY FORMAL government-grade identification photograph. ';
+      promptText += 'MANDATORY: Subject MUST face DIRECTLY forward (0° angle, no tilt, no side view). ';
+      promptText += 'Expression: neutral and calm. Mouth closed. Absolutely NO smiling, NO teeth visible. ';
+      promptText += 'Eyes MUST be fully open, looking straight into the camera. Head perfectly upright. ';
+      promptText += 'Composition: perfectly centered and symmetrical. ';
+      promptText += 'Lighting: completely flat and even, zero shadows on face or background. ';
+      promptText += 'Standard 50mm lens — NO distortion, NO bokeh, NO blur. ';
+      promptText += 'Background: uniform solid plain color (as specified). ';
+      promptText += 'ZERO artistic styling. ZERO creative angles. ZERO dramatic effects. ';
+      promptText += '\n[STRICT ID PHOTO VALIDATION]: Any tilt, smile, side angle, bokeh, dramatic light, or artistic element is STRICTLY FORBIDDEN. ';
     } else {
-      promptText += 'Create a 2x2 grid image panel with a 3:4 aspect ratio per panel. ';
+      if (viewMode === '1-photo') {
+        promptText += 'Create a single high-quality photographic image. Do NOT create a grid. ';
+      } else {
+        promptText += 'Create a 2x2 grid image panel with a 3:4 aspect ratio per panel. ';
+      }
     }
 
-    promptText += "STRICT FACIAL CONSISTENCY MODE: Prioritize the exact facial features, identity, and core facial structure from the provided **Face Reference Image** for all generations. Maintain the primary subject's identity accurately while adapting the pose, lighting, and background. Do not alter the core facial structure. ";
-    promptText += `\nSubject: Single Subject (${gender === 'Pria' ? 'Male' : gender === 'Wanita' ? 'Female' : 'Androgynous/Unisex'}). `;
-    promptText += '\n[ENTITY COUNT VALIDATION]: CRITICAL: There MUST be EXACTLY ONE person in the final image. NO extra background characters, NO clones. ';
+    // ── Multi subject block ────────────────────────────────────────────────
+    if (isMulti) {
+      promptText += `\n[MULTI-SUBJECT SCENE]: This image MUST contain EXACTLY ${subjectCount} people. `;
+      promptText += `Do NOT omit any person. Generate all ${subjectCount} as specified. `;
+      promptText += '\nEach person has their own distinct facial identity. Maintain consistent identity per person. ';
 
-    if (bodyType !== BODY_TYPES[0].id) promptText += `Body Type: ${bodyType}. `;
-    if (accessoriesString !== 'None') promptText += `Accessories: ${accessoriesString}. `;
-    if (facialHair !== FACIAL_HAIR[0].id && gender !== 'Wanita') promptText += `Facial Hair: ${facialHair}. `;
-    promptText += `Facial Expression: ${expression}. `;
-    if (makeup !== MAKEUP_STYLES[0].id) promptText += `Makeup & Face Details: ${makeup}. `;
+      activeSubjects.forEach((s, i) => {
+        const gLabel = s.gender === 'Pria' ? 'Male' : s.gender === 'Wanita' ? 'Female' : 'Unisex';
+        const styleStr = s.useHijab ? `Wearing ${s.hijab}` : `Hairstyle: ${s.hairstyle}`;
+        const clothStr = s.clothing !== 'Original clothing from reference' ? s.clothing : 'Original clothing from their reference';
+        const colorStr = s.colorTheme !== 'Original colors'
+          ? ` Color palette: ${s.colorTheme} (${s.manualColor1}, ${s.manualColor2}, ${s.manualColor3}).`
+          : '';
+        promptText += `\n\n--- PERSON ${i + 1} (${gLabel}) ---`;
+        promptText += `\nFace Identity: Use Face Reference Image ${i + 1}. `;
+        promptText += `Expression: ${s.expression}. `;
+        promptText += `${styleStr}. `;
+        if (s.gender !== 'Wanita' && s.facialHair !== FACIAL_HAIR[0].id) promptText += `Facial Hair: ${s.facialHair}. `;
+        if (s.makeup !== MAKEUP_STYLES[0].id) promptText += `Makeup: ${s.makeup}. `;
+        promptText += `Clothing: ${clothStr}.${colorStr}`;
+      });
 
-    if (useClothingReference) {
-      promptText += "Clothing & Attire: EXACTLY match the clothing style, layering, and silhouette shown in the provided **Secondary Style Reference Image**. ";
-      if (clothingMaterial !== 'Original material') promptText += `However, alter the primary fabric of this outfit so it is made of ${clothingMaterial}. `;
+      promptText += '\n\n[SCENE & ENVIRONMENT]';
     } else {
-      let outfitDesc = '';
-      if (clothing !== 'Original clothing from reference') {
-        outfitDesc += `Clothing: ${clothing}`;
-        outfitDesc += clothingMaterial !== 'Original material' ? `, made specifically from ${clothingMaterial}. ` : '. ';
-      } else if (clothingMaterial !== 'Original material') {
-        outfitDesc += `Clothing Update: Update the original clothing from the reference image to be made entirely of ${clothingMaterial}. `;
-      }
-      if (colorTheme !== 'Original colors') {
-        if (colorTheme === 'Manual') {
-          outfitDesc += `The outfit and overall styling must strictly follow a color palette of hex colors ${manualColor1}, ${manualColor2}, and ${manualColor3}. `;
-        } else {
-          outfitDesc += `The outfit and overall styling must feature a ${colorTheme} (incorporating hex colors ${manualColor1}, ${manualColor2}, and ${manualColor3}). `;
+      // Single subject
+      promptText += "\nSTRICT FACIAL CONSISTENCY MODE: Use the provided **Face Reference Image** to maintain subject identity. ";
+      promptText += `\nSubject: Single (${gender === 'Pria' ? 'Male' : gender === 'Wanita' ? 'Female' : 'Androgynous/Unisex'}). `;
+      promptText += '\n[ENTITY COUNT]: CRITICAL — EXACTLY ONE person. NO extra characters. NO clones. ';
+      if (bodyType !== BODY_TYPES[0].id) promptText += `Body Type: ${bodyType}. `;
+      if (accessoriesString !== 'None') promptText += `Accessories: ${accessoriesString}. `;
+      if (facialHair !== FACIAL_HAIR[0].id && gender !== 'Wanita') promptText += `Facial Hair: ${facialHair}. `;
+      promptText += `Facial Expression: ${expression}. `;
+      if (makeup !== MAKEUP_STYLES[0].id) promptText += `Makeup & Face Details: ${makeup}. `;
+
+      if (useClothingReference) {
+        promptText += "Clothing & Attire: EXACTLY match the clothing style, layering, and silhouette shown in the **Secondary Style Reference Image**. ";
+        if (clothingMaterial !== 'Original material') promptText += `Alter the primary fabric to ${clothingMaterial}. `;
+      } else {
+        let outfitDesc = '';
+        if (clothing !== 'Original clothing from reference') {
+          outfitDesc += `Clothing: ${clothing}`;
+          outfitDesc += clothingMaterial !== 'Original material' ? `, made from ${clothingMaterial}. ` : '. ';
+        } else if (clothingMaterial !== 'Original material') {
+          outfitDesc += `Update the original clothing from the reference image to ${clothingMaterial}. `;
         }
+        if (colorTheme !== 'Original colors') {
+          if (colorTheme === 'Manual') {
+            outfitDesc += `Outfit color palette must be hex colors ${manualColor1}, ${manualColor2}, ${manualColor3}. `;
+          } else {
+            outfitDesc += `Outfit must feature a ${colorTheme} (incorporating hex colors ${manualColor1}, ${manualColor2}, ${manualColor3}). `;
+          }
+        }
+        promptText += outfitDesc;
       }
-      promptText += outfitDesc;
     }
 
+    // Background
     if (background === 'image_ref_bg') {
-      promptText += "Background, Lighting & Camera Angle: EXACTLY match the environment, lighting conditions, and camera perspective shown in the provided **Background Reference Image**. ";
-      promptText += "\n[CRITICAL IDENTITY OVERRIDE]: Do NOT copy the face from the Background Reference Image. The generated face MUST flawlessly match **Image 1: Face Reference**. Image 3 is ONLY for the environment. ";
+      promptText += "Background, Lighting & Camera Angle: EXACTLY match the environment, lighting, and perspective from the **Background Reference Image**. ";
+      if (!isMulti) promptText += "\n[CRITICAL]: Do NOT copy the face from the Background Reference. Face MUST match **Image 1: Face Reference** only. ";
     } else if (finalBackground !== 'Original background from the reference image') {
       promptText += `Background Setting: ${finalBackground}. `;
     }
 
-    if (viewMode === '1-photo') {
+    // Single 1-photo photography settings
+    if (!isMulti && viewMode === '1-photo') {
       const styleStr = useHijab
         ? `Wearing ${hijabs[0]}`
         : (hairstyles[0].includes('Original hairstyle') ? `Hairstyle: ${hairstyles[0]}` : `Hairstyle: ${hairstyles[0]}, Hair Color: ${colors}`);
       promptText += `\nStyle: ${styleStr}. `;
       promptText += `\nPhotography Style & Vibe: ${shootStyle}. `;
-      if (composition !== COMPOSITIONS[0].id) promptText += `Composition Rule: ${composition}. `;
 
-      if (background !== 'image_ref_bg') {
-        if (cameraLens !== CAMERA_LENSES[0].id) promptText += `Camera Lens / Perspective: Use a ${cameraLens}. `;
-        if (pose !== 'Pose matching the original reference') promptText += `Camera Angle & Pose: ${pose}. `;
-        if (lighting !== 'Standard natural daylight') {
-          promptText += `Lighting: ${lighting}. `;
-          if (lighting.includes('Chiaroscuro')) promptText += '(CRITICAL: Strong chiaroscuro effect, face bright, background dark). ';
-          if (lighting.includes('Gobo') || lighting.includes('gobo')) promptText += '(CRITICAL: Ensure clear, aesthetic shadow stripes across the subject). ';
-          if (lighting.includes('Golden Hour Backlighting')) promptText += "(CRITICAL: Ensure strong, warm rim light highlighting the subject's hair and shoulders). ";
-          if (lighting.toLowerCase().includes('softbox') || lighting.toLowerCase().includes('ring light')) {
-            promptText += '\n(CRITICAL INSTRUCTION: Do NOT render or show any physical lighting equipment, softboxes, umbrellas, or light stands in the frame. Only render the lighting EFFECT).';
+      if (!isIdPhotoMode) {
+        if (effectiveComposition !== COMPOSITIONS[0].id) promptText += `Composition Rule: ${effectiveComposition}. `;
+        if (background !== 'image_ref_bg') {
+          if (effectiveLens !== CAMERA_LENSES[0].id) promptText += `Camera Lens: Use a ${effectiveLens}. `;
+          if (effectivePose !== 'Pose matching the original reference') promptText += `Camera Angle & Pose: ${effectivePose}. `;
+          if (effectiveLighting !== 'Standard natural daylight') {
+            promptText += `Lighting: ${effectiveLighting}. `;
+            if (effectiveLighting.includes('Chiaroscuro')) promptText += '(CRITICAL: Strong chiaroscuro, face bright, background dark). ';
+            if (effectiveLighting.includes('Gobo') || effectiveLighting.includes('gobo')) promptText += '(CRITICAL: Clear aesthetic shadow stripes across subject). ';
+            if (effectiveLighting.includes('Golden Hour Backlighting')) promptText += "(CRITICAL: Strong warm rim light on hair and shoulders). ";
+            if (effectiveLighting.toLowerCase().includes('softbox') || effectiveLighting.toLowerCase().includes('ring light')) {
+              promptText += '\n(CRITICAL: Do NOT show any physical lighting equipment in frame. Only the lighting EFFECT).';
+            }
           }
-        }
-      } else {
-        if (pose === 'match_bg_pose') {
-          promptText += 'Camera Angle & Pose: MATCH the pose of the subject in the Background Reference Image. ';
-        } else if (pose !== 'Pose matching the original reference') {
-          promptText += `Camera Angle & Pose: ${pose} (Adapt this pose into the provided background reference). `;
+        } else {
+          if (effectivePose === 'match_bg_pose') {
+            promptText += 'Camera Angle & Pose: MATCH the pose from the Background Reference Image. ';
+          } else if (effectivePose !== 'Pose matching the original reference') {
+            promptText += `Camera Angle & Pose: ${effectivePose} (Adapted to the provided background reference). `;
+          }
         }
       }
       promptText += '\nLayout Instruction: SINGLE image only.';
-    } else if (viewMode === '4-angles') {
+    } else if (!isMulti && viewMode === '4-angles') {
       const styleStr = useHijab
         ? `Wearing ${hijabs[0]}`
         : (hairstyles[0].includes('Original hairstyle') ? `Hairstyle: ${hairstyles[0]}` : `Hairstyle: ${hairstyles[0]}, Hair Color: ${colors}`);
       promptText += `\nStyle: ${styleStr}. `;
-      promptText += '\nLayout Instruction: The 2x2 grid must show the EXACT SAME person from 4 different angles: Top-Left (Front view), Top-Right (Left Profile), Bottom-Left (Right Profile), Bottom-Right (Back of head).';
-    } else {
-      promptText += '\nLayout Instruction: The 2x2 grid must show 4 slightly different stylistic variations on the exact same person. Front-facing portrait for ALL panels.';
+      promptText += '\nLayout Instruction: The 2x2 grid must show the EXACT SAME person from 4 angles: Top-Left (Front), Top-Right (Left Profile), Bottom-Left (Right Profile), Bottom-Right (Back).';
+    } else if (!isMulti) {
+      promptText += '\nLayout Instruction: The 2x2 grid shows 4 stylistic variations. Front-facing portrait for ALL panels.';
       if (useHijab) {
         hijabs.forEach((h, i) => { promptText += `\n- Panel ${i + 1}: ${h}.`; });
       } else {
         hairstyles.forEach((h, i) => { promptText += `\n- Panel ${i + 1}: ${h}.`; });
-        promptText += `\nHair Color for all panels: ${colors} (Unless original hairstyle is selected).`;
+        promptText += `\nHair Color for all panels: ${colors} (Unless original is selected).`;
       }
     }
 
-    const requiredInputs = ['Image 1: Face Reference (For Identity)'];
-    if (useClothingReference) requiredInputs.push('Image 2: Style Reference (For Clothing/Outfit)');
-    if (background === 'image_ref_bg') requiredInputs.push('Image 3: Background Reference (For Location, Angle & Lighting)');
+    // ── Required inputs ───────────────────────────────────────────────────
+    const requiredInputs = isMulti
+      ? activeSubjects.map((_, i) => `Image ${i + 1}: Face Reference for Person ${i + 1}`)
+      : ['Image 1: Face Reference (For Identity)'];
+    if (!isMulti && useClothingReference) requiredInputs.push(`Image ${requiredInputs.length + 1}: Style Reference (Clothing/Outfit)`);
+    if (background === 'image_ref_bg') requiredInputs.push(`Image ${requiredInputs.length + 1}: Background Reference (Location, Angle & Lighting)`);
 
+    // ── JSON Object ───────────────────────────────────────────────────────
     const jsonObj = {
       app_name: 'AI Professional Studio',
-      system_directive: 'STRICT FACIAL CONSISTENCY ENABLED',
+      system_directive: isIdPhotoMode
+        ? 'ID PHOTO STRICT MODE ENABLED'
+        : isMulti
+          ? `MULTI-SUBJECT MODE (${subjectCount} PEOPLE)`
+          : 'STRICT FACIAL CONSISTENCY ENABLED',
       required_inputs: requiredInputs,
-      parameters: {
+      parameters: isMulti ? {
+        mode: 'Multi-Subject',
+        subject_count: subjectCount,
+        subjects: activeSubjects.map((s, i) => ({
+          person: i + 1,
+          gender: s.gender === 'Pria' ? 'Male' : s.gender === 'Wanita' ? 'Female' : 'Unisex',
+          expression: s.expression,
+          style: s.useHijab ? `Hijab: ${s.hijab}` : `Hairstyle: ${s.hairstyle}`,
+          facial_hair: s.gender !== 'Wanita' ? s.facialHair : 'N/A',
+          makeup: s.makeup,
+          clothing: s.clothing,
+          color_theme: s.colorTheme !== 'Original colors'
+            ? `${s.colorTheme} (${s.manualColor1}, ${s.manualColor2}, ${s.manualColor3})`
+            : 'Original colors',
+        })),
+        background: background === 'image_ref_bg' ? 'USE EXTERNAL BACKGROUND REFERENCE IMAGE' : finalBackground,
+        photography: viewMode === '1-photo' ? {
+          shoot_style: shootStyle,
+          composition_rule: effectiveComposition,
+          camera_lens: background === 'image_ref_bg' ? 'Matched to BG Image' : effectiveLens,
+          pose_framing: effectivePose,
+          lighting_artistic: background === 'image_ref_bg' ? 'Matched to BG Image' : effectiveLighting,
+        } : 'N/A (Grid mode)',
+      } : {
         subject_gender: gender === 'Pria' ? 'Male' : gender === 'Wanita' ? 'Female' : 'Unisex',
-        entity_count_constraint: 'CRITICAL: EXACTLY ONE person in the final image. NO extra background characters.',
+        entity_count_constraint: 'CRITICAL: EXACTLY ONE person. NO extra characters.',
         body_type: bodyType,
         layout_mode: viewMode === '1-photo' ? 'Single Portrait' : viewMode === '4-angles' ? 'Grid 2x2 (4 Angles)' : 'Grid 2x2 (4 Styles)',
         hair_or_hijab: useHijab ? 'Hijab' : 'Hair',
@@ -419,22 +732,78 @@ export default function App() {
         expression,
         clothing: useClothingReference ? 'USE EXTERNAL STYLE REFERENCE IMAGE' : clothing,
         clothing_material: clothingMaterial,
-        color_palette: useClothingReference ? 'N/A' : (colorTheme === 'Original colors' ? 'Original colors' : `${colorTheme === 'Manual' ? 'Manual Palette' : colorTheme} (${manualColor1}, ${manualColor2}, ${manualColor3})`),
+        color_palette: useClothingReference ? 'N/A' : (colorTheme === 'Original colors' ? 'Original colors' : `${colorTheme === 'Manual' ? 'Manual' : colorTheme} (${manualColor1}, ${manualColor2}, ${manualColor3})`),
         accessories: accessoriesString,
         background: background === 'image_ref_bg' ? 'USE EXTERNAL BACKGROUND REFERENCE IMAGE' : finalBackground,
         photography: viewMode === '1-photo' ? {
           shoot_style: shootStyle,
-          composition_rule: composition,
-          camera_lens: background === 'image_ref_bg' ? 'Matched to Background Image' : cameraLens,
-          pose_framing: pose === 'match_bg_pose' ? 'Matched to Background Image' : pose,
-          lighting_artistic: background === 'image_ref_bg' ? 'Matched to Background Image' : lighting,
+          id_photo_mode_locked: isIdPhotoMode,
+          composition_rule: isIdPhotoMode ? `🔒 LOCKED: ${effectiveComposition}` : effectiveComposition,
+          camera_lens: background === 'image_ref_bg' ? 'Matched to BG Image' : (isIdPhotoMode ? `🔒 LOCKED: ${effectiveLens}` : effectiveLens),
+          pose_framing: isIdPhotoMode ? `🔒 LOCKED: ${effectivePose}` : (pose === 'match_bg_pose' ? 'Matched to BG Image' : effectivePose),
+          lighting_artistic: background === 'image_ref_bg' ? 'Matched to BG Image' : (isIdPhotoMode ? `🔒 LOCKED: ${effectiveLighting}` : effectiveLighting),
         } : 'N/A',
       },
       text_prompt: promptText,
     };
 
-    const structuredStr = `[SYSTEM INSTRUCTIONS]
-> STRICT FACIAL CONSISTENCY MODE: Prioritize the facial features from the provided reference image. Maintain the subject's identity accurately. Do not alter the core facial structure.
+    // ── Structured text output ────────────────────────────────────────────
+    const structuredStr = isIdPhotoMode
+      ? `[SYSTEM INSTRUCTIONS]
+> ⚠️ ID PHOTO STRICT MODE ACTIVE — All photography settings LOCKED for official ID/Passport compliance.
+
+[REQUIRED IMAGES]
+${requiredInputs.map(r => `- ${r}`).join('\n')}
+
+[SUBJECT DETAILS]
+- Gender: ${jsonObj.parameters.subject_gender}
+- Expression: Neutral (Locked — no smiling, mouth closed)
+- Head Position: Front-facing only, perfectly upright (Locked)
+${useHijab ? `- Hijab Style: ${hijabs[0]}` : `- Hairstyle: ${hairstyles[0]}`}
+- Clothing: ${clothing !== 'Original clothing from reference' ? clothing : 'Original from reference'}
+
+[PHOTOGRAPHY — LOCKED 🔒]
+- Shoot Style: ID Photo / Pasfoto Resmi (Official)
+- Composition: 🔒 Perfect Symmetry, centered
+- Camera Lens: 🔒 Standard 50mm
+- Pose: 🔒 Front-facing headshot only
+- Lighting: 🔒 Flat even studio lighting, zero shadows
+- Background: ${finalBackground}
+
+[FINAL GENERATION PROMPT]
+${promptText}
+`
+      : isMulti
+        ? `[SYSTEM INSTRUCTIONS]
+> MULTI-SUBJECT MODE: ${subjectCount} people in one image. Each person has their own face reference image.
+
+[REQUIRED IMAGES]
+${requiredInputs.map(r => `- ${r}`).join('\n')}
+
+[SUBJECTS]
+${activeSubjects.map((s, i) => `
+Person ${i + 1} (${s.gender === 'Pria' ? 'Male' : s.gender === 'Wanita' ? 'Female' : 'Unisex'}):
+  - Expression: ${s.expression}
+  - ${s.useHijab ? `Hijab: ${s.hijab}` : `Hairstyle: ${s.hairstyle}`}
+  ${s.gender !== 'Wanita' ? `- Facial Hair: ${s.facialHair}` : ''}
+  - Makeup: ${s.makeup}
+  - Clothing: ${s.clothing}
+  - Color Theme: ${s.colorTheme}
+`).join('')}
+
+[PHOTOGRAPHY & ENVIRONMENT]
+- Shoot Style: ${shootStyle}
+- Background: ${background === 'image_ref_bg' ? 'USE EXTERNAL BACKGROUND REFERENCE' : finalBackground}
+${viewMode === '1-photo' ? `- Composition: ${effectiveComposition}
+- Camera Lens: ${background === 'image_ref_bg' ? 'Matched to BG Image' : effectiveLens}
+- Pose: ${effectivePose}
+- Lighting: ${background === 'image_ref_bg' ? 'Matched to BG Image' : effectiveLighting}` : ''}
+
+[FINAL GENERATION PROMPT]
+${promptText}
+`
+        : `[SYSTEM INSTRUCTIONS]
+> STRICT FACIAL CONSISTENCY MODE: Prioritize facial features from the provided reference image. Maintain subject identity accurately.
 
 [REQUIRED IMAGES]
 ${requiredInputs.map(r => `- ${r}`).join('\n')}
@@ -449,9 +818,9 @@ ${gender !== 'Wanita' ? `- Facial Hair: ${jsonObj.parameters.facial_hair}` : ''}
 
 [STYLE & ATTIRE]
 ${useHijab
-  ? `- Hijab Style(s): ${jsonObj.parameters.styles_list.join(' | ')}`
-  : `- Hairstyle(s): ${jsonObj.parameters.styles_list.join(' | ')}\n- Hair Color: ${jsonObj.parameters.hair_color}`
-}
+        ? `- Hijab Style(s): ${jsonObj.parameters.styles_list.join(' | ')}`
+        : `- Hairstyle(s): ${jsonObj.parameters.styles_list.join(' | ')}\n- Hair Color: ${jsonObj.parameters.hair_color}`
+      }
 - Clothing: ${jsonObj.parameters.clothing}
 - Material/Fabric: ${jsonObj.parameters.clothing_material}
 - Color Palette: ${jsonObj.parameters.color_palette}
@@ -478,11 +847,10 @@ ${promptText}
     hairstyles, colorType, color1, color2, color3, accessories, watch, facialHair,
     useHijab, hijabs, expression, makeup, useClothingReference, clothingMaterial,
     colorTheme, manualColor1, manualColor2, manualColor3, clothing, background,
-    customBackground,
+    customBackground, subjectCount, subjects, isIdPhotoMode,
   ]);
 
-  // ── Render ────────────────────────────────────────────────────────────────
-
+  // ── Render helpers ────────────────────────────────────────────────────────
   const selectedBgLabel = useMemo(() => {
     for (const group of BACKGROUNDS) {
       for (const item of group.items) {
@@ -502,412 +870,677 @@ ${promptText}
     return labels[currentBgType] || currentBgType;
   }, [currentBgType]);
 
+  const isMultiSubject = subjectCount > 1 && viewMode === '1-photo';
+
+  // ── RENDER ────────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-neutral-900 text-neutral-100 font-sans p-4 md:p-8">
 
+      {/* Smart Alert Toast */}
       {showSmartAlert && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 bg-indigo-600/90 backdrop-blur-sm border border-indigo-500 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 z-50">
-          <Cpu className="w-5 h-5 text-indigo-200 shrink-0" />
-          <span className="text-sm font-medium">{smartAlertMsg}</span>
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-indigo-600/90 backdrop-blur-md border border-indigo-500/60 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-2 text-sm font-medium">
+          <Cpu className="w-4 h-4" /> {smartAlertMsg}
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto space-y-6">
+      {/* ID Photo Mode Banner */}
+      {isIdPhotoMode && (
+        <div className="fixed top-5 right-5 z-50 bg-amber-900/80 backdrop-blur-md border border-amber-500/60 text-amber-200 px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 text-sm font-semibold">
+          <Shield className="w-4 h-4 text-amber-300" /> Mode Pasfoto Aktif
+        </div>
+      )}
 
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-neutral-800">
+      {/* App Header */}
+      <div className="max-w-[1600px] mx-auto mb-7">
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 bg-gradient-to-br from-indigo-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/25">
+            <Sparkles className="w-5 h-5 text-white" />
+          </div>
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-pink-500 bg-clip-text text-transparent flex items-center gap-2">
-              <Camera className="w-8 h-8 text-indigo-500" />
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent leading-tight">
               AI Professional Studio
             </h1>
-            <p className="text-neutral-400 mt-1">Context-Aware Prompts dengan Smart Scene-Clothing Matching.</p>
+            <p className="text-xs text-neutral-500 mt-0.5">Advanced Prompt Generator for AI Image Models</p>
           </div>
-          <div className="flex items-center gap-2 bg-neutral-800 px-4 py-2 rounded-full text-sm border border-neutral-700">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-            <span className="text-neutral-300">Strict Facial Consistency: <strong className="text-emerald-400">ON</strong></span>
-          </div>
-        </header>
+        </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-          {/* ── LEFT ── */}
-          <div className="lg:col-span-6 space-y-6 bg-neutral-800/50 p-6 rounded-2xl border border-neutral-800 h-[calc(100vh-140px)] overflow-y-auto custom-scrollbar">
+        {/* ══════════════════════════════
+            LEFT PANEL
+        ══════════════════════════════ */}
+        <div className="lg:col-span-6 space-y-4">
 
-            {/* Gender & Layout */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-neutral-400">Gender</label>
-                <select value={gender} onChange={handleGenderChange} className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                  {GENDERS.map(g => <option key={g} value={g}>{g}</option>)}
-                </select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-neutral-400">Mode Layout</label>
-                <select value={viewMode} onChange={e => setViewMode(e.target.value)} className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                  {VIEW_MODES.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
-                </select>
+          {/* ─── Layout & Subject Count ─── */}
+          <div className="bg-neutral-800/40 rounded-2xl border border-neutral-700/50 p-5 space-y-4">
+            <div className="flex items-center gap-2 text-neutral-200 font-semibold text-sm pb-3 border-b border-neutral-700/60">
+              <Layers className="w-4 h-4 text-indigo-400" /> Layout & Jumlah Subjek
+            </div>
+
+            {/* View Mode Tabs */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-neutral-400">Mode Layout</label>
+              <div className="grid grid-cols-3 gap-2">
+                {VIEW_MODES.map(vm => (
+                  <button key={vm.id} onClick={() => setViewMode(vm.id)}
+                    className={`py-2.5 px-2 rounded-xl text-xs font-medium border transition-all ${viewMode === vm.id
+                      ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                      : 'bg-neutral-900/60 border-neutral-700 text-neutral-400 hover:border-neutral-500 hover:text-neutral-200'}`}>
+                    {vm.label}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Body & Face */}
-            <div className="space-y-4 pt-4 border-t border-neutral-700">
-              <div className="flex items-center gap-2 text-pink-400 font-medium">
-                <User className="w-5 h-5" /> Karakteristik Tubuh & Wajah
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-neutral-400">Tipe Badan</label>
-                  <select value={bodyType} onChange={e => setBodyType(e.target.value)} className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-3 text-sm focus:ring-2 focus:ring-pink-500 outline-none">
-                    {BODY_TYPES.map(b => <option key={b.id} value={b.id}>{b.label}</option>)}
-                  </select>
+            {/* Subject Count Selector — only for 1-photo */}
+            {viewMode === '1-photo' && (
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-neutral-400 flex items-center gap-1.5">
+                  <Users className="w-3.5 h-3.5 text-indigo-400" /> Jumlah Orang dalam Foto
+                </label>
+                <div className="grid grid-cols-4 gap-2">
+                  {[1, 2, 3, 4].map(n => (
+                    <button key={n} onClick={() => setSubjectCount(n)}
+                      className={`py-3 rounded-xl text-sm font-bold border transition-all flex flex-col items-center ${subjectCount === n
+                        ? 'bg-gradient-to-b from-indigo-500 to-indigo-700 border-indigo-400 text-white shadow-lg shadow-indigo-500/25'
+                        : 'bg-neutral-900/60 border-neutral-700 text-neutral-400 hover:border-indigo-500/50 hover:text-neutral-200'}`}>
+                      <span className="text-lg leading-none">{n}</span>
+                      <span className="text-[10px] mt-0.5 opacity-70">Orang</span>
+                    </button>
+                  ))}
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-neutral-400">Ekspresi Wajah</label>
-                  <select value={expression} onChange={e => setExpression(e.target.value)} className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-3 text-sm focus:ring-2 focus:ring-pink-500 outline-none">
-                    {EXPRESSIONS.map(ex => <option key={ex.id} value={ex.id}>{ex.label}</option>)}
-                  </select>
-                </div>
+                {isMultiSubject && (
+                  <div className="flex items-start gap-2 text-xs text-indigo-300 bg-indigo-950/30 px-3 py-2.5 rounded-xl border border-indigo-800/40 mt-1">
+                    <Users className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                    <span>Mode Multi-Subjek aktif. Siapkan <strong>{subjectCount} foto referensi wajah</strong> yang berbeda untuk di-upload ke AI.</span>
+                  </div>
+                )}
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                {(gender === 'Pria' || gender === 'Unisex') && (
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-neutral-400">Kumis & Janggut</label>
-                    <select value={facialHair} onChange={e => setFacialHair(e.target.value)} className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-3 text-sm focus:ring-2 focus:ring-pink-500 outline-none">
+            )}
+          </div>
+
+          {/* ─── Multi-Subject Per-Person Panels ─── */}
+          {isMultiSubject && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 px-1">
+                <Users className="w-4 h-4 text-indigo-400" />
+                <span className="text-sm font-semibold text-neutral-300">Pengaturan Per Orang</span>
+                <span className="ml-auto text-xs text-indigo-400 bg-indigo-950/40 px-2 py-0.5 rounded-full border border-indigo-800/40">
+                  {subjectCount} subjek
+                </span>
+              </div>
+              {subjects.slice(0, subjectCount).map((subject, idx) => (
+                <SubjectPanel
+                  key={idx}
+                  subject={subject}
+                  idx={idx}
+                  onChange={handleSubjectChange}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* ─── Single Subject Settings ─── */}
+          {!isMultiSubject && (
+            <>
+              {/* Subject */}
+              <div className="bg-neutral-800/40 rounded-2xl border border-neutral-700/50 p-5 space-y-4">
+                <div className="flex items-center gap-2 text-neutral-200 font-semibold text-sm pb-3 border-b border-neutral-700/60">
+                  <User className="w-4 h-4 text-pink-400" /> Subjek
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-neutral-400">Gender</label>
+                    <select value={gender} onChange={handleGenderChange}
+                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-pink-500 outline-none text-neutral-100">
+                      {GENDERS.map(g => <option key={g} value={g}>{g}</option>)}
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-neutral-400">Tipe Tubuh</label>
+                    <select value={bodyType} onChange={e => setBodyType(e.target.value)}
+                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-pink-500 outline-none text-neutral-100">
+                      {BODY_TYPES.map(bt => <option key={bt.id} value={bt.id}>{bt.label}</option>)}
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-neutral-400">Ekspresi</label>
+                    <select value={expression} onChange={e => setExpression(e.target.value)}
+                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-pink-500 outline-none text-neutral-100">
+                      {EXPRESSIONS.map(ex => <option key={ex.id} value={ex.id}>{ex.label}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                {gender !== 'Wanita' && (
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-neutral-400">Kumis & Janggut</label>
+                    <select value={facialHair} onChange={e => setFacialHair(e.target.value)}
+                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-pink-500 outline-none text-neutral-100">
                       {FACIAL_HAIR.map(fh => <option key={fh.id} value={fh.id}>{fh.label}</option>)}
                     </select>
                   </div>
                 )}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-neutral-400">Gaya Makeup & Efek Wajah</label>
-                  <select value={makeup} onChange={e => setMakeup(e.target.value)} className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-3 text-sm focus:ring-2 focus:ring-pink-500 outline-none">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-neutral-400">Gaya Makeup & Efek Wajah</label>
+                  <select value={makeup} onChange={e => setMakeup(e.target.value)}
+                    className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-pink-500 outline-none text-neutral-100">
                     {MAKEUP_STYLES.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
                   </select>
                 </div>
               </div>
-            </div>
 
-            {/* Hair / Hijab */}
-            <div className="space-y-4 pt-4 border-t border-neutral-700">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-indigo-400 font-medium">
-                  <Scissors className="w-5 h-5" /> Kepala (Rambut / Hijab)
-                </div>
-                {gender === 'Wanita' && (
-                  <label className="flex items-center gap-2 text-sm bg-neutral-900 px-3 py-1.5 rounded-lg border border-neutral-700 cursor-pointer hover:border-indigo-500/50 transition-colors">
-                    <input type="checkbox" checked={useHijab} onChange={handleHijabChange} className="rounded text-indigo-500 bg-neutral-800 border-neutral-600" />
-                    <span className="text-neutral-300">Gunakan Hijab</span>
-                  </label>
-                )}
-              </div>
-              {useHijab ? (
-                <div className="space-y-3 bg-neutral-900/30 p-4 rounded-xl border border-neutral-700/50">
-                  <label className="text-sm font-medium text-neutral-400">Gaya Hijab</label>
-                  {(viewMode === '4-angles' || viewMode === '1-photo') ? (
-                    <select value={hijabs[0]} onChange={e => setHijabs([e.target.value, hijabs[1], hijabs[2], hijabs[3]])} className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                      {HIJAB_STYLES.map(h => <option key={h.id} value={h.id}>{h.label}</option>)}
-                    </select>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-3">
-                      {[0,1,2,3].map(idx => (
-                        <div key={idx} className="space-y-1">
-                          <label className="text-xs text-neutral-500">Panel {idx+1}</label>
-                          <select value={hijabs[idx]} onChange={e => { const nh=[...hijabs];nh[idx]=e.target.value;setHijabs(nh); }} className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
-                            {HIJAB_STYLES.map(h => <option key={h.id} value={h.id}>{h.label}</option>)}
-                          </select>
-                        </div>
-                      ))}
-                    </div>
+              {/* Hair / Hijab */}
+              <div className="bg-neutral-800/40 rounded-2xl border border-neutral-700/50 p-5 space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-neutral-700/60">
+                  <div className="flex items-center gap-2 text-neutral-200 font-semibold text-sm">
+                    <Scissors className="w-4 h-4 text-indigo-400" /> Kepala (Rambut / Hijab)
+                  </div>
+                  {gender === 'Wanita' && (
+                    <label className="flex items-center gap-2 text-xs bg-neutral-900 px-3 py-1.5 rounded-xl border border-neutral-700 cursor-pointer hover:border-indigo-500/50 transition-colors">
+                      <input type="checkbox" checked={useHijab} onChange={handleHijabChange}
+                        className="rounded text-indigo-500 bg-neutral-800 border-neutral-600" />
+                      <span className="text-neutral-300">Gunakan Hijab</span>
+                    </label>
                   )}
                 </div>
-              ) : (
-                <>
-                  <div className="space-y-3 bg-neutral-900/30 p-4 rounded-xl border border-neutral-700/50">
-                    <label className="text-sm font-medium text-neutral-400">Gaya Rambut</label>
+
+                {useHijab ? (
+                  <div className="space-y-3">
+                    <label className="text-xs font-medium text-neutral-400">Gaya Hijab</label>
                     {(viewMode === '4-angles' || viewMode === '1-photo') ? (
-                      <select value={hairstyles[0]} onChange={e => setHairstyles([e.target.value, hairstyles[1], hairstyles[2], hairstyles[3]])} className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                        {(HAIRSTYLES[gender] || HAIRSTYLES['Unisex']).map(h => <option key={h} value={h}>{h}</option>)}
+                      <select value={hijabs[0]} onChange={e => handleHijabStyleChange(0, e.target.value)}
+                        className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                        {HIJAB_STYLES.map(h => <option key={h.id} value={h.id}>{h.label}</option>)}
                       </select>
                     ) : (
-                      <div className="grid grid-cols-2 gap-3">
-                        {[0,1,2,3].map(idx => (
-                          <div key={idx} className="space-y-1">
-                            <label className="text-xs text-neutral-500">Panel {idx+1}</label>
-                            <select value={hairstyles[idx]} onChange={e => { const ns=[...hairstyles];ns[idx]=e.target.value;setHairstyles(ns); }} className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
-                              {(HAIRSTYLES[gender]||HAIRSTYLES['Unisex']).map(h => <option key={h} value={h}>{h}</option>)}
+                      <div className="space-y-2">
+                        {[0, 1, 2, 3].map(i => (
+                          <div key={i} className="flex items-center gap-2">
+                            <span className="text-xs text-neutral-500 w-14 shrink-0">Panel {i + 1}</span>
+                            <select value={hijabs[i]} onChange={e => handleHijabStyleChange(i, e.target.value)}
+                              className="flex-1 bg-neutral-900 border border-neutral-700 rounded-xl p-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                              {HIJAB_STYLES.map(h => <option key={h.id} value={h.id}>{h.label}</option>)}
                             </select>
                           </div>
                         ))}
                       </div>
                     )}
                   </div>
-                  <div className="space-y-3 bg-neutral-900/50 p-4 rounded-xl border border-neutral-700/50">
-                    <label className="text-sm font-medium text-neutral-300">Pewarnaan Rambut</label>
-                    <select value={colorType} onChange={e => setColorType(e.target.value)} className="w-full bg-neutral-800 border border-neutral-600 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-2">
-                      {COLOR_TYPES.map(c => <option key={c} value={c}>{c}</option>)}
+                ) : (
+                  <div className="space-y-3">
+                    {(viewMode === '4-angles' || viewMode === '1-photo') ? (
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-neutral-400">Gaya Rambut</label>
+                        <select value={hairstyles[0]} onChange={e => handleHairstyleChange(0, e.target.value)}
+                          className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                          {(HAIRSTYLES[gender] || HAIRSTYLES['Unisex']).map((h, i) => (
+                            <option key={i} value={h}>{h.length > 58 ? h.substring(0, 58) + '…' : h}</option>
+                          ))}
+                        </select>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {[0, 1, 2, 3].map(i => (
+                          <div key={i} className="flex items-center gap-2">
+                            <span className="text-xs text-neutral-500 w-14 shrink-0">Panel {i + 1}</span>
+                            <select value={hairstyles[i]} onChange={e => handleHairstyleChange(i, e.target.value)}
+                              className="flex-1 bg-neutral-900 border border-neutral-700 rounded-xl p-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                              {(HAIRSTYLES[gender] || HAIRSTYLES['Unisex']).map((h, j) => (
+                                <option key={j} value={h}>{h.length > 52 ? h.substring(0, 52) + '…' : h}</option>
+                              ))}
+                            </select>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-neutral-400">Tipe Warna</label>
+                        <select value={colorType} onChange={e => setColorType(e.target.value)}
+                          className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                          {COLOR_TYPES.map(ct => <option key={ct} value={ct}>{ct}</option>)}
+                        </select>
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-neutral-400">Warna 1</label>
+                        <select value={color1} onChange={e => setColor1(e.target.value)}
+                          className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                          {BASE_COLORS.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                    {(colorType.includes('Two') || colorType === 'Highlight' || colorType.includes('Tri')) && (
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-medium text-neutral-400">Warna 2</label>
+                          <select value={color2} onChange={e => setColor2(e.target.value)}
+                            className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                            {BASE_COLORS.map(c => <option key={c} value={c}>{c}</option>)}
+                          </select>
+                        </div>
+                        {colorType.includes('Tri') && (
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-medium text-neutral-400">Warna 3</label>
+                            <select value={color3} onChange={e => setColor3(e.target.value)}
+                              className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                              {BASE_COLORS.map(c => <option key={c} value={c}>{c}</option>)}
+                            </select>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Accessories */}
+              <div className="bg-neutral-800/40 rounded-2xl border border-neutral-700/50 p-5 space-y-4">
+                <div className="flex items-center gap-2 text-neutral-200 font-semibold text-sm pb-3 border-b border-neutral-700/60">
+                  <Glasses className="w-4 h-4 text-emerald-400" /> Aksesori & Jam Tangan
+                </div>
+
+                <div className="flex gap-1.5 flex-wrap">
+                  {ACCESSORIES_DATABASE.map(g => (
+                    <button key={g.group} onClick={() => setAccCategory(g.group)}
+                      className={`text-xs px-2.5 py-1 rounded-full border transition-all ${accCategory === g.group
+                        ? 'bg-emerald-700/60 border-emerald-500 text-emerald-100'
+                        : 'bg-neutral-900/60 border-neutral-700 text-neutral-400 hover:border-neutral-500'}`}>
+                      {g.group}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap gap-1.5">
+                  {(dynamicAccessoryGroups.find(g => g.group === accCategory)?.items || []).map(item => {
+                    const isSelected = accessories.includes(item.id);
+                    return (
+                      <button key={item.id} onClick={() => handleAccessoryToggle(item.id)}
+                        className={`text-xs px-2.5 py-1.5 rounded-lg border transition-all ${isSelected
+                          ? 'bg-emerald-600/30 border-emerald-500 text-emerald-200'
+                          : 'bg-neutral-900/60 border-neutral-700 text-neutral-400 hover:border-neutral-500'}`}>
+                        {isSelected && '✓ '}{item.label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-neutral-400 flex items-center gap-1.5">
+                    <Watch className="w-3.5 h-3.5" /> Jam Tangan
+                  </label>
+                  <select value={watch} onChange={e => setWatch(e.target.value)}
+                    className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none text-neutral-100">
+                    {LUXURY_WATCHES.map(w => <option key={w.id} value={w.id}>{w.label}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* Clothing */}
+              <div className="bg-neutral-800/40 rounded-2xl border border-neutral-700/50 p-5 space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-neutral-700/60">
+                  <div className="flex items-center gap-2 text-neutral-200 font-semibold text-sm">
+                    <ImageIcon className="w-4 h-4 text-purple-400" />
+                    Pakaian & Material
+                    {currentClothingSceneScore < 2 && <SceneBadge score={currentClothingSceneScore} />}
+                  </div>
+                  <label className="flex items-center gap-2 text-xs bg-neutral-900 px-3 py-1.5 rounded-xl border border-neutral-700 cursor-pointer hover:border-purple-500/50 transition-colors">
+                    <input type="checkbox" checked={useClothingReference} onChange={e => setUseClothingReference(e.target.checked)}
+                      className="rounded text-purple-500 bg-neutral-800 border-neutral-600" />
+                    <span className="text-neutral-300">Gunakan Ref Gambar</span>
+                  </label>
+                </div>
+
+                {!useClothingReference && (
+                  <>
+                    <div className="flex gap-1.5 flex-wrap">
+                      {dynamicClothingGroups.map(g => (
+                        <button key={g.group} onClick={() => setClothCategory(g.group)}
+                          className={`text-xs px-2.5 py-1 rounded-full border transition-all ${clothCategory === g.group
+                            ? 'bg-purple-700/60 border-purple-500 text-purple-100'
+                            : 'bg-neutral-900/60 border-neutral-700 text-neutral-400 hover:border-neutral-500'}`}>
+                          {g.group}
+                        </button>
+                      ))}
+                    </div>
+                    <select value={clothing} onChange={e => setClothing(e.target.value)}
+                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-purple-500 outline-none text-neutral-100">
+                      <option value="Original clothing from reference">Original clothing from reference</option>
+                      {dynamicClothingGroups.filter(g => g.group === clothCategory).flatMap(g =>
+                        g.items.map(item => {
+                          const score = getClothingSceneScore(item, currentBgType);
+                          return (
+                            <option key={item.id} value={item.id}>
+                              {score === 0 ? '⚠ ' : score === 1 ? '~ ' : ''}
+                              {item.label.length > 65 ? item.label.substring(0, 65) + '…' : item.label}
+                            </option>
+                          );
+                        })
+                      )}
                     </select>
-                    <div className="grid grid-cols-3 gap-2">
-                      <select value={color1} onChange={e=>setColor1(e.target.value)} className="bg-neutral-800 border border-neutral-600 rounded-lg p-2 text-xs">{BASE_COLORS.map(c=><option key={c} value={c}>{c}</option>)}</select>
-                      {(colorType.includes('Two')||colorType.includes('Tri')||colorType==='Highlight')&&<select value={color2} onChange={e=>setColor2(e.target.value)} className="bg-neutral-800 border border-neutral-600 rounded-lg p-2 text-xs">{BASE_COLORS.map(c=><option key={c} value={c}>{c}</option>)}</select>}
-                      {colorType.includes('Tri')&&<select value={color3} onChange={e=>setColor3(e.target.value)} className="bg-neutral-800 border border-neutral-600 rounded-lg p-2 text-xs">{BASE_COLORS.map(c=><option key={c} value={c}>{c}</option>)}</select>}
+                  </>
+                )}
+
+                {useClothingReference && (
+                  <div className="bg-purple-900/20 border border-purple-800/40 rounded-xl p-3 text-xs text-purple-300">
+                    Pakaian akan diambil dari <strong>Gambar Referensi Style</strong> yang Anda upload ke AI.
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-neutral-400">Material Kain</label>
+                    <select value={clothingMaterial} onChange={e => setClothingMaterial(e.target.value)}
+                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-purple-500 outline-none text-neutral-100">
+                      {CLOTHING_MATERIALS.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-neutral-400">Tema Warna</label>
+                    <select value={colorTheme} onChange={e => setColorTheme(e.target.value)}
+                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-purple-500 outline-none text-neutral-100">
+                      {COLOR_THEMES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                {colorTheme !== 'Original colors' && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-medium text-neutral-400">
+                        {colorTheme === 'Manual' ? 'Pilih 3 warna dominan secara manual.' : 'Klik warna untuk mengubah, atau tekan "Acak".'}
+                      </label>
+                      {colorTheme !== 'Manual' && (
+                        <button onClick={() => {
+                          const h1 = Math.floor(Math.random() * 360);
+                          const h2 = (h1 + 120) % 360;
+                          const h3 = (h1 + 240) % 360;
+                          setManualColor1(hslToHex(h1, 70, 55));
+                          setManualColor2(hslToHex(h2, 70, 55));
+                          setManualColor3(hslToHex(h3, 70, 55));
+                        }} className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors">
+                          <RefreshCcw className="w-3 h-3" /> Acak
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex gap-3 items-center">
+                      {[[manualColor1, setManualColor1], [manualColor2, setManualColor2], [manualColor3, setManualColor3]].map(([val, setter], i) => (
+                        <div key={i} className="flex flex-col items-center gap-1">
+                          <input type="color" value={val} onChange={e => setter(e.target.value)}
+                            className="w-12 h-12 rounded-xl cursor-pointer border border-neutral-700 bg-transparent" />
+                          <span className="text-[9px] text-neutral-500">{val}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                </>
-              )}
+                )}
+              </div>
+            </>
+          )}
+
+          {/* ─── Background ─── */}
+          <div className="bg-neutral-800/40 rounded-2xl border border-neutral-700/50 p-5 space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-neutral-700/60">
+              <MapPin className="w-4 h-4 text-sky-400" />
+              <span className="text-neutral-200 font-semibold text-sm">Latar Belakang</span>
+              <span className="ml-auto text-xs text-sky-400 bg-sky-900/25 px-2 py-0.5 rounded-full border border-sky-800/40">
+                Scene: {sceneTagLabel}
+              </span>
             </div>
 
-            {/* Accessories */}
-            <div className="space-y-4 pt-4 border-t border-neutral-700">
-              <label className="text-sm font-medium text-neutral-400 flex items-center gap-2">
-                <Glasses className="w-4 h-4" /> Aksesori & Properti
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {dynamicAccessoryGroups.map(ag => (
-                  <button key={ag.group} onClick={() => setAccCategory(ag.group)} className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${accCategory===ag.group?'bg-indigo-600 border-indigo-500 text-white':'bg-neutral-800 border-neutral-700 text-neutral-400 hover:bg-neutral-700 hover:text-neutral-200'}`}>
-                    {ag.group}
-                  </button>
-                ))}
+            <div className="flex gap-1.5 flex-wrap">
+              {BACKGROUNDS.map(g => (
+                <button key={g.group} onClick={() => setBgCategory(g.group)}
+                  className={`text-xs px-2.5 py-1 rounded-full border transition-all ${bgCategory === g.group
+                    ? 'bg-sky-700/60 border-sky-500 text-sky-100'
+                    : 'bg-neutral-900/60 border-neutral-700 text-neutral-400 hover:border-neutral-500'}`}>
+                  {g.group}
+                </button>
+              ))}
+            </div>
+
+            <select value={background} onChange={e => {
+              const newBg = e.target.value;
+              const newBgType = getBgType(newBg);
+              setBackground(newBg);
+              if (!isIdPhotoMode) {
+                const validPoses = filterPosesByBg(newBg, newBgType);
+                const allPoseIds = validPoses.flatMap(g => g.items.map(i => i.id));
+                if (!allPoseIds.includes(pose)) setPose(validPoses[0]?.items[0]?.id || pose);
+              }
+            }} className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-sky-500 outline-none text-neutral-100">
+              {BACKGROUNDS.filter(g => g.group === bgCategory).flatMap(g => g.items).map(item => (
+                <option key={item.id} value={item.id}>{item.label}</option>
+              ))}
+            </select>
+
+            {background === 'custom_bg' && (
+              <input type="text"
+                placeholder="Contoh: A futuristic neon-lit alley in Tokyo at night..."
+                value={customBackground}
+                onChange={e => setCustomBackground(e.target.value)}
+                className="w-full bg-neutral-900 border border-sky-700/40 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-sky-500 outline-none text-neutral-100 placeholder-neutral-600" />
+            )}
+          </div>
+
+          {/* ─── Photography ─── */}
+          {viewMode === '1-photo' && (
+            <div className={`rounded-2xl border p-5 space-y-4 transition-all duration-300 ${isIdPhotoMode
+              ? 'bg-amber-950/15 border-amber-600/35'
+              : background === 'image_ref_bg'
+                ? 'bg-indigo-950/20 border-indigo-500/25'
+                : 'bg-neutral-800/40 border-neutral-700/50'}`}>
+              <div className="flex items-center gap-2 pb-3 border-b border-neutral-700/60">
+                <Camera className="w-4 h-4 text-indigo-400" />
+                <span className="text-neutral-200 font-semibold text-sm">Fotografi</span>
+                {isIdPhotoMode && (
+                  <span className="ml-2 inline-flex items-center gap-1 text-xs text-amber-300 font-medium">
+                    <Shield className="w-3 h-3" /> Mode Pasfoto Aktif
+                  </span>
+                )}
+                {background === 'image_ref_bg' && !isIdPhotoMode && (
+                  <span className="ml-auto text-xs text-indigo-400">Smart: Mengikuti Gambar Latar</span>
+                )}
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-64 overflow-y-auto custom-scrollbar pr-2">
-                {dynamicAccessoryGroups.find(g=>g.group===accCategory)?.items.map(item => (
-                  <label key={item.id} className="flex items-center gap-2 text-sm bg-neutral-900 p-2 rounded-lg border border-neutral-700 cursor-pointer hover:border-pink-500/50 transition-colors">
-                    <input type="checkbox" checked={accessories.includes(item.id)} onChange={()=>toggleAccessory(item.id)} className="rounded text-pink-500 bg-neutral-800 border-neutral-600" />
-                    <span className="text-neutral-300 select-none text-xs leading-tight">{item.label}</span>
-                  </label>
-                ))}
+
+              {/* Shoot Style */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-neutral-400">Tema Shoot</label>
+                <select value={shootStyle} onChange={e => setShootStyle(e.target.value)}
+                  className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                  {SHOOT_STYLES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
+                </select>
+                {isIdPhotoMode && (
+                  <div className="flex items-start gap-2 text-xs text-amber-300 bg-amber-950/25 px-3 py-2.5 rounded-xl border border-amber-700/35 mt-1">
+                    <Shield className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                    <span>Pose, Komposisi, Lensa, dan Pencahayaan dikunci otomatis untuk memastikan hasil pasfoto formal yang valid.</span>
+                  </div>
+                )}
               </div>
-              <div className="space-y-2 pt-2 border-t border-neutral-800">
-                <label className="text-sm font-medium text-neutral-400 flex items-center gap-2">
-                  <Watch className="w-4 h-4" /> Jam Tangan Mewah
+
+              {/* Composition */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-neutral-400 flex items-center gap-2">
+                  Komposisi Bingkai {isIdPhotoMode && <LockBadge />}
                 </label>
-                <select value={watch} onChange={e=>setWatch(e.target.value)} className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-3 text-sm focus:ring-2 focus:ring-pink-500 outline-none">
-                  {LUXURY_WATCHES.map(w=><option key={w.id} value={w.id}>{w.label}</option>)}
+                <select
+                  disabled={isIdPhotoMode}
+                  value={isIdPhotoMode ? ID_PHOTO_LOCKED.composition : composition}
+                  onChange={e => setComposition(e.target.value)}
+                  className={`w-full border rounded-xl p-2.5 text-sm outline-none text-neutral-100 ${isIdPhotoMode
+                    ? 'bg-amber-950/20 border-amber-700/40 opacity-60 cursor-not-allowed'
+                    : 'bg-neutral-900 border-neutral-700 focus:ring-2 focus:ring-indigo-500'}`}>
+                  {isIdPhotoMode
+                    ? <option>{ID_PHOTO_LOCKED.composition}</option>
+                    : COMPOSITIONS.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Lens */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-indigo-300 flex items-center gap-1.5">
+                    Lensa Kamera {isIdPhotoMode && <LockBadge />}
+                  </label>
+                  <select
+                    disabled={background === 'image_ref_bg' || isIdPhotoMode}
+                    value={isIdPhotoMode ? ID_PHOTO_LOCKED.cameraLens : (background === 'image_ref_bg' ? '' : cameraLens)}
+                    onChange={e => setCameraLens(e.target.value)}
+                    className={`w-full border rounded-xl p-2.5 text-sm outline-none text-indigo-100 ${(background === 'image_ref_bg' || isIdPhotoMode)
+                      ? 'bg-indigo-950/20 border-amber-700/40 opacity-60 cursor-not-allowed'
+                      : 'bg-neutral-900 border-neutral-700 focus:ring-2 focus:ring-indigo-500'}`}>
+                    {background === 'image_ref_bg' ? <option>🔒 Mengikuti Latar</option>
+                      : isIdPhotoMode ? <option>{ID_PHOTO_LOCKED.cameraLens}</option>
+                        : dynamicLenses.map(item => <option key={item.id} value={item.id}>{item.label}</option>)}
+                  </select>
+                </div>
+
+                {/* Pose */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-indigo-300 flex items-center gap-1.5">
+                    Pose / Camera Angle {isIdPhotoMode && <LockBadge />}
+                  </label>
+                  <select
+                    disabled={isIdPhotoMode}
+                    value={isIdPhotoMode ? ID_PHOTO_LOCKED.pose : pose}
+                    onChange={e => setPose(e.target.value)}
+                    className={`w-full border rounded-xl p-2.5 text-sm outline-none text-indigo-100 ${isIdPhotoMode
+                      ? 'bg-amber-950/20 border-amber-700/40 opacity-60 cursor-not-allowed'
+                      : 'bg-neutral-900 border-neutral-700 focus:ring-2 focus:ring-indigo-500'}`}>
+                    {isIdPhotoMode
+                      ? <option>{ID_PHOTO_LOCKED.pose}</option>
+                      : dynamicPoses.map(group => (
+                        <optgroup key={group.group} label={`── ${group.group} ──`}>
+                          {group.items.map(item => <option key={item.id} value={item.id}>{item.label}</option>)}
+                        </optgroup>
+                      ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Lighting */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-indigo-300 flex items-center gap-1.5">
+                  Pencahayaan {isIdPhotoMode && <LockBadge />}
+                </label>
+                <select
+                  disabled={background === 'image_ref_bg' || isIdPhotoMode}
+                  value={isIdPhotoMode ? ID_PHOTO_LOCKED.lighting : (background === 'image_ref_bg' ? '' : lighting)}
+                  onChange={e => setLighting(e.target.value)}
+                  className={`w-full border rounded-xl p-2.5 text-sm outline-none text-indigo-100 ${(background === 'image_ref_bg' || isIdPhotoMode)
+                    ? 'bg-indigo-950/20 border-amber-700/40 opacity-60 cursor-not-allowed'
+                    : 'bg-neutral-900 border-neutral-700 focus:ring-2 focus:ring-indigo-500'}`}>
+                  {background === 'image_ref_bg' ? <option>🔒 Mengikuti Latar</option>
+                    : isIdPhotoMode ? <option>{ID_PHOTO_LOCKED.lighting}</option>
+                      : dynamicLighting.map(group => (
+                        <optgroup key={group.group} label={`── ${group.group} ──`}>
+                          {group.items.map(item => <option key={item.id} value={item.id}>{item.label}</option>)}
+                        </optgroup>
+                      ))}
                 </select>
               </div>
             </div>
+          )}
 
-            {/* Background + Smart Clothing */}
-            <div className="space-y-4 pt-4 border-t border-neutral-700">
-              <div className="flex items-center gap-2 text-indigo-400 font-medium">
-                <MapPin className="w-5 h-5" /> Latar Lokasi
+          {/* Generate Button */}
+          <button
+            onClick={handleGenerate}
+            className={`w-full p-4 rounded-2xl font-bold transition-all shadow-lg flex items-center justify-center gap-2.5 text-base text-white ${isIdPhotoMode
+              ? 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 shadow-amber-500/25'
+              : isMultiSubject
+                ? 'bg-gradient-to-r from-purple-600 via-indigo-600 to-pink-600 hover:from-purple-500 hover:via-indigo-500 hover:to-pink-500 shadow-purple-500/25'
+                : 'bg-gradient-to-r from-indigo-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 shadow-indigo-500/25'
+            } hover:scale-[1.01] active:scale-[0.99]`}>
+            {isIdPhotoMode
+              ? <><Shield className="w-5 h-5" /> Generate Prompt Pasfoto Resmi</>
+              : isMultiSubject
+                ? <><Users className="w-5 h-5" /> Generate Prompt {subjectCount} Orang</>
+                : <><Sparkles className="w-5 h-5" /> Generate English Prompt</>
+            }
+          </button>
+        </div>
+
+        {/* ══════════════════════════════
+            RIGHT PANEL — Output
+        ══════════════════════════════ */}
+        <div className="lg:col-span-6 flex flex-col h-[calc(100vh-140px)] bg-neutral-950 rounded-2xl border border-neutral-800 relative overflow-hidden">
+
+          {/* Empty state */}
+          {!generatedPrompt && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center space-y-4 max-w-sm mx-auto p-6">
+              <div className="w-20 h-20 bg-neutral-900 rounded-full flex items-center justify-center mx-auto border border-neutral-800 shadow-xl">
+                <Scan className="w-10 h-10 text-neutral-600" />
               </div>
-              <div className="flex flex-wrap gap-2">
-                {BACKGROUNDS.map(bg => (
-                  <button key={bg.group} onClick={()=>setBgCategory(bg.group)} className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${bgCategory===bg.group?'bg-indigo-600 border-indigo-500 text-white':'bg-neutral-800 border-neutral-700 text-neutral-400 hover:bg-neutral-700 hover:text-neutral-200'}`}>
-                    {bg.group}
-                  </button>
-                ))}
-              </div>
-              <div className="grid grid-cols-1 gap-2 max-h-56 overflow-y-auto custom-scrollbar pr-2">
-                {BACKGROUNDS.find(g=>g.group===bgCategory)?.items.map(item => (
-                  <button key={item.id} onClick={()=>handleBgSelection(item.id)} className={`text-left px-3 py-2.5 rounded-lg text-xs leading-tight transition-colors border ${background===item.id?'bg-indigo-500/20 border-indigo-500 text-indigo-200 shadow-inner':'bg-neutral-800 border-neutral-700 text-neutral-400 hover:border-indigo-500/50 hover:text-neutral-200'}`}>
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-              {background==='custom_bg'&&(
-                <input type="text" value={customBackground} onChange={e=>setCustomBackground(e.target.value)} placeholder="Ketik lokasi dalam B.Inggris (contoh: magical forest with glowing mushrooms...)" className="w-full bg-neutral-900 border border-indigo-500/50 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-white placeholder:text-neutral-400" />
-              )}
-              {background==='image_ref_bg'&&(
-                <div className="p-3 bg-indigo-900/40 border border-indigo-500/50 rounded-lg">
-                  <p className="text-xs text-indigo-200">📸 <strong>Mode Referensi Latar Aktif:</strong> Lensa dan Cahaya mengikuti gambar latar. Anda tetap bisa mengatur Pose secara manual. AI tidak meniru wajah dari gambar latar.</p>
+              <h3 className="text-xl font-semibold text-neutral-300">Menunggu Generate</h3>
+              <p className="text-sm text-neutral-500">Sesuaikan parameter di panel kiri lalu klik tombol Generate. Output JSON/Teks siap disalin ke AI Image Generator.</p>
+              {isIdPhotoMode && (
+                <div className="inline-flex items-center gap-2 text-xs text-amber-400 bg-amber-900/20 px-4 py-2 rounded-full border border-amber-700/40">
+                  <Shield className="w-3.5 h-3.5" /> Mode Pasfoto Resmi Aktif
                 </div>
               )}
-
-              {/* Active scene tag */}
-              {currentBgType !== 'all' && (
-                <div className="flex items-center gap-2 text-xs text-neutral-400 bg-neutral-900/60 px-3 py-2 rounded-lg border border-neutral-700/50">
-                  <Coffee className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Scene aktif: <strong className="text-indigo-300">{sceneTagLabel}</strong> — Pilihan pakaian di bawah otomatis diurutkan berdasarkan kesesuaian scene ini.</span>
-                </div>
-              )}
-            </div>
-
-            {/* Clothing */}
-            <div className="space-y-4 pt-4 border-t border-neutral-700">
-              <div className="flex items-center gap-2 text-indigo-400 font-medium">
-                <Palette className="w-5 h-5" /> Pakaian & Estetika
-              </div>
-
-              <div className="bg-indigo-900/20 border border-indigo-900/50 rounded-xl p-4">
-                <label className="flex items-start gap-3 cursor-pointer group">
-                  <input type="checkbox" checked={useClothingReference} onChange={e=>setUseClothingReference(e.target.checked)} className="rounded text-indigo-500 bg-neutral-800 border-neutral-600 w-5 h-5 cursor-pointer mt-0.5" />
-                  <div>
-                    <span className="text-neutral-200 font-medium group-hover:text-indigo-400 transition-colors flex items-center gap-2">
-                      <Layers className="w-4 h-4" /> Gunakan Referensi Pakaian Eksternal
-                    </span>
-                    <p className="text-xs text-indigo-400/80 mt-1 leading-relaxed">Pakaian mengikuti persis seperti gambar inspirasi lain yang diunggah ke AI Generator.</p>
-                  </div>
-                </label>
-              </div>
-
-              {!useClothingReference && (
-                <div className="space-y-3">
-                  {/* Current outfit scene score warning */}
-                  {currentClothingSceneScore < 2 && clothing !== 'Original clothing from reference' && (
-                    <div className={`flex items-start gap-2 p-3 rounded-lg border text-xs ${currentClothingSceneScore === 1 ? 'bg-amber-900/20 border-amber-700/40 text-amber-300' : 'bg-red-900/20 border-red-700/40 text-red-300'}`}>
-                      <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
-                      <div>
-                        <strong>{currentClothingSceneScore === 1 ? 'Pakaian cukup cocok' : 'Pakaian kurang sesuai scene'}</strong> untuk lokasi <strong>{sceneTagLabel}</strong>.
-                        {currentClothingSceneScore === 0 && ' Pertimbangkan memilih pakaian yang lebih sesuai di bawah.'}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex flex-wrap gap-2">
-                    {dynamicClothingGroups.map(cg => (
-                      <button key={cg.group} onClick={()=>setClothCategory(cg.group)} className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${clothCategory===cg.group?'bg-indigo-600 border-indigo-500 text-white':'bg-neutral-800 border-neutral-700 text-neutral-400 hover:bg-neutral-700 hover:text-neutral-200'}`}>
-                        {cg.group}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Smart sorted clothing list */}
-                  <div className="grid grid-cols-1 gap-1.5 max-h-72 overflow-y-auto custom-scrollbar pr-2">
-                    {dynamicClothingGroups.find(g=>g.group===clothCategory)?.items
-                      .map(item => ({ item, score: getClothingSceneScore(item, currentBgType) }))
-                      .sort((a, b) => b.score - a.score)
-                      .map(({ item, score }) => (
-                        <button key={item.id} onClick={()=>setClothing(item.id)} className={`text-left px-3 py-2.5 rounded-lg text-xs leading-tight transition-colors border flex items-center justify-between gap-2 ${clothing===item.id?'bg-indigo-500/20 border-indigo-500 text-indigo-200 shadow-inner':'bg-neutral-800 border-neutral-700 text-neutral-400 hover:border-indigo-500/50 hover:text-neutral-200'}`}>
-                          <span className="flex-1">{item.label}</span>
-                          <SceneBadge score={score} />
-                        </button>
-                      ))
-                    }
-                  </div>
-                  {useHijab&&<p className="text-[10px] text-indigo-400/80">✨ Hijab aktif: Menampilkan Modest fashion / Hijab approved.</p>}
-                </div>
-              )}
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className={`space-y-2 ${useClothingReference?'md:col-span-2':''}`}>
-                  <label className="text-sm font-medium text-neutral-400">Bahan Kain</label>
-                  <select value={clothingMaterial} onChange={e=>setClothingMaterial(e.target.value)} className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                    {CLOTHING_MATERIALS.map(m=><option key={m.id} value={m.id}>{m.label}</option>)}
-                  </select>
-                </div>
-                <div className={`space-y-2 ${useClothingReference?'opacity-50 pointer-events-none':''}`}>
-                  <label className="text-sm font-medium text-neutral-400">Tema Warna Pakaian</label>
-                  <select value={colorTheme} onChange={handleThemeChange} disabled={useClothingReference} className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                    {COLOR_THEMES.map(t=><option key={t.id} value={t.id}>{t.label}</option>)}
-                  </select>
-                </div>
-              </div>
-
-              {colorTheme!=='Original colors'&&!useClothingReference&&(
-                <div className="flex items-center gap-4 bg-neutral-800/50 p-3 rounded-lg border border-neutral-700">
-                  <div className="flex gap-3">
-                    <input type="color" value={manualColor1} onChange={e=>{setManualColor1(e.target.value);setColorTheme('Manual');}} className="w-10 h-10 rounded cursor-pointer bg-transparent border-0 p-0" />
-                    <input type="color" value={manualColor2} onChange={e=>{setManualColor2(e.target.value);setColorTheme('Manual');}} className="w-10 h-10 rounded cursor-pointer bg-transparent border-0 p-0" />
-                    <input type="color" value={manualColor3} onChange={e=>{setManualColor3(e.target.value);setColorTheme('Manual');}} className="w-10 h-10 rounded cursor-pointer bg-transparent border-0 p-0" />
-                  </div>
-                  <button onClick={()=>randomizeThemeColors(colorTheme)} className="p-2.5 bg-neutral-700 hover:bg-neutral-600 rounded-lg text-indigo-400 hover:text-indigo-300 transition-colors">
-                    <RefreshCcw className="w-4 h-4" />
-                  </button>
-                  <span className="text-[11px] text-neutral-400 leading-tight">{colorTheme==='Manual'?'Pilih 3 warna dominan secara manual.':'Klik warna untuk mengubah, atau tekan "Acak" untuk variasi baru.'}</span>
+              {isMultiSubject && (
+                <div className="inline-flex items-center gap-2 text-xs text-indigo-400 bg-indigo-900/20 px-4 py-2 rounded-full border border-indigo-700/40">
+                  <Users className="w-3.5 h-3.5" /> {subjectCount} orang dikonfigurasi
                 </div>
               )}
             </div>
+          )}
 
-            {/* Photography */}
-            {viewMode==='1-photo'&&(
-              <div className={`space-y-4 p-5 rounded-xl border transition-all duration-300 ${background==='image_ref_bg'?'bg-indigo-950/40 border-indigo-500/30':'bg-indigo-900/10 border-indigo-900/40'}`}>
-                <div className="flex items-center gap-2 text-indigo-400 font-semibold border-b border-indigo-900/50 pb-2">
-                  <Camera className="w-5 h-5" /> Fotografi (Smart Filter Aktif)
-                </div>
-                <div className="space-y-3">
-                  <div className="space-y-1">
-                    <label className="text-xs font-medium text-neutral-400">Tema Shoot</label>
-                    <select value={shootStyle} onChange={e=>setShootStyle(e.target.value)} className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                      {SHOOT_STYLES.map(s=><option key={s.id} value={s.id}>{s.label}</option>)}
-                    </select>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-medium text-neutral-400">Komposisi Bingkai</label>
-                    <select value={composition} onChange={e=>setComposition(e.target.value)} className="w-full bg-neutral-900 border border-neutral-700 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                      {COMPOSITIONS.map(c=><option key={c.id} value={c.id}>{c.label}</option>)}
-                    </select>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <label className="text-xs font-medium text-indigo-300">Lensa Kamera</label>
-                      <select disabled={background==='image_ref_bg'} value={background==='image_ref_bg'?'':cameraLens} onChange={e=>setCameraLens(e.target.value)} className="w-full bg-indigo-950/30 border border-indigo-800 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed">
-                        {background==='image_ref_bg'?<option>🔒 Mengikuti Latar</option>:dynamicLenses.map(l=><option key={l.id} value={l.id}>{l.label}</option>)}
-                      </select>
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-xs font-medium text-indigo-300">Sudut & Pose</label>
-                      <select value={pose} onChange={e=>setPose(e.target.value)} className="w-full bg-indigo-950/30 border border-indigo-800 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-indigo-100">
-                        {dynamicPoses.map(group=>(
-                          <optgroup key={group.group} label={`--- ${group.group} ---`}>
-                            {group.items.map(item=><option key={item.id} value={item.id}>{item.label}</option>)}
-                          </optgroup>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-medium text-indigo-300">Pencahayaan Artistik</label>
-                    <select disabled={background==='image_ref_bg'} value={background==='image_ref_bg'?'':lighting} onChange={e=>setLighting(e.target.value)} className="w-full bg-indigo-950/30 border border-indigo-800 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed">
-                      {background==='image_ref_bg'?<option>🔒 Mengikuti Latar</option>:dynamicLighting.map(group=>(
-                        <optgroup key={group.group} label={`--- ${group.group} ---`}>
-                          {group.items.map(item=><option key={item.id} value={item.id}>{item.label}</option>)}
-                        </optgroup>
-                      ))}
-                    </select>
-                  </div>
-                </div>
+          {/* Output */}
+          {generatedPrompt && (
+            <div className="w-full h-full flex flex-col">
+              {/* Tab bar */}
+              <div className="flex items-center bg-neutral-900 border-b border-neutral-800 p-2 gap-2">
+                <button onClick={() => setOutputFormat('json')}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-colors ${outputFormat === 'json'
+                    ? 'bg-neutral-800 text-indigo-400 shadow-sm'
+                    : 'text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800/50'}`}>
+                  <FileJson className="w-4 h-4" /> JSON Format
+                </button>
+                <button onClick={() => setOutputFormat('structured')}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-colors ${outputFormat === 'structured'
+                    ? 'bg-neutral-800 text-indigo-400 shadow-sm'
+                    : 'text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800/50'}`}>
+                  <FileText className="w-4 h-4" /> Structured Text
+                </button>
+                <button onClick={handleCopy}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${isCopied
+                    ? 'bg-emerald-600/30 text-emerald-400 border border-emerald-600/40'
+                    : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'}`}>
+                  {isCopied ? <><Check className="w-4 h-4" /> Tersalin!</> : <><Copy className="w-4 h-4" /> Salin</>}
+                </button>
               </div>
-            )}
 
-            <button onClick={handleGenerate} className="w-full bg-gradient-to-r from-indigo-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white p-4 rounded-xl font-bold transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2 text-lg">
-              <Sparkles className="w-5 h-5" /> Generate English Prompt
-            </button>
-          </div>
+              {/* Mode badges */}
+              <div className="flex gap-2 px-4 pt-3 pb-1 flex-wrap">
+                {isIdPhotoMode && (
+                  <span className="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-amber-900/30 border border-amber-600/40 text-amber-300 font-semibold">
+                    <Shield className="w-3 h-3" /> ID Photo Strict Mode
+                  </span>
+                )}
+                {isMultiSubject && (
+                  <span className="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-purple-900/30 border border-purple-600/40 text-purple-300 font-semibold">
+                    <Users className="w-3 h-3" /> Multi-Subject: {subjectCount} Orang
+                  </span>
+                )}
+                <span className="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-emerald-900/20 border border-emerald-700/30 text-emerald-400">
+                  <CheckCircle2 className="w-3 h-3" /> Prompt Generated
+                </span>
+              </div>
 
-          {/* ── RIGHT — Output ── */}
-          <div className="lg:col-span-6 flex flex-col h-[calc(100vh-140px)] bg-neutral-950 rounded-2xl border border-neutral-800 relative overflow-hidden">
-            {!generatedPrompt&&(
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-center space-y-4 max-w-sm mx-auto p-6">
-                <div className="w-20 h-20 bg-neutral-900 rounded-full flex items-center justify-center mx-auto mb-4 border border-neutral-800 shadow-xl">
-                  <Scan className="w-10 h-10 text-neutral-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-neutral-300">Menunggu Generate</h3>
-                <p className="text-sm text-neutral-500">Sesuaikan parameter di panel kiri lalu klik tombol Generate. Output JSON/Teks siap disalin ke AI Image Generator.</p>
+              {/* Prompt content */}
+              <div className="flex-1 overflow-y-auto p-4">
+                <pre className="text-xs text-neutral-300 whitespace-pre-wrap font-mono leading-relaxed">
+                  {outputFormat === 'json' ? generatedPrompt.json : generatedPrompt.structured}
+                </pre>
               </div>
-            )}
-            {generatedPrompt&&(
-              <div className="w-full h-full flex flex-col">
-                <div className="flex items-center bg-neutral-900 border-b border-neutral-800 p-2 gap-2">
-                  <button onClick={()=>setOutputFormat('json')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-colors ${outputFormat==='json'?'bg-neutral-800 text-indigo-400 shadow-sm':'text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800/50'}`}>
-                    <FileJson className="w-4 h-4" /> JSON Format
-                  </button>
-                  <button onClick={()=>setOutputFormat('structured')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-colors ${outputFormat==='structured'?'bg-neutral-800 text-emerald-400 shadow-sm':'text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800/50'}`}>
-                    <FileText className="w-4 h-4" /> Structured Text
-                  </button>
-                </div>
-                <div className="flex-1 overflow-hidden relative">
-                  <pre className="p-5 w-full h-full overflow-auto text-sm font-mono whitespace-pre-wrap break-words leading-relaxed custom-scrollbar text-neutral-300">
-                    {outputFormat==='json'
-                      ?<span className="text-pink-300">{generatedPrompt.json}</span>
-                      :<span className="text-emerald-200">{generatedPrompt.structured}</span>}
-                  </pre>
-                  <button onClick={handleCopy} className="absolute top-4 right-4 flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-bold transition-colors shadow-lg shadow-indigo-900/50 z-20">
-                    {isCopied?<Check className="w-4 h-4"/>:<Copy className="w-4 h-4"/>}
-                    {isCopied?'Copied!':'Copy Prompt'}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
-
-      <style dangerouslySetInnerHTML={{__html:`
-        .custom-scrollbar::-webkit-scrollbar{width:8px}
-        .custom-scrollbar::-webkit-scrollbar-track{background:rgba(0,0,0,0.2)}
-        .custom-scrollbar::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:8px}
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.2)}
-      `}}/>
     </div>
   );
 }
