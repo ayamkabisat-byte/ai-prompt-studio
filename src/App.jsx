@@ -25,6 +25,79 @@ const ID_PHOTO_LOCKED = {
   lighting: 'Bright, even flat studio lighting, no shadows on face',
 };
 
+// Quick preset backgrounds for ID photo
+const ID_PHOTO_BACKGROUNDS = [
+  { id: 'Solid red background (Official ID photo style)', label: '🔴 Merah (KTP/SIM)', color: '#dc2626' },
+  { id: 'Solid blue background (Official ID photo style)', label: '🔵 Biru (Paspor/SKCK)', color: '#2563eb' },
+  { id: 'Clean white studio background', label: '⬜ Putih (Umum)', color: '#e5e7eb' },
+];
+
+// ─── COUPLE & GROUP POSES (injected at runtime) ───────────────────────────────
+const COUPLE_GROUP_POSES = [
+  { group: '💑 Couple — Romantis', items: [
+    { id: 'Couple standing side by side, both facing the camera, inside arms gently wrapped around each other\'s waist, warm and natural smiles', label: 'Berdiri Berdampingan, Peluk Pinggang (Natural Smile)', allowedTypes: ['all'] },
+    { id: 'Couple standing facing each other, foreheads touching, eyes closed, soft and intimate atmosphere', label: 'Dahi Bersentuhan, Mata Terpejam (Intimate)', allowedTypes: ['all'] },
+    { id: 'Couple from behind, walking hand in hand towards a scenic background, candid and cinematic', label: 'Dari Belakang, Bergandengan Tangan ke Lokasi Indah (Candid)', allowedTypes: ['nature', 'urban', 'beach', 'yacht'] },
+    { id: 'Couple sitting side by side on a bench, one leaning head on the other\'s shoulder, relaxed and cozy', label: 'Duduk Berdampingan, Kepala di Bahu Pasangan (Cozy)', allowedTypes: ['nature', 'urban', 'cafe', 'indoor'] },
+    { id: 'Couple in a tender back hug, one person from behind wrapping arms around the other, both smiling or eyes closed', label: 'Back Hug (Pelukan dari Belakang), Keduanya Tersenyum', allowedTypes: ['all'] },
+    { id: 'Couple facing each other and sharing a warm laugh, hands intertwined, natural and candid joyful moment', label: 'Saling Berhadapan, Tertawa Bersama, Tangan Bertautan', allowedTypes: ['all'] },
+    { id: 'Couple sitting across from each other at a cafe table, leaning forward close together, looking into each other\'s eyes', label: 'Duduk di Kafe Berhadapan, Condong Berdekatan (Eye Contact)', allowedTypes: ['cafe', 'indoor', 'restaurant'] },
+    { id: 'Couple walking together in a city street, one slightly ahead looking back over the shoulder with a smile', label: 'Berjalan, Satu Menoleh ke Belakang Sambil Tersenyum (Urban Walk)', allowedTypes: ['urban', 'nature', 'beach'] },
+    { id: 'Couple standing together, one from behind with arms wrapped around the other\'s shoulders, both looking at the horizon', label: 'Berpelukan dari Samping, Memandang Cakrawala Bersama', allowedTypes: ['nature', 'beach', 'yacht', 'urban'] },
+    { id: 'Couple on the ground or grass, one resting head in the other\'s lap while the other looks down tenderly', label: 'Satu Berbaring di Pangkuan Pasangan (Tender & Sweet, Outdoor)', allowedTypes: ['nature', 'beach', 'urban'] },
+    { id: 'Couple pressing noses together (Eskimo kiss) playfully, both with eyes closed and slight smiles', label: 'Eskimo Kiss (Hidung Bersentuhan), Senyum Playful', allowedTypes: ['all'] },
+    { id: 'Couple holding hands and swinging arms between them while walking side by side, joyful and carefree', label: 'Bergandengan Tangan, Ayun-ayun Bersama (Carefree & Joyful)', allowedTypes: ['nature', 'urban', 'beach'] },
+  ]},
+  { group: '💑 Couple — Keren & Editorial', items: [
+    { id: 'Couple standing back-to-back, arms crossed or hands in pockets, both looking away in opposite directions — cool editorial style', label: 'Punggung ke Punggung, Tangan Bersilang (Cool Editorial)', allowedTypes: ['studio', 'urban', 'indoor'] },
+    { id: 'Couple walking side-by-side, not looking at each other, both looking forward with confidence — street fashion editorial', label: 'Berjalan Sejajar, Menatap ke Depan Masing-masing (Street Fashion)', allowedTypes: ['urban', 'indoor'] },
+    { id: 'One person sitting on a high surface or ledge, the other standing in front with arms resting on the sitter\'s knees, both looking at camera', label: 'Satu Duduk di Tepian Tinggi, Satu Berdiri di Depan (Asymmetric Editorial)', allowedTypes: ['urban', 'indoor', 'studio', 'nature'] },
+    { id: 'Couple standing at a slight distance, one turning head towards the other who looks at the camera — moody cinematic vibe', label: 'Berjarak, Satu Menoleh ke Pasangan (Moody Cinematic)', allowedTypes: ['urban', 'nature', 'studio', 'indoor'] },
+    { id: 'Close-up couple portrait, cheek to cheek, both smiling warmly towards the camera, heads tilted slightly together', label: 'Close-up: Pipi ke Pipi, Senyum ke Kamera', allowedTypes: ['all'] },
+    { id: 'Couple standing staggered (one slightly in front), both in strong confident poses, fashion editorial', label: 'Staggered Pose (Satu di Depan), Ekspresi Kuat (Fashion Editorial)', allowedTypes: ['studio', 'urban', 'indoor'] },
+    { id: 'Couple standing under one umbrella together, slightly touching shoulders, moody rainy city atmosphere', label: 'Berdiri di Bawah Satu Payung, Suasana Kota Hujan (Moody)', allowedTypes: ['urban', 'indoor'] },
+    { id: 'Couple sitting on a motorcycle together, one driving and one behind with arms around the driver\'s waist, urban editorial', label: 'Naik Motor Bersama, Satu Peluk dari Belakang (Urban Editorial)', allowedTypes: ['urban'] },
+  ]},
+  { group: '💑 Couple — Pernikahan & Formal', items: [
+    { id: 'Classic wedding couple pose: groom standing behind bride, both hands on her shoulders, both smiling softly at the camera', label: 'Pernikahan Klasik: Pengantin Pria di Belakang, Tangan di Bahu', allowedTypes: ['all'] },
+    { id: 'Wedding couple holding hands and walking down an aisle or flower-lined path, seen from the front', label: 'Berjalan di Lorong Bunga/Aisle, Pegangan Tangan (Wedding Walk)', allowedTypes: ['indoor', 'nature', 'all'] },
+    { id: 'Wedding couple first look moment: groom seeing bride for the first time, emotional and tender expression', label: 'First Look Moment: Pengantin Pria Melihat Pengantin Wanita Pertama Kali', allowedTypes: ['all'] },
+    { id: 'Wedding couple sitting together facing slightly towards each other, hands held, formal portrait', label: 'Duduk Berdampingan, Tangan Bergandengan (Formal Wedding Portrait)', allowedTypes: ['indoor', 'studio', 'nature', 'all'] },
+    { id: 'Groom lifting bride off the ground in a romantic spin, bride\'s dress flowing, both laughing joyfully', label: 'Pengantin Pria Mengangkat Pengantin Wanita, Berputar & Tertawa', allowedTypes: ['nature', 'indoor', 'all'] },
+    { id: 'Wedding couple kissing under a floral arch or canopy, intimate and romantic', label: 'Ciuman di Bawah Arch Bunga (Wedding Ceremony Kiss)', allowedTypes: ['indoor', 'nature', 'all'] },
+  ]},
+  { group: '👨‍👩‍👧‍👦 Group — Keluarga', items: [
+    { id: 'Family of 3-5 standing together in a natural row, all facing the camera, warm smiles, arms around each other — classic family portrait', label: 'Keluarga Berdiri Berbaris, Peluk Satu Sama Lain (Classic Family Portrait)', allowedTypes: ['all'] },
+    { id: 'Family sitting together on grass or a bench outdoors, relaxed and candid, children in front or in parents\' laps', label: 'Keluarga Duduk Santai di Taman/Bangku, Anak di Depan atau Pangkuan', allowedTypes: ['nature', 'urban', 'indoor'] },
+    { id: 'Parents lifting child up between them, all laughing — joyful and candid family moment', label: 'Orang Tua Mengangkat Anak di Antara Mereka, Semua Tertawa', allowedTypes: ['nature', 'urban', 'beach', 'indoor'] },
+    { id: 'Family walking towards the camera together from a distance in a park or field, candid and warm', label: 'Keluarga Berjalan Bersama ke Arah Kamera (Candid, Outdoor)', allowedTypes: ['nature', 'urban', 'beach'] },
+    { id: 'Family group hug, all huddle together tightly, all smiling or laughing, warm family composition', label: 'Pelukan Grup Keluarga yang Erat, Semua Tersenyum/Tertawa', allowedTypes: ['all'] },
+    { id: 'Three-generation family portrait: grandparents, parents, and children all together in one warm composition', label: 'Foto Tiga Generasi: Kakek-Nenek, Orang Tua & Anak-cucu', allowedTypes: ['all'] },
+    { id: 'Family sitting on a blanket in the park for a picnic, relaxed and playful, natural candid moment', label: 'Piknik Keluarga di Atas Selimut (Candid & Playful)', allowedTypes: ['nature', 'urban'] },
+  ]},
+  { group: '👥 Group — Teman & Tim', items: [
+    { id: 'Group of friends standing in a loose natural row, arms around each other\'s shoulders or waists, all laughing and candid', label: 'Teman Berdiri Natural, Pelukan Bahu/Pinggang, Tertawa Candid', allowedTypes: ['all'] },
+    { id: 'Group of friends from behind, walking together towards a scenic location, arms linked or around shoulders', label: 'Teman dari Belakang, Berjalan Bersama ke Lokasi Indah', allowedTypes: ['nature', 'urban', 'beach'] },
+    { id: 'Group of friends sitting together on stairs, ledge, or bench, relaxed and candid, varied natural poses', label: 'Teman Duduk di Tangga/Bangku, Pose Bervariasi (Candid)', allowedTypes: ['urban', 'indoor', 'nature'] },
+    { id: 'Group of friends jumping together mid-air at the same time outdoors, fun and energetic group shot', label: 'Semua Melompat Bersama (Group Jump Shot, Fun & Energik)', allowedTypes: ['nature', 'urban', 'beach', 'sports'] },
+    { id: 'Sports team or corporate team in two rows: front row sitting or crouching, back row standing, all facing camera', label: 'Foto Tim Dua Baris: Depan Duduk/Jongkok, Belakang Berdiri (Team Photo)', allowedTypes: ['all'] },
+    { id: 'Group of people in a circle looking down at the camera from above, top-down bird\'s eye view, all smiling', label: 'Grup Melingkar, Foto dari Atas (Top-down Circle Shot)', allowedTypes: ['all'] },
+    { id: 'Group of friends in a chain/train pose, each holding shoulders of person in front, all laughing', label: 'Pose Kereta: Berurutan Pegang Bahu dari Belakang, Semua Tertawa', allowedTypes: ['all'] },
+    { id: 'Group of 3-4 walking side by side, looking forward with confidence, cinematic slow-motion style', label: 'Berjalan Sejajar Penuh Percaya Diri, Menatap ke Depan (Cinematic)', allowedTypes: ['urban', 'nature', 'indoor'] },
+    { id: 'Group selfie: one person in front extending arm with phone, everyone else crowding in behind with various fun expressions', label: 'Group Selfie: Satu Pegang HP Maju ke Depan, Semua Masuk Frame (Fun)', allowedTypes: ['all'] },
+    { id: 'Group of friends scattered naturally at different depths in an outdoor frame, candid lifestyle editorial', label: 'Teman Tersebar Natural di Frame (Depth Layering, Lifestyle Editorial)', allowedTypes: ['nature', 'urban', 'beach'] },
+    { id: 'All hands in the center stacked on top of each other, team spirit huddle', label: 'Tangan Semua ke Tengah Ditumpuk (Team Huddle Spirit)', allowedTypes: ['all'] },
+  ]},
+  { group: '🎉 Group — Perayaan & Momen Spesial', items: [
+    { id: 'Group celebrating together, drinks or glasses raised high, everyone cheering, laughing and joyful — celebration shot', label: 'Grup Angkat Gelas/Botol Bersama, Cheers! (Celebration Shot)', allowedTypes: ['indoor', 'restaurant', 'yacht', 'urban', 'cafe'] },
+    { id: 'Bridal squad or bridesmaids standing together in matching outfits, holding bouquets, all smiling confidently', label: 'Bridesmaid Squad: Seragam Senada, Pegang Buket, Tersenyum Percaya Diri', allowedTypes: ['all'] },
+    { id: 'Group of graduates in robes throwing mortarboard hats in the air together, joyful and celebratory', label: 'Wisudawan Lempar Toga Bersama (Graduation Celebration)', allowedTypes: ['all'] },
+    { id: 'Group at a dining table, all leaning in for a photo, glasses raised, festive dinner party atmosphere', label: 'Foto di Meja Makan, Angkat Gelas, Suasana Dinner Festif', allowedTypes: ['restaurant', 'indoor', 'cafe'] },
+    { id: 'Group around a birthday cake, all about to blow candles together, joyful birthday moment', label: 'Ulang Tahun: Melingkari Kue, Semua Siap Tiup Lilin Bersama', allowedTypes: ['indoor', 'cafe', 'restaurant'] },
+    { id: 'Corporate or organizational group photo, arranged neatly with management in center front row', label: 'Foto Korporat/Kantor: Susunan Formal, Atasan di Tengah Depan', allowedTypes: ['studio', 'indoor', 'office', 'all'] },
+  ]},
+];
+
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 
 const getBgType = (bgId) => {
@@ -36,8 +109,9 @@ const getBgType = (bgId) => {
   return 'all';
 };
 
-const filterPosesByBg = (bgId, bgType) => {
-  return POSES.map(group => {
+const filterPosesByBg = (bgId, bgType, allPoses) => {
+  const source = allPoses || POSES;
+  return source.map(group => {
     const filteredItems = group.items.filter(item => {
       if (item.id === 'match_bg_pose') return bgId === 'image_ref_bg';
       return !item.allowedTypes || item.allowedTypes.includes('all') || item.allowedTypes.includes(bgType);
@@ -401,12 +475,20 @@ export default function App() {
   // ── ID Photo Lock ─────────────────────────────────────────────────────────
   const isIdPhotoMode = useMemo(() => shootStyle === ID_PHOTO_SHOOT_STYLE_ID, [shootStyle]);
 
+  // ID Photo quick background selection
+  const [idPhotoBg, setIdPhotoBg] = useState(ID_PHOTO_BACKGROUNDS[1].id); // default biru
+
+  // Merge POSES with couple/group poses
+  const allPoses = useMemo(() => [...POSES, ...COUPLE_GROUP_POSES], []);
+
   useEffect(() => {
     if (isIdPhotoMode) {
       setPose(ID_PHOTO_LOCKED.pose);
       setComposition(ID_PHOTO_LOCKED.composition);
       setCameraLens(ID_PHOTO_LOCKED.cameraLens);
       setLighting(ID_PHOTO_LOCKED.lighting);
+      setBackground(idPhotoBg);
+      setBgCategory(BACKGROUNDS[1].group); // Basic & Studio
     }
   }, [isIdPhotoMode]);
 
@@ -449,7 +531,7 @@ export default function App() {
     return groups;
   }, [gender, useHijab]);
 
-  const dynamicPoses = useMemo(() => filterPosesByBg(background, currentBgType), [background, currentBgType]);
+  const dynamicPoses = useMemo(() => filterPosesByBg(background, currentBgType, allPoses), [background, currentBgType, allPoses]);
   const dynamicLighting = useMemo(() => filterOptionsByBg(LIGHTING_STYLES, currentBgType), [currentBgType]);
   const dynamicLenses = useMemo(() => filterArrayByBg(CAMERA_LENSES, currentBgType), [currentBgType]);
 
@@ -905,6 +987,69 @@ ${promptText}
         </div>
       </div>
 
+      {/* ─── ID Photo Quick Preset Card ─── */}
+      <div className="max-w-[1600px] mx-auto mb-4">
+        <div className={`rounded-2xl border p-4 transition-all duration-300 ${isIdPhotoMode
+          ? 'bg-amber-950/25 border-amber-500/50 shadow-lg shadow-amber-900/20'
+          : 'bg-neutral-800/30 border-neutral-700/40'}`}>
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Label */}
+            <div className="flex items-center gap-2 shrink-0">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isIdPhotoMode ? 'bg-amber-500/20 border border-amber-500/40' : 'bg-neutral-700/60'}`}>
+                <Shield className={`w-4 h-4 ${isIdPhotoMode ? 'text-amber-300' : 'text-neutral-400'}`} />
+              </div>
+              <div>
+                <div className={`text-xs font-bold ${isIdPhotoMode ? 'text-amber-300' : 'text-neutral-300'}`}>
+                  Mode Pasfoto / ID Photo
+                </div>
+                <div className="text-[10px] text-neutral-500">Klik untuk aktifkan — semua setting dikunci otomatis</div>
+              </div>
+            </div>
+
+            {/* Toggle button */}
+            <button
+              onClick={() => {
+                if (isIdPhotoMode) {
+                  setShootStyle(SHOOT_STYLES[2].id); // back to default
+                } else {
+                  setShootStyle(ID_PHOTO_SHOOT_STYLE_ID);
+                  setViewMode('1-photo');
+                  setSubjectCount(1);
+                }
+              }}
+              className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${isIdPhotoMode
+                ? 'bg-amber-500/20 border-amber-500/60 text-amber-300 hover:bg-amber-500/30'
+                : 'bg-neutral-700/50 border-neutral-600 text-neutral-300 hover:border-amber-500/50 hover:text-amber-300'}`}>
+              {isIdPhotoMode ? '✓ Aktif — Klik untuk Nonaktifkan' : 'Aktifkan Mode Pasfoto'}
+            </button>
+
+            {/* Background quick-select — only when ID photo mode ON */}
+            {isIdPhotoMode && (
+              <div className="flex items-center gap-2 ml-auto">
+                <span className="text-xs text-amber-400/70 font-medium">Latar:</span>
+                {ID_PHOTO_BACKGROUNDS.map(bg => (
+                  <button
+                    key={bg.id}
+                    onClick={() => {
+                      setIdPhotoBg(bg.id);
+                      setBackground(bg.id);
+                    }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${idPhotoBg === bg.id
+                      ? 'border-amber-400 bg-amber-500/20 text-amber-200 shadow-md'
+                      : 'border-neutral-600 bg-neutral-800/60 text-neutral-400 hover:border-amber-500/40'}`}>
+                    <span
+                      className="w-3 h-3 rounded-full border border-white/20 shrink-0"
+                      style={{ backgroundColor: bg.color }}
+                    />
+                    {bg.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
 
         {/* ══════════════════════════════
@@ -1282,47 +1427,66 @@ ${promptText}
           )}
 
           {/* ─── Background ─── */}
-          <div className="bg-neutral-800/40 rounded-2xl border border-neutral-700/50 p-5 space-y-4">
+          <div className={`rounded-2xl border p-5 space-y-4 ${isIdPhotoMode ? 'bg-amber-950/10 border-amber-700/30' : 'bg-neutral-800/40 border-neutral-700/50'}`}>
             <div className="flex items-center gap-2 pb-3 border-b border-neutral-700/60">
               <MapPin className="w-4 h-4 text-sky-400" />
               <span className="text-neutral-200 font-semibold text-sm">Latar Belakang</span>
-              <span className="ml-auto text-xs text-sky-400 bg-sky-900/25 px-2 py-0.5 rounded-full border border-sky-800/40">
-                Scene: {sceneTagLabel}
-              </span>
-            </div>
-
-            <div className="flex gap-1.5 flex-wrap">
-              {BACKGROUNDS.map(g => (
-                <button key={g.group} onClick={() => setBgCategory(g.group)}
-                  className={`text-xs px-2.5 py-1 rounded-full border transition-all ${bgCategory === g.group
-                    ? 'bg-sky-700/60 border-sky-500 text-sky-100'
-                    : 'bg-neutral-900/60 border-neutral-700 text-neutral-400 hover:border-neutral-500'}`}>
-                  {g.group}
-                </button>
-              ))}
-            </div>
-
-            <select value={background} onChange={e => {
-              const newBg = e.target.value;
-              const newBgType = getBgType(newBg);
-              setBackground(newBg);
-              if (!isIdPhotoMode) {
-                const validPoses = filterPosesByBg(newBg, newBgType);
-                const allPoseIds = validPoses.flatMap(g => g.items.map(i => i.id));
-                if (!allPoseIds.includes(pose)) setPose(validPoses[0]?.items[0]?.id || pose);
+              {isIdPhotoMode
+                ? <span className="ml-auto"><LockBadge /></span>
+                : <span className="ml-auto text-xs text-sky-400 bg-sky-900/25 px-2 py-0.5 rounded-full border border-sky-800/40">Scene: {sceneTagLabel}</span>
               }
-            }} className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-sky-500 outline-none text-neutral-100">
-              {BACKGROUNDS.filter(g => g.group === bgCategory).flatMap(g => g.items).map(item => (
-                <option key={item.id} value={item.id}>{item.label}</option>
-              ))}
-            </select>
+            </div>
 
-            {background === 'custom_bg' && (
-              <input type="text"
-                placeholder="Contoh: A futuristic neon-lit alley in Tokyo at night..."
-                value={customBackground}
-                onChange={e => setCustomBackground(e.target.value)}
-                className="w-full bg-neutral-900 border border-sky-700/40 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-sky-500 outline-none text-neutral-100 placeholder-neutral-600" />
+            {/* In ID Photo mode — show locked bg chips */}
+            {isIdPhotoMode ? (
+              <div className="space-y-2">
+                <p className="text-xs text-amber-400/70">Pilihan latar dikunci. Ubah lewat Quick Preset Pasfoto di atas.</p>
+                <div className="flex gap-2 flex-wrap">
+                  {ID_PHOTO_BACKGROUNDS.map(bg => (
+                    <button key={bg.id} onClick={() => { setIdPhotoBg(bg.id); setBackground(bg.id); }}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold border transition-all ${idPhotoBg === bg.id
+                        ? 'border-amber-400 bg-amber-500/20 text-amber-200'
+                        : 'border-neutral-600 bg-neutral-800/60 text-neutral-400 hover:border-amber-500/40'}`}>
+                      <span className="w-3 h-3 rounded-full border border-white/20" style={{ backgroundColor: bg.color }} />
+                      {bg.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="flex gap-1.5 flex-wrap">
+                  {BACKGROUNDS.map(g => (
+                    <button key={g.group} onClick={() => setBgCategory(g.group)}
+                      className={`text-xs px-2.5 py-1 rounded-full border transition-all ${bgCategory === g.group
+                        ? 'bg-sky-700/60 border-sky-500 text-sky-100'
+                        : 'bg-neutral-900/60 border-neutral-700 text-neutral-400 hover:border-neutral-500'}`}>
+                      {g.group}
+                    </button>
+                  ))}
+                </div>
+
+                <select value={background} onChange={e => {
+                  const newBg = e.target.value;
+                  const newBgType = getBgType(newBg);
+                  setBackground(newBg);
+                  const validPoses = filterPosesByBg(newBg, newBgType, allPoses);
+                  const allPoseIds = validPoses.flatMap(g => g.items.map(i => i.id));
+                  if (!allPoseIds.includes(pose)) setPose(validPoses[0]?.items[0]?.id || pose);
+                }} className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-sky-500 outline-none text-neutral-100">
+                  {BACKGROUNDS.filter(g => g.group === bgCategory).flatMap(g => g.items).map(item => (
+                    <option key={item.id} value={item.id}>{item.label}</option>
+                  ))}
+                </select>
+
+                {background === 'custom_bg' && (
+                  <input type="text"
+                    placeholder="Contoh: A futuristic neon-lit alley in Tokyo at night..."
+                    value={customBackground}
+                    onChange={e => setCustomBackground(e.target.value)}
+                    className="w-full bg-neutral-900 border border-sky-700/40 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-sky-500 outline-none text-neutral-100 placeholder-neutral-600" />
+                )}
+              </>
             )}
           </div>
 
