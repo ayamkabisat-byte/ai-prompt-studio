@@ -14,6 +14,15 @@ import {
   getClothingSceneScore
 } from './data.js';
 
+const filterByGender = (items, currentGender) => {
+  return items.filter(item => {
+    if (!item.gender) return true;
+    if (currentGender === 'Wanita') return item.gender.includes('female') || item.gender.includes('unisex');
+    if (currentGender === 'Pria') return item.gender.includes('male') || item.gender.includes('unisex');
+    return true; 
+  });
+};
+
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 
 const ID_PHOTO_SHOOT_STYLE_ID = 'Official ID photo style, front-facing, formal';
@@ -232,16 +241,20 @@ const SubjectPanel = ({ subject, idx, onChange }) => {
   }, [subjectDynamicClothing, clothCategory]);
 
   const hairstyleList = useMemo(() => HAIRSTYLES[subject.gender] || HAIRSTYLES['Unisex'] || [], [subject.gender]);
+  const subjectMakeup = useMemo(() => filterByGender(MAKEUP_STYLES, subject.gender), [subject.gender]);
 
   const handleGenderChange = (e) => {
     const newGender = e.target.value;
     const list = HAIRSTYLES[newGender] || HAIRSTYLES['Unisex'] || [];
     const newHijab = newGender !== 'Wanita' ? false : subject.useHijab;
+    const validMakeup = filterByGender(MAKEUP_STYLES, newGender);
+    
     onChange(idx, {
       gender: newGender,
       useHijab: newHijab,
       hairstyle: list[0] || '',
       clothing: 'Original clothing from reference',
+      makeup: validMakeup[0]?.id || '',
     });
   };
 
@@ -344,9 +357,9 @@ const SubjectPanel = ({ subject, idx, onChange }) => {
           {/* Makeup */}
           <div className="space-y-1">
             <label className="text-xs font-medium text-neutral-400">Makeup & Efek Wajah</label>
-            <select value={subject.makeup} onChange={e => onChange(idx, { makeup: e.target.value })}
+              <select value={subject.makeup} onChange={e => onChange(idx, { makeup: e.target.value })}
               className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
-              {MAKEUP_STYLES.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
+              {subjectMakeup.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
             </select>
           </div>
 
@@ -516,8 +529,12 @@ export default function App() {
     })).filter(group => group.items.length > 0);
   }, [gender, useHijab]);
 
+  const dynamicMakeup = useMemo(() => filterByGender(MAKEUP_STYLES, gender), [gender]);
+
   const dynamicAccessoryGroups = useMemo(() => {
-    const groups = ACCESSORIES_DATABASE.map(g => ({ ...g, items: [...g.items] }));
+    // Filter item berdasarkan gender, lalu filter grup yang kosong
+    const groups = ACCESSORIES_DATABASE.map(g => ({ ...g, items: filterByGender([...g.items], gender) })).filter(g => g.items.length > 0);
+    
     if (gender === 'Wanita') {
       const headwearGroup = groups.find(g => g.group === 'Topi & Kepala');
       const jewelryGroup = groups.find(g => g.group === 'Perhiasan & Tindik');
@@ -531,7 +548,15 @@ export default function App() {
     return groups;
   }, [gender, useHijab]);
 
-  const dynamicPoses = useMemo(() => filterPosesByBg(background, currentBgType, allPoses), [background, currentBgType, allPoses]);
+  const dynamicPoses = useMemo(() => {
+    // Filter berdasarkan background DULU, lalu berdasarkan gender
+    const bgFiltered = filterPosesByBg(background, currentBgType, allPoses);
+    return bgFiltered.map(g => ({
+      ...g,
+      items: filterByGender(g.items, gender)
+    })).filter(g => g.items.length > 0);
+  }, [background, currentBgType, allPoses, gender]);
+
   const dynamicLighting = useMemo(() => filterOptionsByBg(LIGHTING_STYLES, currentBgType), [currentBgType]);
   const dynamicLenses = useMemo(() => filterArrayByBg(CAMERA_LENSES, currentBgType), [currentBgType]);
 
@@ -549,18 +574,36 @@ export default function App() {
   }, [dynamicClothingGroups, clothCategory]);
 
   // ── Handlers ──────────────────────────────────────────────────────────────
-  const handleGenderChange = useCallback((e) => {
+    const handleGenderChange = useCallback((e) => {
     const newGender = e.target.value;
     setGender(newGender);
     const list = HAIRSTYLES[newGender] || HAIRSTYLES['Unisex'];
     setHairstyles([list[0], list[1 % list.length], list[2 % list.length], list[3 % list.length]]);
     let newHijab = useHijab;
     if (newGender !== 'Wanita') { setUseHijab(false); newHijab = false; }
+    
     if (!isClothingValidForGender(clothing, newGender, newHijab)) {
       setClothing('Original clothing from reference');
-      triggerSmartAlert('Gender berubah: Pakaian direset ke Referensi Asli.');
+      triggerSmartAlert('Gender berubah: Pilihan spesifik gender direset.');
     }
-  }, [useHijab, clothing, triggerSmartAlert]);
+
+    // Auto reset Makeup
+    const validMakeup = filterByGender(MAKEUP_STYLES, newGender);
+    setMakeup(validMakeup[0]?.id || '');
+    
+    // Auto reset Aksesoris
+    setAccessories([]);
+    
+    // Auto reset Pose
+    const validPoses = filterPosesByBg(background, currentBgType, allPoses).map(g => ({
+      ...g,
+      items: filterByGender(g.items, newGender)
+    })).filter(g => g.items.length > 0);
+    
+    if (validPoses.length > 0 && validPoses[0].items.length > 0) {
+      setPose(validPoses[0].items[0].id);
+    }
+  }, [useHijab, clothing, triggerSmartAlert, background, currentBgType, allPoses]);
 
   const handleHijabChange = useCallback((e) => {
     const checked = e.target.checked;
@@ -1172,7 +1215,7 @@ ${promptText}
                   <label className="text-xs font-medium text-neutral-400">Gaya Makeup & Efek Wajah</label>
                   <select value={makeup} onChange={e => setMakeup(e.target.value)}
                     className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-pink-500 outline-none text-neutral-100">
-                    {MAKEUP_STYLES.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
+                    {dynamicMakeup.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
                   </select>
                 </div>
               </div>
