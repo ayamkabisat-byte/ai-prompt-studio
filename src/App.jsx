@@ -232,7 +232,6 @@ const SubjectPanel = ({ subject, idx, onChange }) => {
     })).filter(group => group.items.length > 0);
   }, [subject.gender, subject.useHijab]);
 
-  // sync clothCategory when dynamicClothing changes
   useEffect(() => {
     if (subjectDynamicClothing.length > 0) {
       const valid = subjectDynamicClothing.some(g => g.group === clothCategory);
@@ -267,14 +266,15 @@ const SubjectPanel = ({ subject, idx, onChange }) => {
   const accent = personAccents[idx] || personAccents[0];
 
   return (
-    <div className={`rounded-2xl border bg-gradient-to-br ${accent.gradient} overflow-hidden transition-all duration-300`}>
-      {/* Header toggle */}
+    <div className={`rounded-2xl border bg-gradient-to-br ${accent.gradient} overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/5`}>
       <button
         onClick={() => setExpanded(v => !v)}
-        className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors"
+        className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:ring-offset-2 focus:ring-offset-neutral-900"
+        aria-expanded={expanded}
+        aria-label={`Toggle person ${idx + 1} settings`}
       >
         <div className="flex items-center gap-3">
-          <div className={`w-8 h-8 rounded-full bg-neutral-800/80 border-2 ${accent.border} flex items-center justify-center text-sm font-bold ${accent.text}`}>
+          <div className={`w-8 h-8 rounded-full bg-neutral-800/80 border-2 ${accent.border} flex items-center justify-center text-sm font-bold ${accent.text} transition-transform duration-200 group-hover:scale-105`}>
             {idx + 1}
           </div>
           <div className="text-left">
@@ -286,56 +286,54 @@ const SubjectPanel = ({ subject, idx, onChange }) => {
             </div>
           </div>
         </div>
-        {expanded
-          ? <ChevronUp className="w-4 h-4 text-neutral-400" />
-          : <ChevronDown className="w-4 h-4 text-neutral-400" />}
+        <div className="transition-transform duration-200">
+          {expanded
+            ? <ChevronUp className="w-4 h-4 text-neutral-400" />
+            : <ChevronDown className="w-4 h-4 text-neutral-400" />}
+        </div>
       </button>
 
-      {/* Body */}
       {expanded && (
-        <div className="px-4 pb-5 space-y-4 border-t border-white/5 pt-4">
+        <div className="px-4 pb-5 space-y-4 border-t border-white/5 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
 
-          {/* Gender + Expression */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <label className="text-xs font-medium text-neutral-400">Gender</label>
               <select value={subject.gender} onChange={handleGenderChange}
-                className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                 {GENDERS.map(g => <option key={g} value={g}>{g}</option>)}
               </select>
             </div>
             <div className="space-y-1">
               <label className="text-xs font-medium text-neutral-400">Ekspresi</label>
               <select value={subject.expression} onChange={e => onChange(idx, { expression: e.target.value })}
-                className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                 {EXPRESSIONS.map(ex => <option key={ex.id} value={ex.id}>{ex.label}</option>)}
               </select>
             </div>
           </div>
 
-          {/* Hijab toggle */}
           {subject.gender === 'Wanita' && (
-            <label className="flex items-center gap-2 text-sm bg-neutral-900/50 px-3 py-2 rounded-lg border border-neutral-700 cursor-pointer hover:border-indigo-500/50 transition-colors">
+            <label className="flex items-center gap-2 text-sm bg-neutral-900/50 px-3 py-2 rounded-lg border border-neutral-700 cursor-pointer hover:border-indigo-500/50 transition-all duration-200">
               <input type="checkbox" checked={subject.useHijab}
                 onChange={e => onChange(idx, { useHijab: e.target.checked, clothing: 'Original clothing from reference' })}
-                className="rounded text-indigo-500 bg-neutral-800 border-neutral-600" />
+                className="rounded text-indigo-500 bg-neutral-800 border-neutral-600 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-neutral-900" />
               <span className="text-neutral-300 text-sm">Gunakan Hijab</span>
             </label>
           )}
 
-          {/* Hair / Hijab selector */}
           <div className="space-y-1">
             <label className="text-xs font-medium text-neutral-400">
               {subject.useHijab ? 'Gaya Hijab' : 'Gaya Rambut'}
             </label>
             {subject.useHijab ? (
               <select value={subject.hijab} onChange={e => onChange(idx, { hijab: e.target.value })}
-                className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                 {HIJAB_STYLES.map(h => <option key={h.id} value={h.id}>{h.label}</option>)}
               </select>
             ) : (
               <select value={subject.hairstyle} onChange={e => onChange(idx, { hairstyle: e.target.value })}
-                className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                 {hairstyleList.map((h, i) => (
                   <option key={i} value={h}>{h.length > 60 ? h.substring(0, 60) + '…' : h}</option>
                 ))}
@@ -343,41 +341,38 @@ const SubjectPanel = ({ subject, idx, onChange }) => {
             )}
           </div>
 
-          {/* Facial Hair (male only) */}
           {subject.gender !== 'Wanita' && (
             <div className="space-y-1">
               <label className="text-xs font-medium text-neutral-400">Kumis & Janggut</label>
               <select value={subject.facialHair} onChange={e => onChange(idx, { facialHair: e.target.value })}
-                className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                 {FACIAL_HAIR.map(fh => <option key={fh.id} value={fh.id}>{fh.label}</option>)}
               </select>
             </div>
           )}
 
-          {/* Makeup */}
           <div className="space-y-1">
             <label className="text-xs font-medium text-neutral-400">Makeup & Efek Wajah</label>
               <select value={subject.makeup} onChange={e => onChange(idx, { makeup: e.target.value })}
-              className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+              className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
               {subjectMakeup.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
             </select>
           </div>
 
-          {/* Clothing */}
           <div className="space-y-2">
             <label className="text-xs font-medium text-neutral-400">Pakaian</label>
             <div className="flex gap-1.5 flex-wrap">
               {subjectDynamicClothing.map(g => (
                 <button key={g.group} onClick={() => setClothCategory(g.group)}
-                  className={`text-xs px-2.5 py-1 rounded-full border transition-all ${clothCategory === g.group
-                    ? 'bg-indigo-600/80 border-indigo-500 text-white'
-                    : 'bg-neutral-900/50 border-neutral-700 text-neutral-400 hover:border-neutral-500'}`}>
+                  className={`text-xs px-2.5 py-1 rounded-full border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 ${clothCategory === g.group
+                    ? 'bg-indigo-600/80 border-indigo-500 text-white scale-[1.02]'
+                    : 'bg-neutral-900/50 border-neutral-700 text-neutral-400 hover:border-neutral-500 hover:bg-neutral-800/50'}`}>
                   {g.group}
                 </button>
               ))}
             </div>
             <select value={subject.clothing} onChange={e => onChange(idx, { clothing: e.target.value })}
-              className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+              className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
               <option value="Original clothing from reference">Original clothing from reference</option>
               {subjectDynamicClothing
                 .filter(g => g.group === clothCategory)
@@ -390,11 +385,10 @@ const SubjectPanel = ({ subject, idx, onChange }) => {
             </select>
           </div>
 
-          {/* Color Theme */}
           <div className="space-y-1">
             <label className="text-xs font-medium text-neutral-400">Tema Warna Pakaian</label>
             <select value={subject.colorTheme} onChange={e => onChange(idx, { colorTheme: e.target.value })}
-              className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+              className="w-full bg-neutral-900/80 border border-neutral-700 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
               {COLOR_THEMES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
             </select>
           </div>
@@ -409,7 +403,7 @@ const SubjectPanel = ({ subject, idx, onChange }) => {
                 <div key={key} className="flex flex-col items-center gap-1">
                   <input type="color" value={val}
                     onChange={e => onChange(idx, { [key]: e.target.value })}
-                    className="w-10 h-10 rounded-lg cursor-pointer border border-neutral-700 bg-transparent" />
+                    className="w-10 h-10 rounded-lg cursor-pointer border border-neutral-700 bg-transparent hover:scale-105 transition-transform duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                   <span className="text-[9px] text-neutral-500">{val}</span>
                 </div>
               ))}
@@ -488,10 +482,8 @@ export default function App() {
   // ── ID Photo Lock ─────────────────────────────────────────────────────────
   const isIdPhotoMode = useMemo(() => shootStyle === ID_PHOTO_SHOOT_STYLE_ID, [shootStyle]);
 
-  // ID Photo quick background selection
-  const [idPhotoBg, setIdPhotoBg] = useState(ID_PHOTO_BACKGROUNDS[1].id); // default biru
+  const [idPhotoBg, setIdPhotoBg] = useState(ID_PHOTO_BACKGROUNDS[1].id);
 
-  // Merge POSES with couple/group poses
   const allPoses = useMemo(() => [...POSES, ...COUPLE_GROUP_POSES], []);
 
   useEffect(() => {
@@ -501,11 +493,10 @@ export default function App() {
       setCameraLens(ID_PHOTO_LOCKED.cameraLens);
       setLighting(ID_PHOTO_LOCKED.lighting);
       setBackground(idPhotoBg);
-      setBgCategory(BACKGROUNDS[1].group); // Basic & Studio
+      setBgCategory(BACKGROUNDS[1].group);
     }
-  }, [isIdPhotoMode]);
+  }, [isIdPhotoMode, idPhotoBg]);
 
-  // ── Alert ─────────────────────────────────────────────────────────────────
   const triggerSmartAlert = useCallback((msg = 'Logika Cerdas Aktif: Pilihan yang tidak cocok otomatis direset.') => {
     if (alertTimerRef.current) clearTimeout(alertTimerRef.current);
     setSmartAlertMsg(msg);
@@ -513,7 +504,6 @@ export default function App() {
     alertTimerRef.current = setTimeout(() => setShowSmartAlert(false), 3500);
   }, []);
 
-  // ── Derived data ──────────────────────────────────────────────────────────
   const currentBgType = useMemo(() => getBgType(background), [background]);
 
   const dynamicClothingGroups = useMemo(() => {
@@ -532,7 +522,6 @@ export default function App() {
   const dynamicMakeup = useMemo(() => filterByGender(MAKEUP_STYLES, gender), [gender]);
 
   const dynamicAccessoryGroups = useMemo(() => {
-    // Filter item berdasarkan gender, lalu filter grup yang kosong
     const groups = ACCESSORIES_DATABASE.map(g => ({ ...g, items: filterByGender([...g.items], gender) })).filter(g => g.items.length > 0);
     
     if (gender === 'Wanita') {
@@ -549,7 +538,6 @@ export default function App() {
   }, [gender, useHijab]);
 
   const dynamicPoses = useMemo(() => {
-    // Filter berdasarkan background DULU, lalu berdasarkan gender
     const bgFiltered = filterPosesByBg(background, currentBgType, allPoses);
     return bgFiltered.map(g => ({
       ...g,
@@ -573,8 +561,7 @@ export default function App() {
     }
   }, [dynamicClothingGroups, clothCategory]);
 
-  // ── Handlers ──────────────────────────────────────────────────────────────
-    const handleGenderChange = useCallback((e) => {
+  const handleGenderChange = useCallback((e) => {
     const newGender = e.target.value;
     setGender(newGender);
     const list = HAIRSTYLES[newGender] || HAIRSTYLES['Unisex'];
@@ -587,14 +574,11 @@ export default function App() {
       triggerSmartAlert('Gender berubah: Pilihan spesifik gender direset.');
     }
 
-    // Auto reset Makeup
     const validMakeup = filterByGender(MAKEUP_STYLES, newGender);
     setMakeup(validMakeup[0]?.id || '');
     
-    // Auto reset Aksesoris
     setAccessories([]);
     
-    // Auto reset Pose
     const validPoses = filterPosesByBg(background, currentBgType, allPoses).map(g => ({
       ...g,
       items: filterByGender(g.items, newGender)
@@ -647,7 +631,6 @@ export default function App() {
     } catch (err) { console.error('Failed to copy:', err); }
   }, [generatedPrompt, outputFormat]);
 
-  // ── Generate ──────────────────────────────────────────────────────────────
   const handleGenerate = useCallback(() => {
     const effectivePose = isIdPhotoMode ? ID_PHOTO_LOCKED.pose : pose;
     const effectiveComposition = isIdPhotoMode ? ID_PHOTO_LOCKED.composition : composition;
@@ -671,7 +654,6 @@ export default function App() {
 
     let promptText = '';
 
-    // ── ID Photo strict header ────────────────────────────────────────────
     if (isIdPhotoMode) {
       promptText += 'OFFICIAL ID PHOTO / PASSPORT PHOTO GENERATION. ';
       promptText += 'This is a STRICTLY FORMAL government-grade identification photograph. ';
@@ -692,7 +674,6 @@ export default function App() {
       }
     }
 
-    // ── Multi subject block ────────────────────────────────────────────────
     if (isMulti) {
       promptText += `\n[MULTI-SUBJECT SCENE]: This image MUST contain EXACTLY ${subjectCount} people. `;
       promptText += `Do NOT omit any person. Generate all ${subjectCount} as specified. `;
@@ -716,7 +697,6 @@ export default function App() {
 
       promptText += '\n\n[SCENE & ENVIRONMENT]';
     } else {
-      // Single subject
       promptText += "\nSTRICT FACIAL CONSISTENCY MODE: Use the provided **Face Reference Image** to maintain subject identity. ";
       promptText += `\nSubject: Single (${gender === 'Pria' ? 'Male' : gender === 'Wanita' ? 'Female' : 'Androgynous/Unisex'}). `;
       promptText += '\n[ENTITY COUNT]: CRITICAL — EXACTLY ONE person. NO extra characters. NO clones. ';
@@ -748,7 +728,6 @@ export default function App() {
       }
     }
 
-    // Background
     if (background === 'image_ref_bg') {
       promptText += "Background, Lighting & Camera Angle: EXACTLY match the environment, lighting, and perspective from the **Background Reference Image**. ";
       if (!isMulti) promptText += "\n[CRITICAL]: Do NOT copy the face from the Background Reference. Face MUST match **Image 1: Face Reference** only. ";
@@ -756,7 +735,6 @@ export default function App() {
       promptText += `Background Setting: ${finalBackground}. `;
     }
 
-    // Single 1-photo photography settings
     if (!isMulti && viewMode === '1-photo') {
       const styleStr = useHijab
         ? `Wearing ${hijabs[0]}`
@@ -803,14 +781,12 @@ export default function App() {
       }
     }
 
-    // ── Required inputs ───────────────────────────────────────────────────
     const requiredInputs = isMulti
       ? activeSubjects.map((_, i) => `Image ${i + 1}: Face Reference for Person ${i + 1}`)
       : ['Image 1: Face Reference (For Identity)'];
     if (!isMulti && useClothingReference) requiredInputs.push(`Image ${requiredInputs.length + 1}: Style Reference (Clothing/Outfit)`);
     if (background === 'image_ref_bg') requiredInputs.push(`Image ${requiredInputs.length + 1}: Background Reference (Location, Angle & Lighting)`);
 
-    // ── JSON Object ───────────────────────────────────────────────────────
     const jsonObj = {
       app_name: 'AI Professional Studio',
       system_directive: isIdPhotoMode
@@ -872,7 +848,6 @@ export default function App() {
       text_prompt: promptText,
     };
 
-    // ── Structured text output ────────────────────────────────────────────
     const structuredStr = isIdPhotoMode
       ? `[SYSTEM INSTRUCTIONS]
 > ⚠️ ID PHOTO STRICT MODE ACTIVE — All photography settings LOCKED for official ID/Passport compliance.
@@ -975,7 +950,6 @@ ${promptText}
     customBackground, subjectCount, subjects, isIdPhotoMode,
   ]);
 
-  // ── Render helpers ────────────────────────────────────────────────────────
   const selectedBgLabel = useMemo(() => {
     for (const group of BACKGROUNDS) {
       for (const item of group.items) {
@@ -997,28 +971,24 @@ ${promptText}
 
   const isMultiSubject = subjectCount > 1 && viewMode === '1-photo';
 
-  // ── RENDER ────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-neutral-900 text-neutral-100 font-sans p-4 md:p-8">
+    <div className="min-h-screen bg-neutral-900 text-neutral-100 font-sans p-4 md:p-8 antialiased">
 
-      {/* Smart Alert Toast */}
       {showSmartAlert && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-indigo-600/90 backdrop-blur-md border border-indigo-500/60 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-2 text-sm font-medium">
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-indigo-600/90 backdrop-blur-md border border-indigo-500/60 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-2 text-sm font-medium animate-in fade-in slide-in-from-top-4 duration-300">
           <Cpu className="w-4 h-4" /> {smartAlertMsg}
         </div>
       )}
 
-      {/* ID Photo Mode Banner */}
       {isIdPhotoMode && (
-        <div className="fixed top-5 right-5 z-50 bg-amber-900/80 backdrop-blur-md border border-amber-500/60 text-amber-200 px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 text-sm font-semibold">
+        <div className="fixed top-5 right-5 z-50 bg-amber-900/80 backdrop-blur-md border border-amber-500/60 text-amber-200 px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 text-sm font-semibold animate-in fade-in slide-in-from-right-4 duration-300">
           <Shield className="w-4 h-4 text-amber-300" /> Mode Pasfoto Aktif
         </div>
       )}
 
-      {/* App Header */}
       <div className="max-w-[1600px] mx-auto mb-7">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 bg-gradient-to-br from-indigo-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/25">
+          <div className="w-11 h-11 bg-gradient-to-br from-indigo-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/25 transition-transform hover:scale-105 duration-300">
             <Sparkles className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -1030,15 +1000,13 @@ ${promptText}
         </div>
       </div>
 
-      {/* ─── ID Photo Quick Preset Card ─── */}
       <div className="max-w-[1600px] mx-auto mb-4">
         <div className={`rounded-2xl border p-4 transition-all duration-300 ${isIdPhotoMode
           ? 'bg-amber-950/25 border-amber-500/50 shadow-lg shadow-amber-900/20'
-          : 'bg-neutral-800/30 border-neutral-700/40'}`}>
+          : 'bg-neutral-800/30 border-neutral-700/40 hover:border-neutral-600/60'}`}>
           <div className="flex flex-wrap items-center gap-3">
-            {/* Label */}
             <div className="flex items-center gap-2 shrink-0">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isIdPhotoMode ? 'bg-amber-500/20 border border-amber-500/40' : 'bg-neutral-700/60'}`}>
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ${isIdPhotoMode ? 'bg-amber-500/20 border border-amber-500/40' : 'bg-neutral-700/60'}`}>
                 <Shield className={`w-4 h-4 ${isIdPhotoMode ? 'text-amber-300' : 'text-neutral-400'}`} />
               </div>
               <div>
@@ -1049,24 +1017,22 @@ ${promptText}
               </div>
             </div>
 
-            {/* Toggle button */}
             <button
               onClick={() => {
                 if (isIdPhotoMode) {
-                  setShootStyle(SHOOT_STYLES[2].id); // back to default
+                  setShootStyle(SHOOT_STYLES[2].id);
                 } else {
                   setShootStyle(ID_PHOTO_SHOOT_STYLE_ID);
                   setViewMode('1-photo');
                   setSubjectCount(1);
                 }
               }}
-              className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${isIdPhotoMode
-                ? 'bg-amber-500/20 border-amber-500/60 text-amber-300 hover:bg-amber-500/30'
-                : 'bg-neutral-700/50 border-neutral-600 text-neutral-300 hover:border-amber-500/50 hover:text-amber-300'}`}>
+              className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-900 focus:ring-amber-500 ${isIdPhotoMode
+                ? 'bg-amber-500/20 border-amber-500/60 text-amber-300 hover:bg-amber-500/30 hover:scale-[1.02]'
+                : 'bg-neutral-700/50 border-neutral-600 text-neutral-300 hover:border-amber-500/50 hover:text-amber-300 hover:scale-[1.01]'}`}>
               {isIdPhotoMode ? '✓ Aktif — Klik untuk Nonaktifkan' : 'Aktifkan Mode Pasfoto'}
             </button>
 
-            {/* Background quick-select — only when ID photo mode ON */}
             {isIdPhotoMode && (
               <div className="flex items-center gap-2 ml-auto">
                 <span className="text-xs text-amber-400/70 font-medium">Latar:</span>
@@ -1077,9 +1043,9 @@ ${promptText}
                       setIdPhotoBg(bg.id);
                       setBackground(bg.id);
                     }}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${idPhotoBg === bg.id
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-900 focus:ring-amber-500 ${idPhotoBg === bg.id
                       ? 'border-amber-400 bg-amber-500/20 text-amber-200 shadow-md'
-                      : 'border-neutral-600 bg-neutral-800/60 text-neutral-400 hover:border-amber-500/40'}`}>
+                      : 'border-neutral-600 bg-neutral-800/60 text-neutral-400 hover:border-amber-500/40 hover:bg-neutral-700/60'}`}>
                     <span
                       className="w-3 h-3 rounded-full border border-white/20 shrink-0"
                       style={{ backgroundColor: bg.color }}
@@ -1095,33 +1061,27 @@ ${promptText}
 
       <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        {/* ══════════════════════════════
-            LEFT PANEL
-        ══════════════════════════════ */}
         <div className="lg:col-span-6 space-y-4">
 
-          {/* ─── Layout & Subject Count ─── */}
-          <div className="bg-neutral-800/40 rounded-2xl border border-neutral-700/50 p-5 space-y-4">
+          <div className="bg-neutral-800/40 rounded-2xl border border-neutral-700/50 p-5 space-y-4 backdrop-blur-sm">
             <div className="flex items-center gap-2 text-neutral-200 font-semibold text-sm pb-3 border-b border-neutral-700/60">
               <Layers className="w-4 h-4 text-indigo-400" /> Layout & Jumlah Subjek
             </div>
 
-            {/* View Mode Tabs */}
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-neutral-400">Mode Layout</label>
               <div className="grid grid-cols-3 gap-2">
                 {VIEW_MODES.map(vm => (
                   <button key={vm.id} onClick={() => setViewMode(vm.id)}
-                    className={`py-2.5 px-2 rounded-xl text-xs font-medium border transition-all ${viewMode === vm.id
-                      ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20'
-                      : 'bg-neutral-900/60 border-neutral-700 text-neutral-400 hover:border-neutral-500 hover:text-neutral-200'}`}>
+                    className={`py-2.5 px-2 rounded-xl text-xs font-medium border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-900 focus:ring-indigo-500 ${viewMode === vm.id
+                      ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20 scale-[1.02]'
+                      : 'bg-neutral-900/60 border-neutral-700 text-neutral-400 hover:border-neutral-500 hover:text-neutral-200 hover:bg-neutral-800/60'}`}>
                     {vm.label}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Subject Count Selector — only for 1-photo */}
             {viewMode === '1-photo' && (
               <div className="space-y-2">
                 <label className="text-xs font-medium text-neutral-400 flex items-center gap-1.5">
@@ -1130,9 +1090,9 @@ ${promptText}
                 <div className="grid grid-cols-4 gap-2">
                   {[1, 2, 3, 4].map(n => (
                     <button key={n} onClick={() => setSubjectCount(n)}
-                      className={`py-3 rounded-xl text-sm font-bold border transition-all flex flex-col items-center ${subjectCount === n
-                        ? 'bg-gradient-to-b from-indigo-500 to-indigo-700 border-indigo-400 text-white shadow-lg shadow-indigo-500/25'
-                        : 'bg-neutral-900/60 border-neutral-700 text-neutral-400 hover:border-indigo-500/50 hover:text-neutral-200'}`}>
+                      className={`py-3 rounded-xl text-sm font-bold border transition-all duration-200 flex flex-col items-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-900 focus:ring-indigo-500 ${subjectCount === n
+                        ? 'bg-gradient-to-b from-indigo-500 to-indigo-700 border-indigo-400 text-white shadow-lg shadow-indigo-500/25 scale-[1.02]'
+                        : 'bg-neutral-900/60 border-neutral-700 text-neutral-400 hover:border-indigo-500/50 hover:text-neutral-200 hover:bg-neutral-800/60'}`}>
                       <span className="text-lg leading-none">{n}</span>
                       <span className="text-[10px] mt-0.5 opacity-70">Orang</span>
                     </button>
@@ -1148,7 +1108,6 @@ ${promptText}
             )}
           </div>
 
-          {/* ─── Multi-Subject Per-Person Panels ─── */}
           {isMultiSubject && (
             <div className="space-y-3">
               <div className="flex items-center gap-2 px-1">
@@ -1169,11 +1128,9 @@ ${promptText}
             </div>
           )}
 
-          {/* ─── Single Subject Settings ─── */}
           {!isMultiSubject && (
             <>
-              {/* Subject */}
-              <div className="bg-neutral-800/40 rounded-2xl border border-neutral-700/50 p-5 space-y-4">
+              <div className="bg-neutral-800/40 rounded-2xl border border-neutral-700/50 p-5 space-y-4 backdrop-blur-sm">
                 <div className="flex items-center gap-2 text-neutral-200 font-semibold text-sm pb-3 border-b border-neutral-700/60">
                   <User className="w-4 h-4 text-pink-400" /> Subjek
                 </div>
@@ -1182,21 +1139,21 @@ ${promptText}
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-neutral-400">Gender</label>
                     <select value={gender} onChange={handleGenderChange}
-                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-pink-500 outline-none text-neutral-100">
+                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                       {GENDERS.map(g => <option key={g} value={g}>{g}</option>)}
                     </select>
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-neutral-400">Tipe Tubuh</label>
                     <select value={bodyType} onChange={e => setBodyType(e.target.value)}
-                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-pink-500 outline-none text-neutral-100">
+                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                       {BODY_TYPES.map(bt => <option key={bt.id} value={bt.id}>{bt.label}</option>)}
                     </select>
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-neutral-400">Ekspresi</label>
                     <select value={expression} onChange={e => setExpression(e.target.value)}
-                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-pink-500 outline-none text-neutral-100">
+                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                       {EXPRESSIONS.map(ex => <option key={ex.id} value={ex.id}>{ex.label}</option>)}
                     </select>
                   </div>
@@ -1206,7 +1163,7 @@ ${promptText}
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-neutral-400">Kumis & Janggut</label>
                     <select value={facialHair} onChange={e => setFacialHair(e.target.value)}
-                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-pink-500 outline-none text-neutral-100">
+                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                       {FACIAL_HAIR.map(fh => <option key={fh.id} value={fh.id}>{fh.label}</option>)}
                     </select>
                   </div>
@@ -1214,22 +1171,21 @@ ${promptText}
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-neutral-400">Gaya Makeup & Efek Wajah</label>
                   <select value={makeup} onChange={e => setMakeup(e.target.value)}
-                    className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-pink-500 outline-none text-neutral-100">
+                    className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                     {dynamicMakeup.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
                   </select>
                 </div>
               </div>
 
-              {/* Hair / Hijab */}
-              <div className="bg-neutral-800/40 rounded-2xl border border-neutral-700/50 p-5 space-y-4">
+              <div className="bg-neutral-800/40 rounded-2xl border border-neutral-700/50 p-5 space-y-4 backdrop-blur-sm">
                 <div className="flex items-center justify-between pb-3 border-b border-neutral-700/60">
                   <div className="flex items-center gap-2 text-neutral-200 font-semibold text-sm">
                     <Scissors className="w-4 h-4 text-indigo-400" /> Kepala (Rambut / Hijab)
                   </div>
                   {gender === 'Wanita' && (
-                    <label className="flex items-center gap-2 text-xs bg-neutral-900 px-3 py-1.5 rounded-xl border border-neutral-700 cursor-pointer hover:border-indigo-500/50 transition-colors">
+                    <label className="flex items-center gap-2 text-xs bg-neutral-900 px-3 py-1.5 rounded-xl border border-neutral-700 cursor-pointer hover:border-indigo-500/50 transition-all duration-200">
                       <input type="checkbox" checked={useHijab} onChange={handleHijabChange}
-                        className="rounded text-indigo-500 bg-neutral-800 border-neutral-600" />
+                        className="rounded text-indigo-500 bg-neutral-800 border-neutral-600 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-neutral-900" />
                       <span className="text-neutral-300">Gunakan Hijab</span>
                     </label>
                   )}
@@ -1240,7 +1196,7 @@ ${promptText}
                     <label className="text-xs font-medium text-neutral-400">Gaya Hijab</label>
                     {(viewMode === '4-angles' || viewMode === '1-photo') ? (
                       <select value={hijabs[0]} onChange={e => handleHijabStyleChange(0, e.target.value)}
-                        className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                        className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                         {HIJAB_STYLES.map(h => <option key={h.id} value={h.id}>{h.label}</option>)}
                       </select>
                     ) : (
@@ -1249,7 +1205,7 @@ ${promptText}
                           <div key={i} className="flex items-center gap-2">
                             <span className="text-xs text-neutral-500 w-14 shrink-0">Panel {i + 1}</span>
                             <select value={hijabs[i]} onChange={e => handleHijabStyleChange(i, e.target.value)}
-                              className="flex-1 bg-neutral-900 border border-neutral-700 rounded-xl p-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                              className="flex-1 bg-neutral-900 border border-neutral-700 rounded-xl p-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                               {HIJAB_STYLES.map(h => <option key={h.id} value={h.id}>{h.label}</option>)}
                             </select>
                           </div>
@@ -1263,7 +1219,7 @@ ${promptText}
                       <div className="space-y-1.5">
                         <label className="text-xs font-medium text-neutral-400">Gaya Rambut</label>
                         <select value={hairstyles[0]} onChange={e => handleHairstyleChange(0, e.target.value)}
-                          className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                          className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                           {(HAIRSTYLES[gender] || HAIRSTYLES['Unisex']).map((h, i) => (
                             <option key={i} value={h}>{h.length > 58 ? h.substring(0, 58) + '…' : h}</option>
                           ))}
@@ -1275,7 +1231,7 @@ ${promptText}
                           <div key={i} className="flex items-center gap-2">
                             <span className="text-xs text-neutral-500 w-14 shrink-0">Panel {i + 1}</span>
                             <select value={hairstyles[i]} onChange={e => handleHairstyleChange(i, e.target.value)}
-                              className="flex-1 bg-neutral-900 border border-neutral-700 rounded-xl p-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                              className="flex-1 bg-neutral-900 border border-neutral-700 rounded-xl p-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                               {(HAIRSTYLES[gender] || HAIRSTYLES['Unisex']).map((h, j) => (
                                 <option key={j} value={h}>{h.length > 52 ? h.substring(0, 52) + '…' : h}</option>
                               ))}
@@ -1289,14 +1245,14 @@ ${promptText}
                       <div className="space-y-1.5">
                         <label className="text-xs font-medium text-neutral-400">Tipe Warna</label>
                         <select value={colorType} onChange={e => setColorType(e.target.value)}
-                          className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                          className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                           {COLOR_TYPES.map(ct => <option key={ct} value={ct}>{ct}</option>)}
                         </select>
                       </div>
                       <div className="space-y-1.5">
                         <label className="text-xs font-medium text-neutral-400">Warna 1</label>
                         <select value={color1} onChange={e => setColor1(e.target.value)}
-                          className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                          className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                           {BASE_COLORS.map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
                       </div>
@@ -1306,7 +1262,7 @@ ${promptText}
                         <div className="space-y-1.5">
                           <label className="text-xs font-medium text-neutral-400">Warna 2</label>
                           <select value={color2} onChange={e => setColor2(e.target.value)}
-                            className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                            className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                             {BASE_COLORS.map(c => <option key={c} value={c}>{c}</option>)}
                           </select>
                         </div>
@@ -1314,7 +1270,7 @@ ${promptText}
                           <div className="space-y-1.5">
                             <label className="text-xs font-medium text-neutral-400">Warna 3</label>
                             <select value={color3} onChange={e => setColor3(e.target.value)}
-                              className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                              className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                               {BASE_COLORS.map(c => <option key={c} value={c}>{c}</option>)}
                             </select>
                           </div>
@@ -1325,8 +1281,7 @@ ${promptText}
                 )}
               </div>
 
-              {/* Accessories */}
-              <div className="bg-neutral-800/40 rounded-2xl border border-neutral-700/50 p-5 space-y-4">
+              <div className="bg-neutral-800/40 rounded-2xl border border-neutral-700/50 p-5 space-y-4 backdrop-blur-sm">
                 <div className="flex items-center gap-2 text-neutral-200 font-semibold text-sm pb-3 border-b border-neutral-700/60">
                   <Glasses className="w-4 h-4 text-emerald-400" /> Aksesori & Jam Tangan
                 </div>
@@ -1334,9 +1289,9 @@ ${promptText}
                 <div className="flex gap-1.5 flex-wrap">
                   {ACCESSORIES_DATABASE.map(g => (
                     <button key={g.group} onClick={() => setAccCategory(g.group)}
-                      className={`text-xs px-2.5 py-1 rounded-full border transition-all ${accCategory === g.group
-                        ? 'bg-emerald-700/60 border-emerald-500 text-emerald-100'
-                        : 'bg-neutral-900/60 border-neutral-700 text-neutral-400 hover:border-neutral-500'}`}>
+                      className={`text-xs px-2.5 py-1 rounded-full border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-900 focus:ring-emerald-500 ${accCategory === g.group
+                        ? 'bg-emerald-700/60 border-emerald-500 text-emerald-100 scale-[1.02]'
+                        : 'bg-neutral-900/60 border-neutral-700 text-neutral-400 hover:border-neutral-500 hover:bg-neutral-800/60'}`}>
                       {g.group}
                     </button>
                   ))}
@@ -1347,9 +1302,9 @@ ${promptText}
                     const isSelected = accessories.includes(item.id);
                     return (
                       <button key={item.id} onClick={() => handleAccessoryToggle(item.id)}
-                        className={`text-xs px-2.5 py-1.5 rounded-lg border transition-all ${isSelected
+                        className={`text-xs px-2.5 py-1.5 rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-900 focus:ring-emerald-500 ${isSelected
                           ? 'bg-emerald-600/30 border-emerald-500 text-emerald-200'
-                          : 'bg-neutral-900/60 border-neutral-700 text-neutral-400 hover:border-neutral-500'}`}>
+                          : 'bg-neutral-900/60 border-neutral-700 text-neutral-400 hover:border-neutral-500 hover:bg-neutral-800/60'}`}>
                         {isSelected && '✓ '}{item.label}
                       </button>
                     );
@@ -1361,23 +1316,22 @@ ${promptText}
                     <Watch className="w-3.5 h-3.5" /> Jam Tangan
                   </label>
                   <select value={watch} onChange={e => setWatch(e.target.value)}
-                    className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none text-neutral-100">
+                    className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                     {LUXURY_WATCHES.map(w => <option key={w.id} value={w.id}>{w.label}</option>)}
                   </select>
                 </div>
               </div>
 
-              {/* Clothing */}
-              <div className="bg-neutral-800/40 rounded-2xl border border-neutral-700/50 p-5 space-y-4">
+              <div className="bg-neutral-800/40 rounded-2xl border border-neutral-700/50 p-5 space-y-4 backdrop-blur-sm">
                 <div className="flex items-center justify-between pb-3 border-b border-neutral-700/60">
                   <div className="flex items-center gap-2 text-neutral-200 font-semibold text-sm">
                     <ImageIcon className="w-4 h-4 text-purple-400" />
                     Pakaian & Material
                     {currentClothingSceneScore < 2 && <SceneBadge score={currentClothingSceneScore} />}
                   </div>
-                  <label className="flex items-center gap-2 text-xs bg-neutral-900 px-3 py-1.5 rounded-xl border border-neutral-700 cursor-pointer hover:border-purple-500/50 transition-colors">
+                  <label className="flex items-center gap-2 text-xs bg-neutral-900 px-3 py-1.5 rounded-xl border border-neutral-700 cursor-pointer hover:border-purple-500/50 transition-all duration-200">
                     <input type="checkbox" checked={useClothingReference} onChange={e => setUseClothingReference(e.target.checked)}
-                      className="rounded text-purple-500 bg-neutral-800 border-neutral-600" />
+                      className="rounded text-purple-500 bg-neutral-800 border-neutral-600 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-neutral-900" />
                     <span className="text-neutral-300">Gunakan Ref Gambar</span>
                   </label>
                 </div>
@@ -1387,15 +1341,15 @@ ${promptText}
                     <div className="flex gap-1.5 flex-wrap">
                       {dynamicClothingGroups.map(g => (
                         <button key={g.group} onClick={() => setClothCategory(g.group)}
-                          className={`text-xs px-2.5 py-1 rounded-full border transition-all ${clothCategory === g.group
-                            ? 'bg-purple-700/60 border-purple-500 text-purple-100'
-                            : 'bg-neutral-900/60 border-neutral-700 text-neutral-400 hover:border-neutral-500'}`}>
+                          className={`text-xs px-2.5 py-1 rounded-full border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-900 focus:ring-purple-500 ${clothCategory === g.group
+                            ? 'bg-purple-700/60 border-purple-500 text-purple-100 scale-[1.02]'
+                            : 'bg-neutral-900/60 border-neutral-700 text-neutral-400 hover:border-neutral-500 hover:bg-neutral-800/60'}`}>
                           {g.group}
                         </button>
                       ))}
                     </div>
                     <select value={clothing} onChange={e => setClothing(e.target.value)}
-                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-purple-500 outline-none text-neutral-100">
+                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                       <option value="Original clothing from reference">Original clothing from reference</option>
                       {dynamicClothingGroups.filter(g => g.group === clothCategory).flatMap(g =>
                         g.items.map(item => {
@@ -1422,14 +1376,14 @@ ${promptText}
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-neutral-400">Material Kain</label>
                     <select value={clothingMaterial} onChange={e => setClothingMaterial(e.target.value)}
-                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-purple-500 outline-none text-neutral-100">
+                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                       {CLOTHING_MATERIALS.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
                     </select>
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-neutral-400">Tema Warna</label>
                     <select value={colorTheme} onChange={e => setColorTheme(e.target.value)}
-                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-purple-500 outline-none text-neutral-100">
+                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                       {COLOR_THEMES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
                     </select>
                   </div>
@@ -1449,7 +1403,7 @@ ${promptText}
                           setManualColor1(hslToHex(h1, 70, 55));
                           setManualColor2(hslToHex(h2, 70, 55));
                           setManualColor3(hslToHex(h3, 70, 55));
-                        }} className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors">
+                        }} className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-md px-1">
                           <RefreshCcw className="w-3 h-3" /> Acak
                         </button>
                       )}
@@ -1458,7 +1412,7 @@ ${promptText}
                       {[[manualColor1, setManualColor1], [manualColor2, setManualColor2], [manualColor3, setManualColor3]].map(([val, setter], i) => (
                         <div key={i} className="flex flex-col items-center gap-1">
                           <input type="color" value={val} onChange={e => setter(e.target.value)}
-                            className="w-12 h-12 rounded-xl cursor-pointer border border-neutral-700 bg-transparent" />
+                            className="w-12 h-12 rounded-xl cursor-pointer border border-neutral-700 bg-transparent hover:scale-105 transition-transform duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500" />
                           <span className="text-[9px] text-neutral-500">{val}</span>
                         </div>
                       ))}
@@ -1469,8 +1423,7 @@ ${promptText}
             </>
           )}
 
-          {/* ─── Background ─── */}
-          <div className={`rounded-2xl border p-5 space-y-4 ${isIdPhotoMode ? 'bg-amber-950/10 border-amber-700/30' : 'bg-neutral-800/40 border-neutral-700/50'}`}>
+          <div className={`rounded-2xl border p-5 space-y-4 backdrop-blur-sm ${isIdPhotoMode ? 'bg-amber-950/10 border-amber-700/30' : 'bg-neutral-800/40 border-neutral-700/50'}`}>
             <div className="flex items-center gap-2 pb-3 border-b border-neutral-700/60">
               <MapPin className="w-4 h-4 text-sky-400" />
               <span className="text-neutral-200 font-semibold text-sm">Latar Belakang</span>
@@ -1480,16 +1433,15 @@ ${promptText}
               }
             </div>
 
-            {/* In ID Photo mode — show locked bg chips */}
             {isIdPhotoMode ? (
               <div className="space-y-2">
                 <p className="text-xs text-amber-400/70">Pilihan latar dikunci. Ubah lewat Quick Preset Pasfoto di atas.</p>
                 <div className="flex gap-2 flex-wrap">
                   {ID_PHOTO_BACKGROUNDS.map(bg => (
                     <button key={bg.id} onClick={() => { setIdPhotoBg(bg.id); setBackground(bg.id); }}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold border transition-all ${idPhotoBg === bg.id
+                      className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-900 focus:ring-amber-500 ${idPhotoBg === bg.id
                         ? 'border-amber-400 bg-amber-500/20 text-amber-200'
-                        : 'border-neutral-600 bg-neutral-800/60 text-neutral-400 hover:border-amber-500/40'}`}>
+                        : 'border-neutral-600 bg-neutral-800/60 text-neutral-400 hover:border-amber-500/40 hover:bg-neutral-700/60'}`}>
                       <span className="w-3 h-3 rounded-full border border-white/20" style={{ backgroundColor: bg.color }} />
                       {bg.label}
                     </button>
@@ -1501,9 +1453,9 @@ ${promptText}
                 <div className="flex gap-1.5 flex-wrap">
                   {BACKGROUNDS.map(g => (
                     <button key={g.group} onClick={() => setBgCategory(g.group)}
-                      className={`text-xs px-2.5 py-1 rounded-full border transition-all ${bgCategory === g.group
-                        ? 'bg-sky-700/60 border-sky-500 text-sky-100'
-                        : 'bg-neutral-900/60 border-neutral-700 text-neutral-400 hover:border-neutral-500'}`}>
+                      className={`text-xs px-2.5 py-1 rounded-full border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-900 focus:ring-sky-500 ${bgCategory === g.group
+                        ? 'bg-sky-700/60 border-sky-500 text-sky-100 scale-[1.02]'
+                        : 'bg-neutral-900/60 border-neutral-700 text-neutral-400 hover:border-neutral-500 hover:bg-neutral-800/60'}`}>
                       {g.group}
                     </button>
                   ))}
@@ -1516,7 +1468,7 @@ ${promptText}
                   const validPoses = filterPosesByBg(newBg, newBgType, allPoses);
                   const allPoseIds = validPoses.flatMap(g => g.items.map(i => i.id));
                   if (!allPoseIds.includes(pose)) setPose(validPoses[0]?.items[0]?.id || pose);
-                }} className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-sky-500 outline-none text-neutral-100">
+                }} className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                   {BACKGROUNDS.filter(g => g.group === bgCategory).flatMap(g => g.items).map(item => (
                     <option key={item.id} value={item.id}>{item.label}</option>
                   ))}
@@ -1527,15 +1479,14 @@ ${promptText}
                     placeholder="Contoh: A futuristic neon-lit alley in Tokyo at night..."
                     value={customBackground}
                     onChange={e => setCustomBackground(e.target.value)}
-                    className="w-full bg-neutral-900 border border-sky-700/40 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-sky-500 outline-none text-neutral-100 placeholder-neutral-600" />
+                    className="w-full bg-neutral-900 border border-sky-700/40 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200 text-neutral-100 placeholder-neutral-600 hover:border-sky-600/60" />
                 )}
               </>
             )}
           </div>
 
-          {/* ─── Photography ─── */}
           {viewMode === '1-photo' && (
-            <div className={`rounded-2xl border p-5 space-y-4 transition-all duration-300 ${isIdPhotoMode
+            <div className={`rounded-2xl border p-5 space-y-4 backdrop-blur-sm transition-all duration-300 ${isIdPhotoMode
               ? 'bg-amber-950/15 border-amber-600/35'
               : background === 'image_ref_bg'
                 ? 'bg-indigo-950/20 border-indigo-500/25'
@@ -1553,11 +1504,10 @@ ${promptText}
                 )}
               </div>
 
-              {/* Shoot Style */}
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-neutral-400">Tema Shoot</label>
                 <select value={shootStyle} onChange={e => setShootStyle(e.target.value)}
-                  className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-neutral-100">
+                  className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-neutral-100 hover:border-neutral-600">
                   {SHOOT_STYLES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
                 </select>
                 {isIdPhotoMode && (
@@ -1568,7 +1518,6 @@ ${promptText}
                 )}
               </div>
 
-              {/* Composition */}
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-neutral-400 flex items-center gap-2">
                   Komposisi Bingkai {isIdPhotoMode && <LockBadge />}
@@ -1577,9 +1526,9 @@ ${promptText}
                   disabled={isIdPhotoMode}
                   value={isIdPhotoMode ? ID_PHOTO_LOCKED.composition : composition}
                   onChange={e => setComposition(e.target.value)}
-                  className={`w-full border rounded-xl p-2.5 text-sm outline-none text-neutral-100 ${isIdPhotoMode
+                  className={`w-full border rounded-xl p-2.5 text-sm outline-none transition-all duration-200 text-neutral-100 ${isIdPhotoMode
                     ? 'bg-amber-950/20 border-amber-700/40 opacity-60 cursor-not-allowed'
-                    : 'bg-neutral-900 border-neutral-700 focus:ring-2 focus:ring-indigo-500'}`}>
+                    : 'bg-neutral-900 border-neutral-700 focus:ring-2 focus:ring-indigo-500 hover:border-neutral-600'}`}>
                   {isIdPhotoMode
                     ? <option>{ID_PHOTO_LOCKED.composition}</option>
                     : COMPOSITIONS.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
@@ -1587,7 +1536,6 @@ ${promptText}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {/* Lens */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-indigo-300 flex items-center gap-1.5">
                     Lensa Kamera {isIdPhotoMode && <LockBadge />}
@@ -1596,16 +1544,15 @@ ${promptText}
                     disabled={background === 'image_ref_bg' || isIdPhotoMode}
                     value={isIdPhotoMode ? ID_PHOTO_LOCKED.cameraLens : (background === 'image_ref_bg' ? '' : cameraLens)}
                     onChange={e => setCameraLens(e.target.value)}
-                    className={`w-full border rounded-xl p-2.5 text-sm outline-none text-indigo-100 ${(background === 'image_ref_bg' || isIdPhotoMode)
+                    className={`w-full border rounded-xl p-2.5 text-sm outline-none transition-all duration-200 text-indigo-100 ${(background === 'image_ref_bg' || isIdPhotoMode)
                       ? 'bg-indigo-950/20 border-amber-700/40 opacity-60 cursor-not-allowed'
-                      : 'bg-neutral-900 border-neutral-700 focus:ring-2 focus:ring-indigo-500'}`}>
+                      : 'bg-neutral-900 border-neutral-700 focus:ring-2 focus:ring-indigo-500 hover:border-neutral-600'}`}>
                     {background === 'image_ref_bg' ? <option>🔒 Mengikuti Latar</option>
                       : isIdPhotoMode ? <option>{ID_PHOTO_LOCKED.cameraLens}</option>
                         : dynamicLenses.map(item => <option key={item.id} value={item.id}>{item.label}</option>)}
                   </select>
                 </div>
 
-                {/* Pose */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-indigo-300 flex items-center gap-1.5">
                     Pose / Camera Angle {isIdPhotoMode && <LockBadge />}
@@ -1614,9 +1561,9 @@ ${promptText}
                     disabled={isIdPhotoMode}
                     value={isIdPhotoMode ? ID_PHOTO_LOCKED.pose : pose}
                     onChange={e => setPose(e.target.value)}
-                    className={`w-full border rounded-xl p-2.5 text-sm outline-none text-indigo-100 ${isIdPhotoMode
+                    className={`w-full border rounded-xl p-2.5 text-sm outline-none transition-all duration-200 text-indigo-100 ${isIdPhotoMode
                       ? 'bg-amber-950/20 border-amber-700/40 opacity-60 cursor-not-allowed'
-                      : 'bg-neutral-900 border-neutral-700 focus:ring-2 focus:ring-indigo-500'}`}>
+                      : 'bg-neutral-900 border-neutral-700 focus:ring-2 focus:ring-indigo-500 hover:border-neutral-600'}`}>
                     {isIdPhotoMode
                       ? <option>{ID_PHOTO_LOCKED.pose}</option>
                       : dynamicPoses.map(group => (
@@ -1628,7 +1575,6 @@ ${promptText}
                 </div>
               </div>
 
-              {/* Lighting */}
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-indigo-300 flex items-center gap-1.5">
                   Pencahayaan {isIdPhotoMode && <LockBadge />}
@@ -1637,9 +1583,9 @@ ${promptText}
                   disabled={background === 'image_ref_bg' || isIdPhotoMode}
                   value={isIdPhotoMode ? ID_PHOTO_LOCKED.lighting : (background === 'image_ref_bg' ? '' : lighting)}
                   onChange={e => setLighting(e.target.value)}
-                  className={`w-full border rounded-xl p-2.5 text-sm outline-none text-indigo-100 ${(background === 'image_ref_bg' || isIdPhotoMode)
+                  className={`w-full border rounded-xl p-2.5 text-sm outline-none transition-all duration-200 text-indigo-100 ${(background === 'image_ref_bg' || isIdPhotoMode)
                     ? 'bg-indigo-950/20 border-amber-700/40 opacity-60 cursor-not-allowed'
-                    : 'bg-neutral-900 border-neutral-700 focus:ring-2 focus:ring-indigo-500'}`}>
+                    : 'bg-neutral-900 border-neutral-700 focus:ring-2 focus:ring-indigo-500 hover:border-neutral-600'}`}>
                   {background === 'image_ref_bg' ? <option>🔒 Mengikuti Latar</option>
                     : isIdPhotoMode ? <option>{ID_PHOTO_LOCKED.lighting}</option>
                       : dynamicLighting.map(group => (
@@ -1652,15 +1598,14 @@ ${promptText}
             </div>
           )}
 
-          {/* Generate Button */}
           <button
             onClick={handleGenerate}
-            className={`w-full p-4 rounded-2xl font-bold transition-all shadow-lg flex items-center justify-center gap-2.5 text-base text-white ${isIdPhotoMode
+            className={`w-full p-4 rounded-2xl font-bold transition-all shadow-lg flex items-center justify-center gap-2.5 text-base text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-900 focus:ring-indigo-500 ${isIdPhotoMode
               ? 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 shadow-amber-500/25'
               : isMultiSubject
                 ? 'bg-gradient-to-r from-purple-600 via-indigo-600 to-pink-600 hover:from-purple-500 hover:via-indigo-500 hover:to-pink-500 shadow-purple-500/25'
                 : 'bg-gradient-to-r from-indigo-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 shadow-indigo-500/25'
-            } hover:scale-[1.01] active:scale-[0.99]`}>
+            } hover:scale-[1.01] active:scale-[0.99] duration-200`}>
             {isIdPhotoMode
               ? <><Shield className="w-5 h-5" /> Generate Prompt Pasfoto Resmi</>
               : isMultiSubject
@@ -1670,12 +1615,8 @@ ${promptText}
           </button>
         </div>
 
-        {/* ══════════════════════════════
-            RIGHT PANEL — Output
-        ══════════════════════════════ */}
-        <div className="lg:col-span-6 flex flex-col h-[calc(100vh-140px)] bg-neutral-950 rounded-2xl border border-neutral-800 relative overflow-hidden">
+        <div className="lg:col-span-6 flex flex-col h-[calc(100vh-140px)] bg-neutral-950 rounded-2xl border border-neutral-800 relative overflow-hidden shadow-2xl">
 
-          {/* Empty state */}
           {!generatedPrompt && (
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center space-y-4 max-w-sm mx-auto p-6">
               <div className="w-20 h-20 bg-neutral-900 rounded-full flex items-center justify-center mx-auto border border-neutral-800 shadow-xl">
@@ -1696,32 +1637,29 @@ ${promptText}
             </div>
           )}
 
-          {/* Output */}
           {generatedPrompt && (
-            <div className="w-full h-full flex flex-col">
-              {/* Tab bar */}
+            <div className="w-full h-full flex flex-col animate-in fade-in duration-300">
               <div className="flex items-center bg-neutral-900 border-b border-neutral-800 p-2 gap-2">
                 <button onClick={() => setOutputFormat('json')}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-colors ${outputFormat === 'json'
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-900 focus:ring-indigo-500 ${outputFormat === 'json'
                     ? 'bg-neutral-800 text-indigo-400 shadow-sm'
                     : 'text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800/50'}`}>
                   <FileJson className="w-4 h-4" /> JSON Format
                 </button>
                 <button onClick={() => setOutputFormat('structured')}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-colors ${outputFormat === 'structured'
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-900 focus:ring-indigo-500 ${outputFormat === 'structured'
                     ? 'bg-neutral-800 text-indigo-400 shadow-sm'
                     : 'text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800/50'}`}>
                   <FileText className="w-4 h-4" /> Structured Text
                 </button>
                 <button onClick={handleCopy}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${isCopied
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-900 focus:ring-indigo-500 ${isCopied
                     ? 'bg-emerald-600/30 text-emerald-400 border border-emerald-600/40'
                     : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'}`}>
                   {isCopied ? <><Check className="w-4 h-4" /> Tersalin!</> : <><Copy className="w-4 h-4" /> Salin</>}
                 </button>
               </div>
 
-              {/* Mode badges */}
               <div className="flex gap-2 px-4 pt-3 pb-1 flex-wrap">
                 {isIdPhotoMode && (
                   <span className="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-amber-900/30 border border-amber-600/40 text-amber-300 font-semibold">
@@ -1738,8 +1676,7 @@ ${promptText}
                 </span>
               </div>
 
-              {/* Prompt content */}
-              <div className="flex-1 overflow-y-auto p-4">
+              <div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-neutral-900">
                 <pre className="text-xs text-neutral-300 whitespace-pre-wrap font-mono leading-relaxed">
                   {outputFormat === 'json' ? generatedPrompt.json : generatedPrompt.structured}
                 </pre>
